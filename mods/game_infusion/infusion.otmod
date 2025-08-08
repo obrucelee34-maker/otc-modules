@@ -1,0 +1,7 @@
+Module
+  name: game_infusion
+  description: Infusion management interface for the game
+  sandboxed: true
+  scripts: [ infusion ]
+  @onLoad: GameInfusion:init()
+  @onUnload: GameInfusion:terminate()
