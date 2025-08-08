@@ -1,0 +1,178 @@
+ArchetypeSpell < UIWidget
+  size: 50 50
+  image-color: #555555
+  opacity: 0.9
+
+  $hover !on:
+    opacity: 1.0
+    image-color: #ffffff
+  $pressed !on:
+    opacity: 0.9
+    image-color: #ffffff
+
+  $on:
+    image-color: #ffffff
+
+  @onMousePress: |
+    function(widget, mousePos, mouseButton)
+      modules.game_spelltree.spellClicked(widget, mousePos, mouseButton)
+    end
+  @onDoubleClick: modules.game_spelltree.spellDoubleClicked(self)
+  @onEnableChange: self.spell_overlay:setVisible(self:isEnabled())
+
+ArchetypeSpellOverlay < UIWidget
+  id: spell_overlay
+  size: 51 51
+  anchors.centerIn: parent
+  visible: false
+  phantom: true
+
+  UIWidget
+    id: bottom_points
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: -2
+    image-source: /images/ui/windows/spelltree/spell_bottom_points_0
+    phantom: true
+
+ArchetypeLegacySpell < UIWidget
+  size: 61 61
+  image-color: #555555
+  opacity: 0.9
+
+  $hover !on:
+    opacity: 1.0
+    image-color: #ffffff
+  $pressed !on:
+    opacity: 0.9
+    image-color: #ffffff
+
+  $on:
+    image-color: #ffffff
+
+  @onMousePress: |
+    function(widget, mousePos, mouseButton)
+      modules.game_spelltree.legacySpellClicked(widget, mousePos, mouseButton)
+    end
+  @onDoubleClick: modules.game_spelltree.legacySpellDoubleClicked(self)
+
+ArchetypeLegacySpellOverlay < UIWidget
+  size: 70 70
+  phantom: true
+
+  UIWidget
+    id: border
+    anchors.fill: parent
+    image-source: /images/ui/windows/spelltree/legacy_spell_border
+    phantom: true
+  
+  UIWidget
+    id: bottom_points
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: -2
+    image-source: /images/ui/windows/spelltree/legacy_spell_bottom_points_0
+    phantom: true
+
+ArchetypeLegacySpellLock < UIWidget
+  size: 22 27
+  phantom: true
+  image-source: /images/ui/windows/spelltree/lock
+
+ArchetypePassive < ArchetypeSpell
+  @onMousePress: |
+    function(widget, mousePos, mouseButton)
+      modules.game_spelltree.passiveClicked(widget)
+    end
+  UIWidget
+    id: highlight
+    visible: false
+    anchors.fill: parent
+    image-source: /images/ui/windows/spelltree/highlight_spell
+    phantom: true
+
+
+SpellTree < Panel
+  anchors.fill: parent
+
+  Panel
+    id: content
+    anchors.fill: parent
+    margin: 10
+
+SpellTreeMenuButton < UIButton
+  size: 55 65
+  image-color: gray
+  @onSetup: |
+    if self.tooltip then
+      self.background.archetypeImage:setTooltip(self.tooltip)
+    end
+
+  UIWidget
+    id: background
+    phantom: true
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/spelltree/archetype_button
+
+    $on:
+      image-source: /images/ui/windows/spelltree/archetype_button_active
+    $checked !on:
+      image-source: /images/ui/windows/spelltree/archetype_button_checked
+
+    UIWidget
+      id: archetypeImage
+      size: 45 45
+      image-color: #ffffff
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 4
+      $hover:
+        image-color: #cccccc
+      $pressed:
+        image-color: #aaaaaa
+      @onSetup: |
+        self:setImageSource(string.format("/images/ui/icons/archetypes/45x45/%s", self:getParent():getParent():getId()))
+      @onClick: modules.game_spelltree.archetypeButtonClicked(self:getParent():getParent())
+
+  UIWidget
+    id: archetypeLevel
+    padding: 2 2 2 2
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 2
+    text-auto-resize: true
+    font: poppins-semibold-12
+    text-align: center
+    text-offset: 0 2
+    text: NoN
+    image-source: /images/ui/windows/spelltree/archetype_level_off
+    $on:
+      image-source: /images/ui/windows/spelltree/archetype_level_on
+
+    @onGeometryChange: function(self) self:setWidth(math.max(self:getWidth(), 20)) end
+
+SpellLinkVertical < UIWidget
+  margin-top: 1
+  margin-bottom: 1
+  width: 2
+  phantom: true
+  background-color: #55401a
+  $on:
+    background-color: #e7b131
+
+SpellLinkHorizontal < UIWidget
+  margin-top: 1
+  margin-bottom: 1
+  height: 2
+  phantom: true
+  background-color: #55401a
+  $on:
+    background-color: #e7b131
+
+SpellLinkDiagonal < UIWidget
+  image-source: /images/ui/windows/spelltree/diagonal_link
+  image-color: #55401a
+  phantom: true
+  $on:
+    image-color: #e7b131

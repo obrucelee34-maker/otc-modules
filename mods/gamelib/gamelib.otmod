@@ -1,0 +1,31 @@
+Module
+  name: gamelib
+  description: Contains game related classes
+  author: OTClient team
+  website: www.otclient.info
+
+  @onLoad: |
+    dofile 'items'
+    dofile 'shops'
+    dofile 'const'
+    dofile 'util'
+    dofile 'protocol'
+    dofile 'protocollogin'
+    dofile 'protocolgame'
+    dofile 'position'
+    dofile 'game'
+    dofile 'animator'
+
+    dofile 'creature'
+    dofile 'player'
+    dofile 'thing'
+    dofile 'spells'
+    dofile 'houses'
+    dofile 'math2d'
+    dofile 'farms'
+    dofile 'rooms'
+    dofile 'decors'
+    dofile 'communitylands'
+    dofile 'ravencards'
+
+    dofiles 'ui'

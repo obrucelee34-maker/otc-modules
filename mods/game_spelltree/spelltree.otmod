@@ -1,0 +1,11 @@
+Module
+  name: game_spelltree
+  description: View spelltree
+  sandboxed: true
+  scripts: [ spelltree, button_handlers, archetype_info ]
+  @onLoad: |
+    GameSpellTree:init()
+    GameArchetypeInfo:init()
+  @onUnload: |
+    GameSpellTree:terminate()
+    GameArchetypeInfo:terminate()

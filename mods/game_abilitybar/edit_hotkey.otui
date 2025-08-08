@@ -1,0 +1,81 @@
+PopupWindow
+  padding-right: 20
+  padding-left: 20
+  padding-bottom: 20
+  !text: tr('Edit Hotkey')
+  size: 400 215
+  @onEscape: self:destroy()
+
+  Panel
+    background-color: #181A1D
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: -7
+    margin-right: -7
+    height: 25
+    Label
+      id: comboPreview
+      !text: tr('Current hotkey to change: %s', 'none')
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      text-auto-resize: true
+      text-align: left
+      font: myriad-pro-14
+      text-offset: 0 2
+
+  Label
+    !text: tr('Click "Apply" to assign the hotkey.\nClick "Clear" to remove the hotkey.')
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 10
+    text-auto-resize: true
+    font: myriad-pro-14
+
+  Label
+    id: errorLabel
+    text: "This hotkey is already in use and will be overwritten."
+    color: red
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    margin-top: 10
+    visible: false
+    font: myriad-pro-14
+
+  HorizontalSeparator
+    id: separator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin-bottom: 20
+
+  ModalButton
+    id: applyButton
+    !text: tr('Apply')
+    anchors.left: parent.left
+    size: 90 40
+    text-auto-resize: false
+    anchors.bottom: parent.bottom
+    margin-left: 0
+    @onClick: AbilityBar.hotkeyCaptureOk(self:getParent(), self:getParent():recursiveGetChildById('comboPreview').keyCombo, self:getParent().category)
+
+  ModalButton
+    id: clearButton
+    !text: tr('Clear')
+    size: 90 40
+    text-auto-resize: false
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-left: 0
+    @onClick: self:getParent():recursiveGetChildById('comboPreview').keyCombo = '' AbilityBar.hotkeyCaptureOk(self:getParent(), self:getParent():recursiveGetChildById('comboPreview').keyCombo, self:getParent().category)
+
+  ModalButton
+    id: cancelButton
+    !text: tr('Cancel')
+    size: 90 40
+    text-auto-resize: false
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-left: 0
+    @onClick: self:getParent():destroy()

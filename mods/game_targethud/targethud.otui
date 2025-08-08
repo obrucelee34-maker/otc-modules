@@ -1,0 +1,271 @@
+TargetHudStatusIcon < UIWidget
+  size: 19 19
+  image-size: 19 19
+  image-source: /images/ui/windows/targethud/icon_bg
+  phantom: true
+
+  UIWidget
+    anchors.centerIn: parent
+    size: 18 17
+    image-source: /images/ui/windows/targethud/icon_frame
+
+  UIWidget
+    id: icon
+    anchors.centerIn: parent
+    size: 15 15
+
+  UIWidget
+    id: text
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-bottom: -3
+    text-auto-resize: true
+
+AggroHolderHudBar < UIHealthBar
+  size: 87 23
+  phantom: true
+  visible: false
+  margin-top: 1
+
+  Panel
+    id: background
+    anchors.fill: parent
+    image-source: /images/ui/windows/targethud/aggro_holder_background
+    image-border: 5
+
+  Panel
+    id: separators
+    anchors.fill: parent
+    margin-bottom: 2
+    margin-left: 9
+    margin-right: 9
+    image-source: /images/ui/windows/health_bars/party/border_overlay
+    image-border: 5
+
+  UIHealthBar
+    id: health
+    anchors.fill: separators
+    margin-right: 15
+
+    Panel
+      id: bar
+      anchors.fill: parent
+      margin-top: 3
+      margin-bottom: 2
+      image-source: /images/ui/windows/health_bars/party/health_fill
+
+    Panel
+      id: border
+      anchors.left: prev.left
+      anchors.top: prev.top
+      anchors.bottom: prev.bottom
+      image-source: /images/ui/windows/health_bars/party/health_border
+
+  Panel
+    id: name
+    font: poppins-semibold-bordered-12
+    height: 15
+    anchors.verticalCenter: health.verticalCenter
+    anchors.left: parent.left
+    anchors.right: pareint.right
+    margin-top: 1
+    margin-left: 15
+    text-color: #FFFFFF
+    text-auto-resize: true
+    
+  Panel
+    id: border_left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-top: -1
+    image-source: /images/ui/windows/targethud/aggro_holder_border_left
+
+TargetHudAggroTop < UIWidget
+  size: 63 21
+
+  UIWidget
+    id: glow
+    image-source: /images/ui/windows/targethud/aggro_top_glow
+    anchors.fill: parent
+    image-border: 5
+    image-offset: -1 0
+    margin: -5
+
+  UIWidget
+    id: frame
+    image-source: /images/ui/windows/targethud/aggro_top_frame
+    anchors.fill: parent
+    image-border: 4
+  
+  UIWidget
+    id: value
+    anchors.centerIn: parent
+    font: poppins-semibold-bordered-12
+    text-auto-resize: true
+    text-offset: 0 2
+    text: +999%
+
+TargetHudAggroRight < UIWidget
+  size: 63 21
+
+  UIWidget
+    id: glow
+    image-source: /images/ui/windows/targethud/aggro_right_glow
+    anchors.fill: parent
+    image-border: 4
+    margin: -5
+
+  UIWidget
+    id: frame
+    image-source: /images/ui/windows/targethud/aggro_right_frame
+    image-border: 4
+    anchors.fill: parent
+  
+  UIWidget
+    id: value
+    anchors.centerIn: parent
+    font: poppins-semibold-bordered-12
+    text-auto-resize: true
+    text-offset: 0 2
+    text: +999%
+
+TargetHudBar < UITargetBar
+  size: 306 26
+  phantom: true
+
+  Panel
+    id: background
+    anchors.centerIn: parent
+    anchors.left: parent.left
+    $on:
+      image-source: /images/ui/windows/targethud/background
+    $!on:
+      image-source: /images/ui/windows/targethud/circle_background
+
+  Panel
+    id: fill
+    image-source: /images/ui/windows/targethud/bar_fill
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 12
+
+  Panel
+    id: glow
+    image-source: /images/ui/windows/targethud/bar_border
+    anchors.right: fill.right
+    anchors.verticalCenter: fill.verticalCenter
+
+  Panel
+    id: frame
+    height: 23
+    image-source: /images/ui/windows/targethud/bar_overlay
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-right: 13
+    margin-top: 1
+
+  Panel
+    id: frame_left
+    image-source: /images/ui/windows/targethud/circle_border_left
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: -6
+    size: 37 37
+    image-source: /images/ui/windows/targethud/circle_border_left
+
+  UICreature
+    id: portrait
+    size: 24 24
+    clipping: true
+    anchors.centerIn: prev
+    outfit-direction: 2
+    phantom: true
+    circle: true
+  
+  Panel
+    id: frame_glow_overlay
+    size: 40 40
+    image-source: /images/ui/windows/targethud/circle_glow
+    anchors.centerIn: prev
+
+  Panel
+    id: frame_overlay
+    size: 36 36
+    image-source: /images/ui/windows/targethud/circle_overlay
+    anchors.centerIn: prev
+
+  Panel
+    id: frame_right
+    size: 19 31
+    image-source: /images/ui/windows/targethud/border_right
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: frame.right
+    margin-top: 1
+    margin-left: -7
+
+  Panel
+    id: name
+    anchors.centerIn: parent
+    text-vertical-auto-resize: true
+    width: 150
+    font: poppins-semibold-bordered-12
+    text-offset: 0 1
+    margin-top: 1
+    text: Name
+
+  UIWidget
+    id: icon
+    size: 24 24
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 6
+
+TargetHudBarPanel < Panel
+  size: 536 86
+  draggable: true
+  phantom: false
+
+  EditModePanel
+    &title: 'Target UI'
+
+  Panel
+    id: content
+    anchors.fill: parent
+    phantom: true
+
+    AggroHolderHudBar
+      id: aggroHolderHudBar
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+
+    TargetHudAggroTop
+      id: main_aggro
+      anchors.horizontalCenter: targetHudBar.horizontalCenter
+      anchors.bottom: targetHudBar.top
+      margin-bottom: -3
+
+    TargetHudAggroRight
+      id: highest_aggro
+      anchors.left: targetHudBar.right
+      anchors.verticalCenter: targetHudBar.verticalCenter
+      margin-left: -10
+
+    TargetHudBar
+      id: targetHudBar
+      anchors.left: aggroHolderHudBar.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: -8
+
+    Panel
+      id: statusIcons
+      anchors.left: targetHudBar.left
+      anchors.top: targetHudBar.bottom
+      height: 19
+      margin-top: 6
+      margin-left: 10
+      layout:
+        type: horizontalBox
+        spacing: 3
+        fit-children: true

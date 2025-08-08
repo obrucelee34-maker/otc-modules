@@ -1,0 +1,615 @@
+TopPanel < Panel
+  image-source: /images/ui/windows/spelltree/top_panel
+  padding: 1 1 1 1
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+
+  Panel
+    id: classNamePanel
+    padding: 5 22 5 22
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: /images/ui/windows/spelltree/class_name_panel
+
+    UIWidget
+      id: effectiveLevel
+      padding: 3 3 3 3
+      image-border: 5
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      text-align: center
+      text-offset: 0 4
+      text-auto-resize: true
+      font: poppins-semibold-15
+      image-source: /images/ui/windows/spelltree/effective_level_panel
+      text: NaN
+      @onGeometryChange: function(self) self:setWidth(math.max(43, self:getWidth())) self:setHeight(math.max(42, self:getHeight())) end
+
+    Label
+      id: className
+      anchors.fill: parent
+      anchors.right: prev.left
+      text-align: left
+      text-offset: 0 4
+      font: poppins-semibold-27
+      text: Unknown
+
+  UIWidget
+    id: infoIcon
+    anchors.verticalCenter: classNamePanel.verticalCenter
+    anchors.horizontalCenter: classNamePanel.right
+    image-source: /images/ui/windows/spelltree/info_icon
+
+  Panel
+    id: archetypesPanel
+    anchors.left: infoIcon.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-left: 41
+    margin-right: 25
+    margin-top: 10
+    layout:
+      type: horizontalBox
+      spacing: 37
+
+    SpellTreeMenuButton
+      id: archery
+      &tooltip: tr("Archery")
+
+    SpellTreeMenuButton
+      id: holy
+      &tooltip: tr("Holy")
+
+    SpellTreeMenuButton
+      id: protection
+      &tooltip: tr("Protection")
+
+    SpellTreeMenuButton
+      id: shadow
+      &tooltip: tr("Shadow")
+
+    SpellTreeMenuButton
+      id: spiritual
+      &tooltip: tr("Spiritual")
+
+    SpellTreeMenuButton
+      id: warfare
+      &tooltip: tr("Warfare")
+
+    SpellTreeMenuButton
+      id: witchcraft
+      &tooltip: tr("Witchcraft")
+
+    SpellTreeMenuButton
+      id: wizardry
+      &tooltip: tr("Wizardry")
+
+
+PointsPanel < Panel
+  id: pointsPanel
+  size: 291 40
+  padding: 5
+  padding-left: 12
+  padding-right: 12
+  image-source: /images/ui/windows/spelltree/skill_points_bg
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  layout:
+    type: horizontalBox
+    fit-children: true
+    spacing: 2
+
+  UIWidget
+    size: 24 24
+    text-auto-resize: true
+    text-offset: 0 3
+    font: poppins-semibold-14
+    !text: tr('Points Available')
+
+  UIWidget
+    id: pointsSeparator
+    image-source: /images/ui/windows/spelltree/points_separator
+    margin-left: 8
+    margin-right: 8
+
+  UIWidget
+    size: 24 24
+    margin-bottom: 3
+    margin-top: 3
+    id: skillPointsIcon
+    image-source: /images/ui/windows/spelltree/skill_points_icon
+    @onHoverChange: |
+      GameSpellTree:displaySkillPointsTooltip(self, self:isHovered())
+
+  Label
+    id: skillPointsLabel
+    size: 30 24
+    font: poppins-semibold-16
+    text-align: center
+    text-offset: 0 3
+    text: 0
+
+  UIWidget
+    id: pointsSeparator
+    image-source: /images/ui/windows/spelltree/points_separator
+    margin-left: 8
+    margin-right: 8
+
+  UIWidget
+    size: 24 24
+    margin-bottom: 3
+    margin-top: 3
+    id: legacySkillPointsIcon
+    image-source: /images/ui/windows/spelltree/legacy_points_icon
+    image-auto-resize: false
+    @onHoverChange: |
+      GameSpellTree:displayLegacySkillPointsTooltip(self, self:isHovered())
+
+  Label
+    id: legacySkillPointsLabel
+    size: 30 24
+    phantom: true
+    font: poppins-semibold-16
+    text-align: center
+    text-offset: 0 3
+    text: 0
+
+GameSpellTreeSkillPointsTooltip < UIWidget
+  size: 300 200
+  image-source: /images/ui/windows/tooltip/dark_background
+  image-border: 10
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  UIWidget
+    id: header
+    size: 300 50
+    image-border: 20
+    text: Points Distribution
+    font: poppins-16
+    text-offset: 0 5
+
+  UIWidget
+    id: skill_points
+    size: 300 300
+    background-color: #181A1D
+    padding: 20
+    margin-bottom: 0
+    layout:
+      type: verticalBox
+      fit-children: true
+
+    GameSpellTreeSkillPointsTooltipContentCategorySkillPoints
+    GameSpellTreeSkillPointsTooltipContentTitle
+      text: Active Archetypes
+      margin-bottom: 15
+    GameSpellTreeSkillPointsTooltipContentArchetypes
+      id: active_archetypes
+    GameSpellTreeSkillPointsTooltipContentTitle
+      margin-top: 15
+      id: active_points
+
+    GameSpellTreeSkillPointsTooltipContentSeparator
+
+    GameSpellTreeSkillPointsTooltipContentTitle
+      text: Inactive Archetypes
+      margin-bottom: 15
+    GameSpellTreeSkillPointsTooltipContentArchetypes
+      id: inactive_archetypes
+    GameSpellTreeSkillPointsTooltipContentTitle
+      margin-top: 15
+      id: inactive_points
+
+    GameSpellTreeSkillPointsTooltipContentSeparator
+    GameSpellTreeSkillPointsTooltipContentTitle
+      text: Using Skill Points
+      margin-bottom: 15
+    GameSpellTreeSkillPointsTooltipContentText
+      text: Allocate up to 50 Skill Points to unlock Skills and Passives.
+      margin-bottom: 15
+    GameSpellTreeSkillPointsTooltipContentTitle
+      id: points_spent
+      text: Points Spent: 0/50
+    GameSpellTreeSkillPointsTooltipContentSeparator
+    GameSpellTreeSkillPointsTooltipContentTitle
+      id: points_available
+      text: Available Skill Points: 0
+    GameSpellTreeSkillPointsTooltipContentSeparator
+
+    GameSpellTreeSkillPointsTooltipContentBottom
+
+GameSpellTreeLegacySkillPointsTooltip < UIWidget
+  size: 300 200
+  image-source: /images/ui/windows/tooltip/dark_background
+  image-border: 10
+  layout:
+    type: verticalBox
+    fit-children: true
+  
+  UIWidget
+    id: legacy_skill_points
+    size: 300 100
+    padding: 20
+    layout:
+      type: verticalBox
+      fit-children: true
+
+    GameSpellTreeSkillPointsTooltipContentCategoryLegacySkillPoints
+    UIWidget
+      font: poppins-14
+      text-auto-resize: true
+      text-wrap: true
+      text-align: left
+      text-color: #CED2D9
+      !text: tr('You receive 1 Legacy Skill Point each new level past Legacy Level 75. Legacy Skill Points are used to learn Legacy Skills, which are permanent. Upon changing or resetting Archetypes, those Skill Points will remain there.')
+      margin-bottom: 20
+    
+    GameSpellTreeSkillPointsTooltipContentSeparator
+    GameSpellTreeSkillPointsTooltipContentBottom
+
+GameSpellTreeSkillPointsTooltipContentSeparator < UIWidget
+  background-color: #3A3D43
+  height: 1
+  margin-top: 20
+  margin-bottom: 20
+
+GameSpellTreeSkillPointsTooltipContentBottom < UIWidget
+  id: footer
+  size: 300 24
+  font: poppins-16
+  text: Total: 0
+  text-offset: 0 5
+  text-align: left
+
+GameSpellTreeSkillPointsTooltipContentArchetypes < UIWidget
+  size: 300 100
+  layout:
+    type: verticalBox
+    spacing: 5
+    fit-children: true
+
+GameSpellTreeSkillPointsTooltipContentCategory < UIWidget
+  size: 260 24
+  margin-bottom: 20
+  UIWidget
+    id: icon
+    size: 24 24
+  
+  UIWidget
+    id: text
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.bottom: icon.bottom
+    margin-left: 5
+    font: poppins-semibold-16
+    text-auto-resize: true
+    text-offset: 5 0
+    text-align: left
+    text-color: #CED2D9
+
+GameSpellTreeSkillPointsTooltipContentCategorySkillPoints < GameSpellTreeSkillPointsTooltipContentCategory
+  @onSetup: |
+    self.icon:setImageSource('/images/ui/windows/spelltree/skill_points_icon')
+    self.text:setText(tr("Skill Points"))
+
+GameSpellTreeSkillPointsTooltipContentCategoryLegacySkillPoints < GameSpellTreeSkillPointsTooltipContentCategory
+  @onSetup: |
+    self.icon:setImageSource('/images/ui/windows/spelltree/legacy_points_icon')
+    self.text:setText(tr("Legacy Skill Points"))
+
+GameSpellTreeSkillPointsTooltipContentItem < UIWidget
+  size: 260 30
+  UIWidget
+    id: icon
+    size: 24 24
+  
+  UIWidget
+    id: text
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: icon.verticalCenter
+    font: poppins-14
+    text-auto-resize: true
+    text-offset: 5 2
+    text-align: left
+    text-color: #CED2D9
+
+GameSpellTreeSkillPointsTooltipContentTitle < UIWidget
+  text-align: left
+  text-auto-resize: true
+  font: poppins-semibold-14
+  text-color: #CED2D9
+
+GameSpellTreeSkillPointsTooltipContentText < UIWidget
+  text-align: left
+  text-auto-resize: true
+  text-wrap: true
+  font: poppins-14
+  text-color: #CED2D9
+
+CurrencyPanel < Panel
+  image-source: /images/ui/windows/spelltree/currency_panel
+  padding: 0 15 0 15
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+
+  UIWidget
+    size: 32 32
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    image-source: /images/ui/icons/silver_44
+
+  // TODO: change this
+  Label
+    id: currencyAmount
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    anchors.right: parent.right
+    font: poppins-semibold-16
+    text-offset: 5 2
+    text-align: center
+    text: 0
+
+SpellTreeSlot < UIWidget
+  padding: 1 1 1 1
+  image-source: /images/ui/windows/spelltree/archetype_panel
+
+SpellTreeSlotContent < UIWidget
+  id: slotContent
+  anchors.fill: parent
+
+EmptySpellTreeContent < SpellTreeSlotContent
+  padding: 15
+  UIWidget
+    id: option
+    size: 58 66
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/spelltree/lock
+    phantom: true
+    @onClick: modules.game_spelltree.learnNewArchetype(self)
+
+    $on:
+      size: 61 61
+      image-color: #bbbbbb
+      image-source: /images/ui/windows/spelltree/learn_new
+      phantom: false
+    
+    $on hover:
+      image-color: #ffffff
+
+  UIWidget
+    id: label
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    font: poppins-17
+
+ActiveSpellTreeContent < SpellTreeSlotContent
+
+  UIWidget
+    id: backgroundImage
+    phantom: true
+    image-source: /images/ui/windows/spelltree/archetype_backgrounds/warfare
+    anchors.right: parent.right
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+
+  Panel
+    id: header
+    visible: true
+    size: 358 59
+    padding: 9 22 10 19
+    //border: 1 red
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/spelltree/archetype_name_panel
+
+    UIWidget
+      id: archetypeIcon
+      size: 45 45
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/ui/icons/archetypes/45x45/warfare
+
+    UIWidget
+      id: archetypeLevel
+      image-border: 3
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/ui/windows/spelltree/archetype_level_panel
+      font: poppins-semibold-12
+      text-auto-resize: true
+      text-align: center
+      text-offset: 0 1
+      text: NaN
+      @onGeometryChange: function(self) self:setWidth(math.max(27, self:getWidth())) self:setHeight(math.max(27, self:getHeight())) end
+
+    UIWidget
+      id: archetypeName
+      height: 40
+      anchors.left: archetypeIcon.right
+      anchors.right: archetypeLevel.left
+      anchors.verticalCenter: parent.verticalCenter
+      font: poppins-semibold-20
+      text: Unknown
+      text-offset: 0 5
+      margin: 5
+      text-align: center
+
+  UIWidget
+    id: progressBar
+    size: 150 5
+    padding: 1 1 1 1
+    image-source: /images/ui/windows/spelltree/progress_bar
+    anchors.top: header.bottom
+    anchors.horizontalCenter: header.horizontalCenter
+    margin-top: -3
+
+    UIWidget
+      id: innerProgressBar
+      size: 148 3
+      image-source: /images/ui/windows/spelltree/progress_bar_content
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      image-color: #ffa851ff
+
+  Panel
+    id: tree
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    anchors.bottom: parent.bottom
+    padding-top: 10
+
+MainPanel < Panel
+  layout:
+    type: horizontalBox
+    spacing: 20
+  
+  SpellTreeSlot
+    id: tree1
+  
+  SpellTreeSlot
+    id: tree2
+  
+  SpellTreeSlot
+    id: tree3
+
+SpellTreePanel < Panel
+  anchors.fill: parent
+
+  RDMenuTitle
+    id: title
+    !text: tr('Skill Tree')
+    margin-top: 32
+    color: #e7b131
+
+  UIWidget
+    id: skillPointsLbl
+    text: Skill Points: 0
+    text-auto-resize: true
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    font: myriad-pro-24
+
+  Panel
+    id: contentPanel
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-top: 0
+    margin-left: 114
+    margin-right: 114
+
+    UIMenuPanel
+      id: tree1Parent
+      size: 514 810
+      anchors.top: parent.top
+      anchors.left: parent.left
+
+      Panel
+        size: 514 810
+        anchors.centerIn: parent
+        padding-top: 10
+        id: tree1
+
+    RDVerticalSeparator
+      anchors.left: prev.right
+      anchors.top: prev.top
+      height: 712
+
+    UIMenuPanel
+      id: tree2Parent
+      size: 514 810
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+
+      Panel
+        size: 514 810
+        id: tree2
+        anchors.centerIn: parent
+        padding-top: 10
+
+    RDVerticalSeparator
+      anchors.left: prev.right
+      anchors.top: prev.top
+      height: 712
+
+    UIMenuPanel
+      id: tree3Parent
+      size: 514 810
+      anchors.top: parent.top
+      anchors.right: parent.right
+
+      Panel
+        size: 514 810
+        id: tree3
+        anchors.centerIn: parent
+        padding-top: 10
+
+  Panel
+    id: buttonsPanel
+    anchors.top: contentPanel.top
+    anchors.right: parent.right
+    margin-right: 25
+    width: 75
+
+    layout:
+      type: verticalBox
+      spacing: 10
+      fit-children: true
+
+    SpellTreeMenuButton
+      id: archeryButton
+      image-source: /images/ui/icons/archetypes/45x45/archery_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/archery
+
+    SpellTreeMenuButton
+      id: holyButton
+      image-source: /images/ui/icons/archetypes/45x45/holy_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/holy
+
+    SpellTreeMenuButton
+      id: protectionButton
+      image-source: /images/ui/icons/archetypes/45x45/protection_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/protection
+
+    SpellTreeMenuButton
+      id: shadowButton
+      image-source: /images/ui/icons/archetypes/45x45/shadow_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/shadow
+
+    SpellTreeMenuButton
+      id: spiritualButton
+      image-source: /images/ui/icons/archetypes/45x45/spiritual_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/spiritual
+
+    SpellTreeMenuButton
+      id: warfareButton
+      image-source: /images/ui/icons/archetypes/45x45/warfare_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/warfare
+
+    SpellTreeMenuButton
+      id: witchcraftButton
+      image-source: /images/ui/icons/archetypes/45x45/witchcraft_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/witchcraft
+
+    SpellTreeMenuButton
+      id: wizardryButton
+      image-source: /images/ui/icons/archetypes/45x45/wizardry_disabled
+      $hover:
+        image-source: /images/ui/icons/archetypes/45x45/wizardry

@@ -1,0 +1,6 @@
+Module
+  name: game_minimap
+  sandboxed: true
+  scripts: [ minimap ]
+  @onLoad: init()
+  @onUnload: terminate()

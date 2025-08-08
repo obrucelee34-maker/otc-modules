@@ -1,0 +1,462 @@
+BattleListSortPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/battle/filter_background
+  image-border: 5
+  padding: 20
+  width: 240
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 10
+
+  BattleListSortHeader
+  BattleListSortOptions
+
+BattleListSortHeader < UIWidget
+  id: header
+  height: 35
+  focusable: false
+
+  UIWidget
+    id: orderDirectionIcon
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/battle/oredering_descending
+    $on:
+      image-source: /images/ui/windows/battle/oredering_ascending
+    @onClick: modules.game_battle.BattleList:changeOrderDirection()
+
+  UIWidget
+    id: orderDirection
+    anchors.right: orderDirectionIcon.left
+    anchors.verticalCenter: orderDirectionIcon.verticalCenter
+    margin-right: 10
+    margin-top: 1
+    text-auto-resize: true
+    font: poppins-12
+    icon-align: right
+    !text: tr('descending')
+    $on:
+      !text: tr('ascending')
+    @onClick: modules.game_battle.BattleList:changeOrderDirection()
+
+  UIWidget
+    anchors.left: parent.left
+    anchors.verticalCenter: orderDirection.verticalCenter
+    !text: tr('Order by')
+    text-color: #36F991
+    font: poppins-12
+      
+  UIWidget
+    id: separator
+    height: 1
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-top: 10
+    border: 1 #25272C
+
+
+BattleListSortOptions < UIWidget
+  id: content
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 10
+
+BattleListSortOption < UIWidget
+  height: 20
+  focusable: true
+
+  UIWidget
+    id: radio
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/waypoints/radio_icon
+    image-auto-resize: true
+    focusable: false
+
+    $on !disabled:
+      image-source: /images/ui/windows/waypoints/radio_icon_active
+    $disabled:
+      image-source: /images/ui/windows/waypoints/radio_icon_disabled
+
+  UIWidget
+    id: name
+    anchors.left: radio.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    focusable: false
+    text: -
+    text-auto-resize: true
+    font: poppins-14
+    text-color: #CED2D9
+    $disabled:
+      text-color: #7E828B
+    $on !disabled:
+      text-color: #36F991
+
+BattleListFilterPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/battle/filter_background
+  image-border: 5
+  padding: 20
+  width: 240
+
+BattleListFilterPopupMenuSubItem < UIWidget
+  id: subitem
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+
+BattleListFilterPopupMenuSeparator < UIWidget
+  background-color: #25272C
+  height: 1
+  phantom: true
+
+BattleListFilterPopupMenuButton < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-12
+  text-horizontal-auto-resize: true
+  text-align: top-left
+  text-color: #CED2D9
+  text-offset: 0 10
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onStateChange: |
+    function(self, state)
+      self.arrow:setOn(state)
+    end
+  @onCheckChange: |
+    function(self, state)
+      self.arrow:setChecked(state)
+    end
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 5
+    image-source: /images/ui/windows/market/filter_panel_icon_expand
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_expanded
+    $checked:
+      visible: false
+
+  UIWidget
+    id: content
+    anchors.left: parent.left
+    anchors.right: arrow.left
+    anchors.top: parent.top
+    margin-top: 30
+    layout:
+      type: verticalBox
+      fit-children: true
+
+
+BattleListFilterPopupMenuClearAll < UIWidget
+  id: clear_button
+  text: Clear all
+  font: poppins-semibold-14
+  text-color: #CED2D9
+  $disabled:
+    text-color: #7E828B
+  enabled: false
+  margin-top: 5
+  opacity: 1
+  $hover:
+    opacity: 0.75
+  $pressed:
+    opacity: 0.5
+  text-auto-resize: true
+  text-align: center
+  @onClick: |
+    modules.game_battle.BattleList:clearAllFilters()
+  @onEnableChange: |
+    if not self.underscore then
+      return
+    end
+    self.underscore:setOn(self:isEnabled())
+
+  UIWidget
+    id: underscore
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    height: 1
+    background-color: #595c64
+
+    @onSetup: |
+      self:setWidth(self:getParent():getTextSize().width + 2)
+
+
+BattleListFilterPopupMenuButtonExpanded < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  text-offset: 30 1
+  $checked:
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onClick: |
+    self.checkbox:setChecked(not self.checkbox:isChecked())
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    @onCheckChange: |
+      function(self, state)
+        modules.game_battle.BattleList:onFilterPanelCheckboxChange(self, state)
+      end
+
+BattleListCreature < UIWidget
+  height: 48
+  @onHoverChange: |
+    function(self, isHovering)
+      modules.game_battle.BattleList.hoverCreatureOnBattleList(self, isHovering)
+    end
+
+  UIWidget
+    id: healthBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    phantom: true
+    image-source: /images/ui/windows/battle/creature_background_hp
+    image-border-left: 60
+    image-border-right: 20
+    image-auto-resize: true
+
+    UIHealthBar
+      id: health
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      margin-left: 38
+      margin-top: 13
+      margin-bottom: 16
+      padding-right: 27
+      phantom: true
+      @onStateChange: |
+        self.bar:setOn(self:isOn())
+      $on:
+        margin-bottom: 13
+
+      UIWidget
+        id: bar
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        phantom: true
+        image-source: /images/ui/windows/battle/healthbar_small
+        $on:
+          image-source: /images/ui/windows/battle/healthbar
+
+      UIWidget
+        id: border
+        width: 4
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: prev.left
+        phantom: true
+        image-source: /images/ui/windows/battle/hp_border
+        background-color: blue
+
+    UIWidget
+      id: creatureName
+      &ignoreTr: true
+      font: poppins-semibold-bordered-12
+      height: 15
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 44
+      margin-right: 22
+      phantom: true
+      text-align: left
+
+    UIHealthBar
+      id: mana
+      size: 96 4
+      anchors.top: health.bottom
+      anchors.left: parent.left
+      margin-left: 38
+      padding-right: 27
+      margin-top: 2
+      phantom: true
+
+      UIWidget
+        id: bar
+        image-source: /images/ui/windows/health_bars/party/mana_fill
+        image-rect: 0 0 96 4
+        phantom: true
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+      Panel
+        id: border
+        anchors.left: prev.left
+        anchors.verticalCenter: prev.verticalCenter
+        image-source: /images/ui/windows/health_bars/party/mana_border
+        visible: false
+
+  UIWidget
+    id: iconBackground
+    anchors.top: parent.top
+    anchors.left: healthBar.left
+    margin-top: 2
+    margin-left: 5
+    margin-bottom: 1
+    image-source: /images/ui/windows/battle/icon_background
+    anchors.verticalCenter: parent.verticalCenter
+
+  UICreature
+    id: icon
+    clipping: true
+    anchors.fill: iconBackground
+    margin: 5
+    outfit-direction: 2
+    phantom: true
+    circle: true
+
+  Panel
+    id: iconFrame
+    anchors.fill: iconBackground
+    phantom: true
+    image-source: /images/ui/windows/battle/icon_frame
+
+  UIWidget
+    id: borderRight
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 4
+    margin-top: 1
+    phantom: true
+    image-source: /images/ui/windows/battle/border
+
+BattleListHeader < UIWidget
+  height: 35
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  image-source: /images/ui/windows/battle/header_background
+  phantom: true
+
+  UIButton
+    id: settingsButton
+    size: 25 25
+    anchors.right: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/battle/settings_icon
+    margin-right: 3
+    opacity: 1
+    $on:
+      image-source: /images/ui/windows/battle/sorting_icon_active
+    $hover:
+      opacity: 0.75
+    $pressed:
+      opacity: 0.5
+    @onClick: modules.game_battle.BattleList:onFilterPanelClick(self)
+
+  UIButton
+    id: sortingButton
+    size: 25 25
+    anchors.left: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/battle/sorting_icon
+    margin-left: 3
+    opacity: 1
+    $on:
+      image-source: /images/ui/windows/battle/sorting_icon_active
+    $hover:
+      opacity: 0.75
+    $pressed:
+      opacity: 0.5
+    @onClick: modules.game_battle.BattleList:onSortPanelClick(self)
+    
+
+BattleListCreatures < UIWidget
+  id: creatures
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  anchors.bottom: parent.bottom
+  phantom: true
+
+  VerticalScrollBar
+    id: scrollbar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    pixels-scroll: true
+    margin-right: 2
+    margin-bottom: 5
+    step: 32
+
+  ScrollablePanel
+    id: list
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: scrollbar.left
+    vertical-scrollbar: scrollbar
+    padding-left: 5
+    margin-bottom: 3
+    layout:
+      type: verticalBox
+      spacing: 0
+
+BattleListWindow < UIWindow
+  id: battleListWindow
+  size: 168 300
+  draggable: true
+  visible: true
+  image-source: /images/ui/windows/battle/background
+  image-border: 3
+
+  EditModePanel
+    &title: 'Battle List'
+
+  UIWidget
+    id: content
+    anchors.fill: parent
+    phantom: true
+
+    BattleListHeader
+    BattleListCreatures
+      margin: 3
+      margin-top: 10
+      margin-bottom: 0
+
+  ResizeBorder
+    id: horizontalResizeBorder
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    enabled: true
+    &minimum: 168
+    &maximum: 350
+    @onResizeParent: |
+      function(self, parent)
+        modules.game_battle.BattleList:onUpdateWindowWidth()
+      end
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    enabled: true
+    &minimum: 100

@@ -1,0 +1,460 @@
+MinimapToggleButton < UIWidget
+  size: 30 30
+  icon-size: 16 16
+  icon-align: center
+  icon-color: #A6AAB2
+  opacity: 0.9
+  image-source: /images/ui/windows/minimap/icon_border_off
+  $hover:
+    opacity: 1.0
+  $pressed:
+    opacity: 0.9
+  $on:
+    icon-color: #181A1D
+    image-source: /images/ui/windows/minimap/icon_border_on
+  
+  @onDragEnter: function(a,b,c) modules.game_minimap.onMinimapButtonDragEnter(a,b,c) end
+  @onSetup: |
+    function(self)
+      if self.setupFunc then
+        self:setupFunc()
+      end
+    end
+
+MinimapExpandingButton < UIWidget
+  size: 30 30
+  icon-size: 16 16
+  icon-align: center
+  icon-color: #A6AAB2
+  opacity: 0.9
+  image-source: /images/ui/windows/minimap/icon_border_off
+  $hover:
+    opacity: 1.0
+  $pressed:
+    opacity: 0.9
+  $on:
+    //icon-color: #181A1D
+    //image-source: /images/ui/windows/minimap/icon_border_on
+
+  @onStateChange: |
+    local parent = self:getParent()
+    parent[self:getId() .. 'Popup']:setVisible(self:isOn())
+  //@onDragEnter: function(a,b,c) modules.game_minimap.onMinimapButtonDragEnter(a,b,c) end
+  @onSetup: |
+    function(self)
+      if self.setupFunc then
+        self:setupFunc()
+      end
+    end
+
+MinimapWindow < UIWindow
+  id: minimapWindow
+  size: 260 260
+  draggable: true
+  
+  @onMousePress: |
+    function(widget, mousePos)
+      autoWalk(widget.image, mousePos)
+    end
+
+  EditModePanel
+    &title: 'MiniMap'
+
+  UIWidget
+    id: image
+    anchors.bottom: border.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 200 200
+    draggable: true
+    phantom: false
+
+  UIWidget
+    id: border
+    anchors.top: topPanel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/minimap/border
+    margin-top: 5
+    phantom: true
+
+  UIWidget
+    id: topPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: 10
+    margin-right: 10
+    image-border: 15
+    padding: 5
+    image-source: /images/ui/windows/minimap/btnTime
+  
+    UIWidget
+      id: time
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text-auto-resize: true
+      text-align: right
+      font: poppins-semibold-14
+      text-offset: 0 2
+
+    UIWidget
+      id: regionName
+      anchors.fill: parent
+      text-auto-resize: true
+      image-border: 15
+      text-align: left
+      text-offset: 0 2
+      font:
+        name: poppins-semibold
+        size: 14
+      margin-left: 10
+
+  UIWidget
+    id: zoomIn
+    size: 25 25
+    opacity: 0.9
+    $hover:
+      opacity: 1.0
+    $pressed:
+      opacity: 0.9
+    &offset: -3
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_minimap.zoomIn()
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 52.5, self.offset)
+
+  UIWidget
+    id: zoomInImage
+    image-source: /images/ui/windows/minimap/zoomin
+    image-auto-resize: true
+    phantom: true
+    &offset: -3
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 52.5, self.offset)
+
+  UIWidget
+    id: zoomOut
+    size: 25 25
+    opacity: 0.9
+    $hover:
+      opacity: 1.0
+    $pressed:
+      opacity: 0.9
+    &offset: -3
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_minimap.zoomOut()
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 37.5, self.offset)
+
+  UIWidget
+    id: zoomOutImage
+    image-source: /images/ui/windows/minimap/zoomout
+    image-auto-resize: true
+    phantom: true
+    &offset: -3
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 37.5, self.offset)
+
+  MinimapToggleButton
+    id: questTrackerButton
+    draggable: true
+    icon-source: /images/ui/windows/minimap/icon_questTracker
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_settings.toggleOption('showQuestTracker')
+    &offset: -3
+    &tooltip: 'Toggle quest tracker'
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 95, self.offset)
+
+  MinimapToggleButton
+    id: teleportButton
+    draggable: true
+    image-source: /images/ui/windows/minimap/hearth_background
+    icon-source: /images/ui/windows/minimap/icon_hearth
+    icon-color: #36F991
+    $on:
+      image-source: /images/ui/windows/minimap/hearth_background
+      icon-color: #A6AAB2
+    $disabled:
+      icon-color: #A6AAB2
+      opacity: 0.8
+
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_hearthteleport.GameHearthTeleport:teleport()
+    &offset: -3
+    &tooltip: 'Teleport to Ravencrest'
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 350, self.offset)
+      self:setCanHoverWhenDisabled(true)
+      connect(self, {
+        onHoverChange = function()
+          modules.game_hearthteleport.GameHearthTeleport.onHoverChange(self, self:isHovered())
+        end
+      })
+
+  UIWidget
+    id: safeModeButtonPopup
+    anchors.verticalCenter: safeModeButton.verticalCenter
+    anchors.right: safeModeButton.left
+    image-source: /images/ui/windows/minimap/background
+    margin-right: -20
+    visible: false
+
+    UIWidget
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 5
+      @onClick: onPvpButtonClicked(self:getId())
+      opacity: 0.8
+      $hover:
+        opacity: 1.0
+
+    UIWidget
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 30
+      @onClick: onPvpButtonClicked(self:getId())
+      opacity: 0.8
+      $hover:
+        opacity: 1.0
+
+    UIWidget
+      width: 1
+      anchors.left: parent.left
+      anchors.top: prev.top
+      anchors.bottom: prev.bottom
+      background-color: #3A3D43
+      margin-left: 25
+
+  MinimapExpandingButton
+    id: safeModeButton
+    draggable: true
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local popup = modules.game_minimap.safeModeButtonPopup
+      if popup then
+        popup:setVisible(self:isOn())
+      end
+    &offset: 5
+    &tooltip:'Toggle player attack (PvP)'
+    &setupFunc: |
+      function(self)
+        self:setAnglePosition(self:getParent().image, 225, self.offset)
+        connect(g_game, {
+          onPVPModeChange = onPvpModeChange
+        })
+      end
+
+  UIWidget
+    id: floorIndicatorButtonPopup
+    anchors.verticalCenter: floorIndicatorButton.verticalCenter
+    anchors.right: floorIndicatorButton.left
+    image-source: /images/ui/windows/minimap/background
+    margin-right: -20
+    visible: false
+
+    UIWidget
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 5
+      @onClick: onFloorIndicatorButtonClicked(self:getId())
+      opacity: 0.8
+      $hover:
+        opacity: 1.0
+
+    UIWidget
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 30
+      @onClick: onFloorIndicatorButtonClicked(self:getId())
+      opacity: 0.8
+      $hover:
+        opacity: 1.0
+
+    UIWidget
+      width: 1
+      anchors.left: parent.left
+      anchors.top: prev.top
+      anchors.bottom: prev.bottom
+      background-color: #3A3D43
+      margin-left: 25
+
+  MinimapExpandingButton
+    id: floorIndicatorButton
+    draggable: true
+    icon-source: /images/ui/windows/minimap/icon_floor_enabled
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      self:setOn(not self:isOn())
+    &offset: -2
+    &tooltip:'Toggle floor change indicators'
+    &setupFunc: |
+      function(self)
+        self:setAnglePosition(self:getParent().image, 130, self.offset)
+      end
+
+  MinimapToggleButton
+    id: houseMakerButton
+    draggable: true
+    icon-source: /images/ui/windows/minimap/icon_house
+    @onClick: |
+      if g_layout.isEditMode() then
+        return
+      end
+      modules.game_house.GameHouse:toggleHouseMode()
+    &offset: 2
+    &tooltip: 'Toggle house mode'
+    &setupFunc: |
+      function(self)
+        self:setAnglePosition(self:getParent().image, 195, self.offset)
+        connect(g_game, {
+          onHouseModeChange = function(value)
+            self:setOn(value)
+            local parent = self:getParent()
+            parent.questTrackerButton:setVisible(not value)
+            parent.safeModeButton:setVisible(not value)
+            parent.floorIndicatorButton:setVisible(not value)
+            local window = value and Tutorial.currentInteractionWindow
+            if window and window.onHouseMode then
+              window.onHouseMode()
+            end
+          end
+        })
+      end
+
+  MinimapToggleButton
+    id: channelSwitchButton
+    draggable: true
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_channel_selector.GameSwitchChannel:toggle()
+    &offset: -3
+    &tooltip: 'Channel Selector'
+    font: poppins-semibold-14
+    text-offset: 0 2
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 15, self.offset)
+
+  MinimapToggleButton
+    id: battleListButton
+    draggable: true
+    icon-source: /images/ui/windows/minimap/battle_list
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_battle.BattleList:toggle()
+    &offset: 0
+    &tooltip: 'Battle List'
+    font: poppins-semibold-14
+    text-offset: 0 2
+    icon-offset: -1 0
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 165, self.offset)
+
+  MinimapToggleButton
+    id: mailButton
+    draggable: true
+    icon-source: /images/ui/windows/minimap/mail
+    @onClick: |
+      if g_layout.isEditMode() then
+          return
+      end
+      modules.game_social.GameSocial:selectTab('mail')
+      modules.game_social.GameSocial:toggle()
+    &offset: 2
+    &tooltip: 'Mailbox'
+    $hover:
+      icon-source: /images/ui/windows/minimap/mail_hover
+    $on:
+      icon-color: white
+    font: poppins-semibold-14
+    text-offset: 0 2
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 300, self.offset)
+
+  UIWidget
+    id: iconWind
+    image-source: /images/ui/windows/minimap/icon_wind
+    size: 56 45
+    text: S
+    text-offset: 31 0
+    font: poppins-semibold-12
+    @onSetup: |
+      self:setAnglePosition(self:getParent().image, 330)
+
+
+MiniMapPlayerIcon < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 24 30
+
+  UICreature
+    id: playerOutfit
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 20 20
+    margin-top: 2
+    margin-left: 2
+    clipping: true
+    outfit-scale: 1
+    outfit-offset: 5 3
+    outfit-direction: 2
+    phantom: true
+
+  UIWidget
+    id: playerOutfitFrame
+    anchors.fill: parent
+    image-source: /images/ui/windows/minimap/arrow/frame_player
+    image-auto-resize: true
+    phantom: true
+
+MiniMapPartyIcon < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 24 30
+
+  UICreature
+    id: partyOutfit
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 20 20
+    margin-top: 2
+    margin-left: 2
+    clipping: true
+    outfit-scale: 1
+    outfit-offset: 5 3
+    outfit-direction: 2
+    phantom: true
+
+  UIWidget
+    id: partyOutfitFrame
+    anchors.fill: parent
+    image-source: /images/ui/windows/minimap/arrow/frame_party
+    image-auto-resize: true
+    margin-top: 1
+    phantom: true

@@ -1,0 +1,7 @@
+Module
+  name: game_targethud
+  description: Target HUD
+  sandboxed: true
+  scripts: [ uitargetbar, targethud ]
+  @onLoad: init()
+  @onUnload: terminate()

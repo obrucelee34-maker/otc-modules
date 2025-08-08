@@ -1,0 +1,133 @@
+GameNotificationRegionBase < UIWidget
+  size: 455 100
+  margin-top: 30
+  phantom: true
+  &centerFunc: |
+    function(self)
+      -- set padding to achieve the correct size
+      local parentWidth = self:getParent():getWidth()
+      local padding = (parentWidth - 455) / 2
+      self:setPaddingLeft(padding)
+      self:setPaddingRight(padding)
+    end
+  @onGeometryChange: |
+    self:centerFunc()
+  @onSetup: |
+    self:centerFunc()
+
+  UIWidget
+    id: background
+    size: 455 47
+    image-source: /images/ui/windows/notification/region_background
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 5
+    image-border: 5
+    phantom: true
+
+  UIProgressBar3
+    id: progress_bar
+    size: 401 3
+    image-source: /images/ui/windows/notification/timer_background
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-border: 5
+    &minWidth: 0
+    phantom: true
+    visible: false
+    onSetup: |
+      self:setPercent(10)
+
+    Panel
+      id: progress
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      image-source: /images/ui/windows/notification/timer
+      size: 401 3
+      phantom: true
+      image-border: 3
+
+GameNotificationRegionProgressBar < UIWidget
+  id: region_progress
+  size: 118 8
+  margin-top: 6
+  phantom: true
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  image-source: /images/ui/windows/worldmap/region_info/timer_bar1
+  padding-top: 2
+  padding-bottom: 2
+  padding-left: 3
+  padding-right: 3
+  margin-bottom: 18
+
+  UIProgressBar
+    id: progress
+    anchors.fill: parent
+    background-color: #A556FF
+    @onSetup: self:setPercent(20)
+
+GameNotificationRegionIconLeft < UIWidget
+  id: icon_left
+  size: 32 32
+  anchors.right: region_progress.left
+  anchors.bottom: parent.bottom
+  margin-bottom: 7
+  margin-right: -5
+
+GameNotificationRegionIconRight < UIWidget
+  id: icon_right
+  size: 32 32
+  anchors.left: region_progress.right
+  anchors.bottom: parent.bottom
+  margin-bottom: 7
+  margin-left: -5
+
+GameNotificationRegionTimer < UIWidget
+  id: region_timer
+  anchors.left: icon_right.right
+  anchors.right: parent.right
+  anchors.verticalCenter: icon_right.verticalCenter
+  margin-right: 20
+  text-align: right
+  margin-top: 1
+  font: poppins-semibold-15
+  icon: /images/ui/windows/worldmap/region_info/timer_icon
+  icon-size: 15 15
+  icon-offset: -15 -1
+
+GameNotificationRegionTitle < UIWidget
+  id: region_title
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.top: parent.top
+  font: vollkorn-sc-bold-bordered-36
+  text: Notification title goes here
+  text-auto-resize: true
+
+GameNotificationRegionState < UIWidget
+  id: region_state
+  anchors.left: parent.left
+  anchors.verticalCenter: icon_left.verticalCenter
+  margin-left: 20
+  margin-top: 1
+  font: poppins-semibold-15
+  text-auto-resize: true
+
+GameNotificationRegionIconMiddle < UIWidget
+  id: icon_middle
+  size: 32 32
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  margin-bottom: 7
+  margin-left: 10
+
+GameNotificationRegionStateMiddle < UIWidget
+  id: region_state_middle
+  anchors.left: icon_middle.right
+  anchors.verticalCenter: icon_middle.verticalCenter
+  margin-left: 20
+  margin-top: 1
+  font: poppins-semibold-15
+  text-auto-resize: true

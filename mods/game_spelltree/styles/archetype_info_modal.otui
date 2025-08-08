@@ -1,0 +1,305 @@
+ArchetypeInfoLabel < Label
+  color: #a6aab2
+  font: poppins-semibold-16
+  text-align: left
+  text-auto-resize: true
+
+ArchetypeInfoSkillGrid < Panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  padding-top: 10
+  margin-left: 60
+  margin-right: 60
+  layout:
+    type: grid
+    cell-size: 60 60
+    cell-spacing: 20 20
+    flow: true
+
+ArchetypeInfoTitle < Panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 40
+  text-align: center
+  font: poppins-semibold-14
+  image-source: /images/ui/windows/spelltree/arechetype_info_modal/header_skill
+
+ArchetypeInfoSubTitle < Panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 22
+
+  @onSetup: |
+    local text = self:getChildById('textHolder'):getChildById('text')
+    text:setText(self:getText())
+    self:setText('')
+    self:getChildById('textHolder'):setOn(self.textHighlight)
+
+  UIWidget
+    id: textHolder
+    height: 22
+    padding: 0 12 0 12
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    layout:
+      type: horizontalBox
+      fit-children: true
+    $on:
+      background-color: #181A1D
+
+    UIWidget
+      id: text
+      height: 22
+      font: poppins-14
+      text-auto-resize: true
+      color: #a6aab2
+
+  UIWidget
+    id: separator_left
+    height: 1
+    anchors.verticalCenter: textHolder.verticalCenter
+    anchors.left: parent.left
+    anchors.right: textHolder.left
+    background-color: #3A3D43
+
+  UIWidget
+    id: separator_right
+    height: 1
+    anchors.verticalCenter: textHolder.verticalCenter
+    anchors.right: parent.right
+    anchors.left: textHolder.right
+    background-color: #3A3D43
+
+ArchetypeInfoSkillToggle < UIWidget
+  image-smooth: true
+  @onClick: modules.game_spelltree.GameArchetypeInfo:updateSkill(self)
+  $checked:
+    image-color: #ffffff
+  $!checked:
+    image-color: #707070
+
+ArchetypeInfoSkillsPanel < Panel
+  id: skills_panel
+  width: 345
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  margin-bottom: 19
+
+  ArchetypeInfoSubTitle
+    margin-top: 27
+    anchors.top: parent.top
+    text: Active Skills
+
+  ArchetypeInfoSkillGrid
+    id: active_skills
+    height: 250
+    margin-left: 20
+    margin-right: 20
+
+  ArchetypeInfoSubTitle
+    text: Passive Skills
+
+  ArchetypeInfoSkillGrid
+    id: passive_skills
+    height: 170
+
+ArchetypeInfoSkillInformation < UIWidget
+  id: info
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  height: 160
+
+  UIWidget
+    id: icon
+    size: 60 60
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-left: 10
+  
+  ArchetypeInfoLabel
+    id: name
+    anchors.top: parent.top
+    anchors.left: prev.right
+    margin-left: 22
+    text: Brutal Strike
+    color: white
+
+  ArchetypeInfoLabel
+    id: target
+    font: poppins-13
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 5
+    text: target type
+
+  ArchetypeInfoLabel
+    id: cast_type
+    font: poppins-13
+    color: #36F991
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    margin-top: 5
+    text: cast type
+
+  ScrollablePanel
+    id: description_scrollable
+    font: poppins-15-special
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    text-wrap: true
+    margin-top: 15
+    vertical-scrollbar: description_scrollbar
+    layout:
+      type: verticalBox
+      spacing: 4
+      fit-children: false
+
+    ArchetypeInfoLabel
+      id: description
+      font: poppins-15-special
+      text-wrap: true
+      text: description
+
+  VerticalScrollBar
+    id: description_scrollbar
+    anchors.top: prev.top
+    anchors.bottom: prev.bottom
+    anchors.right: parent.right
+    step: 48
+    pixels-scroll: true
+
+SkillPreview < UIWidget
+  id: skill_preview
+  size: 345 193
+  anchors.top: prev.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 10
+  draggable: false
+  @onHoverChange: |
+    if self:isEnabled() then
+      self:getChildById('icon'):setVisible(not self:isHovered())
+      self:setImagePlaying(self:isHovered())
+    end        
+  $hover:
+    image-color: white
+  $!hover:
+    image-color: #707070
+  UIWidget
+    id: icon
+    anchors.centerIn: parent
+    size: 64 64
+    image-source: /images/ui/windows/entergame/characterCreation/icon_player
+    image-smooth: true
+    opacity: 0.8
+
+SkillPreviewPanel < Panel
+  id: preview_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  anchors.top: prev.bottom
+  margin-top: 15
+  ArchetypeInfoSubTitle
+    anchors.top: parent.top
+    text: Preview
+    &textHighlight: true
+
+  SkillPreview
+  
+ArchetypeInfoSkillInformationPanel < Panel
+  id: skill_information_panel
+  anchors.top: parent.top
+  anchors.right: parent.right
+  anchors.left: skills_panel.right
+  anchors.bottom: bottom_panel.top
+  margin-top: 20
+  margin-left: 26
+  margin-bottom: 19
+  image-source: /images/ui/windows/spelltree/arechetype_info_modal/background_skill
+
+  ArchetypeInfoTitle
+    text: Skill Information
+
+  UIWidget
+    id: content
+    padding: 16
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+
+    ArchetypeInfoSkillInformation
+    SkillPreviewPanel
+
+ArchetypeInfoBottomPanel < Panel
+  id: bottom_panel
+  image-source: /images/ui/windows/entergame/login/server_location_background
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 141
+  padding-bottom: 20
+
+  UIWidget
+    id: warning_text
+    height: 51
+    !text: tr('Are you sure you want to select {|Warfare|, #FFA851}?')
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    font: poppins-14
+
+  UIWidget
+    id: separator
+    height: 1
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #3A3D43
+
+  PrimaryButton
+    id: back_button
+    text: Confirm
+    anchors.right: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-right: 13
+    @onClick: modules.game_spelltree.GameArchetypeInfo:confirm()
+
+  NeutralButton
+    id: create_character_button
+    text: Cancel
+    anchors.left: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-left: 13
+    @onClick: modules.game_spelltree.GameArchetypeInfo:cancel()
+
+ArchetypeInfoBackgroundPanel < UIWidget
+  id: background_panel
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.horizontalCenter: parent.horizontalCenter
+  image-auto-resize: true
+  margin-right: 75
+  margin-top: 30
+
+ArchetypeInfoModal < MainWindow
+  size: 787 700
+  anchors.centerIn: parent
+  visible: true
+
+  MainWindowContent
+    id: contentPanel
+    padding: 10 20 20 20
+    anchors.bottom: next.top
+
+    ArchetypeInfoBackgroundPanel
+    ArchetypeInfoSkillsPanel
+    ArchetypeInfoSkillInformationPanel
+
+  ArchetypeInfoBottomPanel

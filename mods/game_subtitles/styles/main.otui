@@ -1,0 +1,15 @@
+GameSubtitlesWindow < UIWidget
+  id: game_subtitles_window
+  background-color: #000000B2
+  text-vertical-auto-resize: true
+  font: poppins-30
+  text-color: white
+  padding-top: 33
+  padding-bottom: 33
+  padding-left: 37
+  padding-right: 37
+  text-wrap: true
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.bottom: parent.bottom
+  margin-bottom: 25
+  width: 1250

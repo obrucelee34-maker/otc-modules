@@ -1,0 +1,22 @@
+UIWidget
+  id: background
+  image-source: /images/background.mp4
+  image-smooth: true
+  image-fixed-ratio: true
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  focusable: false
+
+  UIButton
+    id: exitButton
+    image-source: /images/ui/windows/entergame/login/exit_button
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin: 20
+    @onClick: exit()
+    $pressed:
+      opacity: 0.8
+
+

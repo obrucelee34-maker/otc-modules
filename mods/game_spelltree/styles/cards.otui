@@ -1,0 +1,260 @@
+ArchetypeSpellCardMicro < UIWidget
+  id: card_holder
+  phantom: true
+  image-source: /images/ui/windows/spelltree/cards/micro_card_background
+  size: 23 31
+  $on:
+    image-source: /images/ui/windows/spelltree/cards/micro_card_background_on
+  image-color: white
+  $checked:
+    image-color: alpha
+  @onCheckChange: |
+    function(self, checked)
+      self.add_card:setVisible(not checked)
+      self.card_image:setVisible(not checked and self.cardData)
+      self.ability:setVisible(checked)
+      if self.updateCardWidget then
+        self:updateCardWidget()
+      end
+    end
+
+  UIWidget
+    id: add_card
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/spelltree/cards/micro_card_add
+    size: 13 13
+    phantom: true
+    $on:
+      image-source: /images/ui/windows/spelltree/cards/micro_lock_icon
+
+  UIWidget
+    id: card_image
+    anchors.fill: parent
+    image-source: /images/ui/ravencards/illustrations/rat_scavenger.ktx
+    margin: 1
+    visible: false
+    phantom: true
+  
+  ArchetypeSpell
+    id: ability
+    anchors.centerIn: parent
+    size: 22 22
+    visible: false
+    phantom: true
+
+ArchetypeSpellCardSmall < UIWidget
+  id: card_holder
+  image-source: /images/ui/windows/spelltree/cards/small_card_background
+  $on:
+    image-source: /images/ui/windows/spelltree/cards/small_card_background_on
+  image-color: white
+  $checked:
+    image-color: alpha
+
+  @onClick: |
+    function(self)
+      if self:isChecked() then
+        return
+      end
+
+      modules.game_spelltree.GameSpellTree:selectCard(self.spellInfo, self.cardData)
+    end
+  
+  @onCheckChange: |
+    function(self, checked)
+      self.add_card:setVisible(not checked)
+      self.card_image:setVisible(not checked and self.cardData)
+    end
+
+  UIWidget
+    id: add_card
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/spelltree/cards/small_card_add
+    size: 18 18
+    phantom: true
+    $on:
+      image-source: /images/ui/windows/spelltree/cards/small_lock_icon
+
+  UIWidget
+    id: card_image
+    anchors.fill: parent
+    image-source: /images/ui/ravencards/illustrations/rat_scavenger.ktx
+    margin: 1
+    visible: false
+    phantom: true
+
+CardSelectionWindow < MainWindow
+  id: card_selection_window
+  &title: 'Select your card'
+  //&iconPath: 'icon_achievements'
+  &iconSize: {width = 22, height = 22}
+  size: 768 642
+  visible: false
+  anchors.centerIn: parent
+  draggable: false
+
+  MainWindowContent
+    UIWidget
+      id: label
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.top: parent.top
+      margin-top: 20
+      font: poppins-semibold-15
+      &formatText: 'Select which card you want to use for |%s|.'
+      text-auto-resize: true
+
+    UIWidget
+      id: left_card_holder
+      anchors.left: parent.left
+      anchors.top: label.bottom
+      margin-top: 40
+      margin-left: 20
+      size: 330 381
+      CardSelectionCard
+
+    UIWidget
+      id: right_card_holder
+      anchors.right: parent.right
+      anchors.top: label.bottom
+      margin-top: 40
+      margin-left: 20
+      size: 330 381
+      CardSelectionCard
+
+    SuccessButton
+      id: confirm_button
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-bottom: 10
+      text: Select Card
+      width: 140
+      @onClick: modules.game_spelltree.GameSpellTree:confirmCardSelection()
+
+CardSelectionCard < UIWidget
+  id: card_holder
+  anchors.fill: parent
+  @onClick: |
+    if not self.cardData then
+      return
+    end
+
+    local bg = self.background
+    if bg:isOn() then
+      return
+    end
+
+    local parent = self:getParent():getParent()
+    local left = parent.left_card_holder.card_holder
+    local right = parent.right_card_holder.card_holder
+
+    left.background:setOn(false)
+    right.background:setOn(false)
+
+    bg:setOn(true)
+    modules.game_spelltree.GameSpellTree:changeCurrentSelectedCard(self.cardData.name)
+
+    -- try to select the last available rarity
+    for i = self.rarity_background:getChildCount(), 1, -1 do
+      local child = self.rarity_background:getChildByIndex(i)
+      if child:isEnabled() then
+        child.background:setOn(true)
+        child:onClick()
+        break
+      end
+    end
+    
+  UIWidget
+    id: background
+    anchors.fill: parent
+    image-source: /images/ui/windows/spelltree/cards/card_selection_background
+    $on:
+      image-source: /images/ui/windows/spelltree/cards/card_selection_background_on
+    margin-bottom: 25
+    phantom: true
+    @onStateChange: |
+      local parent = self:getParent()
+      parent.mark:setVisible(self:isOn())
+      if not self:isOn() then
+        for _, child in ipairs(parent.rarity_background:getChildren()) do
+          child.background:setOn(false)
+        end
+      end
+
+  Ravencard
+    id: card
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: background.verticalCenter
+    size: 195 299
+    margin-bottom: 10
+    phantom: true
+
+  UIWidget
+    id: lock
+    anchors.centerIn: background
+    size: 58 69
+    image-source: /images/ui/windows/spelltree/cards/card_selection_lock
+    phantom: true
+    visible: false
+
+  UIWidget
+    id: rarity_background
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    size: 299 51
+    image-source: /images/ui/windows/spelltree/cards/card_selection_rarity_background
+    layout:
+      type: horizontalBox
+      spacing: 7
+    CardSelectionRarity
+      id: 1
+    CardSelectionRarity
+      id: 2
+    CardSelectionRarity
+      id: 3
+    CardSelectionRarity
+      id: 4
+    CardSelectionRarity
+      id: 5
+    CardSelectionRarity
+      id: 6
+    CardSelectionRarity
+      id: 7
+    
+  UIWidget
+    id: mark
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.top
+    image-source: /images/ui/windows/spelltree/cards/card_selection_mark
+    visible: false
+
+CardSelectionRarity < UIWidget
+  $first:
+    margin-left: 12
+  size: 33 33
+  @onClick: |
+    local parent = self:getParent():getParent()
+    if not parent.background:isOn() then
+      return
+    end
+
+    for _, child in ipairs(self:getParent():getChildren()) do
+      child.background:setOn(false)
+    end
+    self.background:setOn(true)
+    parent.card:setRarity(tonumber(self:getId()))
+    parent.ravenCardAbilityInfo.rarity = tonumber(self:getId())
+    parent.ravenCardAbilityInfo.description = g_ravencards:getCardDescription(parent.card:getName(), tonumber(self:getId())),
+    modules.game_spelltree.GameSpellTree:changeCurrentSelectedCardRarity(tonumber(self:getId()))
+  UIWidget
+    id: background
+    size: 33 33
+    anchors.centerIn: parent
+    image-source:
+    $on:
+      image-source: /images/ui/windows/spelltree/cards/rarity_selection_background_on
+    phantom: true
+  UIWidget
+    id: icon
+    anchors.centerIn: parent
+    size: 20 28
+    phantom: true

@@ -1,0 +1,404 @@
+SaveBuildPanel < Panel
+  id: spellTreeSaveBuildPanel
+  image-source: /images/ui/windows/spelltree/save_build/top_panel_background
+  anchors.bottom: spellTreeWindow.top
+  anchors.horizontalCenter: spellTreeWindow.horizontalCenter
+  padding-left: 60
+  padding-right: 60
+  visible: false
+  phantom: false
+  @onClick: |
+    local panel = self:getParent():getChildById('spellTreeWindow'):recursiveGetChildById('spellTreeSaveBuildSelectionPanel')
+    if panel then
+      panel:setVisible(not panel:isVisible())
+      panel:raise()
+    end
+
+  Panel
+    id: archetype_icons
+    height: 24
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-top: 2
+    margin-left: 5
+    phantom: true
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 5
+    Panel
+      id: archetype_1
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_2
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_3
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+
+  Panel
+    id: name
+    font: poppins-14
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 10
+    text-offset: 0 1
+    text: Test Build 1
+    text-align: left
+    phantom: true
+
+  UIWidget
+    id: button
+    image-source: /images/ui/windows/spelltree/save_build/button_arrow_down
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: parent.right
+    margin-right: 5
+    enabled: false
+    phantom: true
+    $on:
+      image-source: /images/ui/windows/spelltree/save_build/button_arrow_up
+
+  UIWidget
+    id: info
+    image-source: /images/ui/windows/spelltree/info_icon
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.right: prev.left
+    margin-right: 5
+    visible: false
+    phantom: true
+    &tooltip: ''
+    &coloredTooltip: GetHighlightedText(tr("This build will only be used in {Aether Rift, #BA7DFF} events"))
+
+SaveBuildSelectionWidget < UIWidget
+  height: 50
+  background-color: #FFFFFF00
+  $checked:
+    background-color: #181A1D
+  @onHoverChange: |
+    self.edit_button:setVisible(self:isHovered())
+    self:setChecked(self:isHovered())
+  @onClick: modules.game_spelltree.GameSpellTree:onReplaceBuildWindow(self)
+
+  Panel
+    id: current_build_tag
+    anchors.top: parent.top
+    anchors.left: parent.left
+    visible: false
+    image-source: /images/ui/windows/spelltree/save_build/current_build_tag
+
+  Panel
+    id: button
+    image-source: /images/ui/windows/spelltree/save_build/button_off
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 10
+    $on:
+      image-source: /images/ui/windows/spelltree/save_build/button_on
+    $disabled:
+      image-source: /images/ui/windows/spelltree/save_build/button_lock
+
+  Panel
+    id: archetype_icons
+    height: 24
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    margin-left: 10
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 5
+    Panel
+      id: archetype_1
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_2
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_3
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+
+  Panel
+    id: name
+    font: poppins-14
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 10
+    text-offset: 0 1
+    text: Test Build 1
+    text-align: left
+
+  UIWidget
+    id: edit_button
+    image-source: /images/ui/windows/spelltree/save_build/button_edit
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+    visible: false
+    @onClick: |
+      modules.game_spelltree.GameSpellTree:onEditBuildWindow(self:getParent())
+    @onHoverChange: |
+      self:getParent():setChecked(self:isHovered() or self:getParent():isHovered())
+      self:setVisible(self:isHovered() or self:getParent():isHovered())
+
+  Panel
+    id: separator
+    image-source: /images/ui/windows/spelltree/save_build/separator
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+SaveBuildSelectionPanel < Panel
+  height: 100
+  id: spellTreeSaveBuildSelectionPanel
+  image-source: /images/ui/windows/spelltree/save_build/popup_panel_background
+  image-border: 10
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 10
+  visible: false
+  @onVisibilityChange: |
+    local parent = self:getParent():getParent()
+    if parent then
+      parent:getChildById('spellTreeSaveBuildPanel').button:setOn(self:isVisible())
+    end
+
+  Panel
+    id: content
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 0
+    layout:
+      type: verticalBox
+      fit-children: true
+
+  Panel
+    id: bottom_panel
+    height: 50
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+
+    Panel
+      id: button
+      image-source: /images/ui/windows/spelltree/save_build/button_lock
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-left: 10
+
+    Panel
+      id: name
+      font: poppins-14
+      anchors.verticalCenter: prev.verticalCenter
+      anchors.left: prev.right
+      margin-left: 10
+      text-offset: 0 1
+      text-auto-resize: true
+      text: Build 1
+      color: #7E828B
+
+    SuccessButton
+      id: unlock_button
+      size: 60 40
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 10
+      text: 0
+      &resizeText: true
+      &minWidth: 60
+      &iconPath: '/images/ui/icons/silver_24'
+      &iconAlign: left
+      &iconOffset: '20 0'
+      &textMarginLeft: 25
+      &iconColor: white
+      @onSetup: self.icon:setChecked(true)
+      @onClick: |
+        modules.game_spelltree.GameSpellTree:unlockBuildSlot()
+      
+SaveBuildReplaceWindow < PopupWindow
+  id: saveBuildReplaceWindow
+  size: 300 350
+  anchors.centerIn: parent
+  draggable: false
+  padding-top: 0
+  visible: true
+
+  Panel
+    font: poppins-semibold-14
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 20
+    text-auto-resize: true
+    text: Replace Build
+    color: white
+
+  PopupWindowLabel
+    id: middlePanel
+    height: 220
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 45
+
+    Panel
+      id: descriptionLabel
+      font: poppins-14
+      text-wrap: true
+      anchors.top: parent.top
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 10
+      margin-top: 0
+
+    Panel
+      id: archetypesLabel
+      font: poppins-14
+      !text: tr('New Archetypes:')
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 10
+
+    Panel
+      id: archetype_icons
+      height: 76
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 10
+      layout:
+        type: horizontalBox
+        fit-children: true
+        spacing: 10
+      Panel
+        id: archetype_1
+        size: 76 76
+        image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+      Panel
+        id: archetype_2
+        size: 76 76
+        image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+      Panel
+        id: archetype_3
+        size: 76 76
+        image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    
+  Panel
+    id: buttonsPanel
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    height: 50
+    margin-bottom: 2
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    SuccessButton
+      id: confirmButton
+      &resizeText: true
+      &minWidth: 100
+      &iconPath: '/images/ui/icons/silver_30'
+      &iconAlign: left
+      &iconOffset: '30 0'
+      &textMarginLeft: 40
+      &iconColor: white
+      @onSetup: self.icon:setChecked(true)
+      @onClick: |
+        modules.game_spelltree.GameSpellTree:changeBuildSelection(self.buildId, nil)
+        self:getParent():getParent():destroy()
+
+    SuccessButton
+      id: confirmAetherRiftButton
+      visible: false
+      !text: tr('Confirm')
+      @onClick: |
+        modules.game_spelltree.GameSpellTree:changeBuildSelection(nil, self.aetherBuildId)
+        self:getParent():getParent():destroy()
+
+    PopupWindowButton
+      id: cancelButton
+      !text: tr('Cancel')
+      @onClick: self:getParent():getParent():destroy()
+  
+AetherBuildSelectionWidget < UIWidget
+  height: 50
+  background-color: #FFFFFF00
+  $checked:
+    background-color: #181A1D
+  @onHoverChange: |
+    self:setChecked(self:isHovered())
+  @onClick: modules.game_spelltree.GameSpellTree:onSelectAetherRiftBuild(self)
+
+  Panel
+    id: current_build_tag
+    anchors.top: parent.top
+    anchors.left: parent.left
+    visible: false
+    image-source: /images/ui/windows/spelltree/save_build/current_build_tag
+
+  Panel
+    id: button
+    image-source: /images/ui/windows/spelltree/save_build/button_off
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 10
+    $on:
+      image-source: /images/ui/windows/spelltree/save_build/button_on
+    $disabled:
+      image-source: /images/ui/windows/spelltree/save_build/button_lock
+
+  Panel
+    id: archetype_icons
+    height: 24
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    margin-left: 10
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 5
+    Panel
+      id: archetype_1
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_2
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+    Panel
+      id: archetype_3
+      size: 24 24
+      image-source: /images/ui/windows/spelltree/save_build/archetype_slot_empty
+
+  Panel
+    id: name
+    font: poppins-14
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 10
+    text-offset: 0 1
+    text: Aether Rift
+    text-align: left
+
+  UIWidget
+    id: aether_build_icon
+    image-source: /images/ui/windows/spelltree/save_build/aether_rift_build_icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 10
+
+  Panel
+    id: separator
+    image-source: /images/ui/windows/spelltree/save_build/separator
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right

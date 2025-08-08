@@ -1,0 +1,11 @@
+Module
+  name: game_notification
+  author: LPE
+  scripts: [ notification ]
+  sandboxed: false
+
+  @onLoad: |
+    GameNotification:init()
+
+  @onUnload: |
+    GameNotification:terminate()

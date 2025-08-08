@@ -1,0 +1,105 @@
+ArchetypeTree < UIWidget
+  id: archetype_tree
+  anchors.fill: parent
+  size: 340 340
+
+  Panel
+    id: spellsPanel
+    anchors.fill: parent
+    // spell widgets are going to be inserted here
+
+  Panel
+    id: legacySpellDivisor
+    height: 35
+    padding: 5 5 5 5
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: legacySpellPanel.top
+
+    UIWidget
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      image-source: /images/ui/windows/spelltree/passive_skills_divisor_line
+      margin-top: 12
+    
+      Panel
+        size: 100 20
+        background-color: #131416ff
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        font: poppins-semibold-12
+        !text: tr("Legacy Skill")
+
+  Panel
+    id: legacySpellPanel
+    size: 70 70
+    anchors.bottom: passivesDivisor.top
+    anchors.horizontalCenter: parent.horizontalCenter
+
+    ArchetypeLegacySpell
+      id: legacySpell1
+      anchors.centerIn: parent
+
+    ArchetypeLegacySpellOverlay
+      id: legacySpellOverlay1
+      anchors.centerIn: prev
+
+    ArchetypeLegacySpellLock
+      id: legacySpellLock1
+      anchors.centerIn: parent
+      visible: false
+
+  Panel
+    id: passivesDivisor
+    height: 40
+    padding: 5 5 5 5
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: passivesPanel.top
+
+    UIWidget
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      image-source: /images/ui/windows/spelltree/passive_skills_divisor_line
+      margin-top: 12
+    
+      Panel
+        size: 100 20
+        background-color: #131416ff
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.horizontalCenter: parent.horizontalCenter
+        font: poppins-semibold-12
+        !text: tr("Passives")
+
+  Panel
+    id: passivesPanel
+    height: 45
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 10
+
+    ArchetypePassive
+      id: passive1
+
+    ArchetypePassive
+      id: passive2
+
+    ArchetypePassive
+      id: passive3
+
+    ArchetypePassive
+      id: passive4
+
+    ArchetypePassive
+      id: passive5
+  
+    ArchetypePassive
+      id: passive6
+    
+    @onSetup: |
+      for _, passive in ipairs(self:getChildren()) do
+        passive:setWidth(self:getHeight())
+      end

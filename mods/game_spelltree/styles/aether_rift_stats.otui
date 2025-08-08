@@ -1,0 +1,505 @@
+GameSpelltreeAetherRiftStatsWindow < AttachedWindow
+  id: aether_rift_stats_window
+  title: Aether Rift Stats
+  hide-close-button: true
+  side: left
+  margin-top: 46
+  visible: false
+  size: 402 685
+
+  GameSpelltreeAetherRiftPowerPanel
+  GameSpelltreeAetherRiftStatsPanel
+  GameSpelltreeAetherRiftStatsPanelScrollBar
+
+  HorizontalSeparator
+    id: aether_rift_bottom_panel_separator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: aether_rift_bottom_panel.top
+    height: 2
+    margin-bottom: 1
+
+  GameSpelltreeAetherRiftBottomPanel
+
+GameSpelltreeAetherRiftPowerPanel < UIWidget
+  id: aether_rift_power_panel
+  margin-top: 60
+  margin-left: 20
+  margin-right: 20
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  &statNames: |
+    {
+        [STAT_ATTACK] = 'attack_power',
+        [STAT_DEFENSE] = 'defense_power',
+    }
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 15
+  GameSpelltreeAetherRiftPrimaryPower
+    id: attack_power
+  GameSpelltreeAetherRiftPrimaryPower
+    id: defense_power
+
+GameSpelltreeAetherRiftPrimaryPower < UIWidget
+  height: 25
+  @onSetup: |
+    self.name:setText(self:getId())
+    self.icon:setImageSource(string.format("/images/ui/windows/character/icon_%s", self:getId()))
+  UIWidget
+    id: icon
+    size: 25 25
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 15
+    text-auto-resize: true
+    font: poppins-14
+    text-color: #b1b1b1
+    @onTextChange: |
+      self:setText(self:getText():gsub("_", " "):titleCase(), true)
+  UIWidget
+    id: value
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    height: 25
+    text: 0
+    font: poppins-semibold-18
+    text-auto-resize: true
+    margin-right: 25
+    text-offset: 0 6
+
+GameSpelltreeAetherRiftStatsPanel < ScrollablePanel
+  id: aether_rift_stats_panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: aether_rift_bottom_panel_separator.top
+  margin-top: 15
+  margin-bottom: 2
+  vertical-scrollbar: aether_rift_stats_panel_scrollbar
+
+  GameSpelltreeAetherRiftStatsPanelPrimary
+  GameSpelltreeAetherRiftStatsPanelSecondary
+  GameSpelltreeAetherRiftStatsPanelStatic
+
+GameSpelltreeAetherRiftStatsPanelScrollBar < VerticalScrollBar
+  id: aether_rift_stats_panel_scrollbar
+  anchors.top: aether_rift_stats_panel.top
+  anchors.right: parent.right
+  anchors.bottom: aether_rift_stats_panel.bottom
+  step: 48
+  pixels-scroll: true
+  margin-right: 5
+  margin-top: 2
+  margin-bottom: 2
+
+GameSpelltreeAetherRiftStatsPanelPrimary < Panel
+  id: primary_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  GameSpelltreeAetherRiftStatsPanelPrimaryHeader
+  GameSpelltreeAetherRiftStatsPanelPrimaryAttributes
+
+GameSpelltreeAetherRiftStatsPanelPrimaryHeader < UIWidget
+  id: header
+  height: 42
+  image-source: /images/ui/windows/spelltree/aether_rift/attributes_header_background
+
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    font: poppins-14
+    text-auto-resize: true
+    text: Primary Attributes
+  
+  UIWidget
+    id: right_text
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    font: poppins-14
+    text-auto-resize: true
+    text-color: #77D463
+    !text: tr('points available')
+  
+  UIWidget
+    id: points
+    anchors.right: right_text.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 5
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-color: #77D463
+    text: 0
+
+GameSpelltreeAetherRiftStatsPanelPrimaryAttributes < UIWidget
+  id: primary_attributes_panel
+  margin-left: 20
+  margin-right: 20
+  &statNames: |
+    {
+        [STAT_VITALITY] = 'vitality',
+        [STAT_MIGHT] = 'might',
+        [STAT_INTELLIGENCE] = 'intelligence',
+        [STAT_DEXTERITY] = 'dexterity',
+        [STAT_WISDOM] = 'wisdom',
+    }
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 9
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: vitality
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: might
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: intelligence
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: dexterity
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: wisdom
+
+GameSpelltreeAetherRiftStatsPanelSecondary < Panel
+  id: secondary_panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 15
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  GameSpelltreeAetherRiftStatsPanelSecondaryHeader
+  GameSpelltreeAetherRiftStatsPanelSecondaryAttributes
+
+GameSpelltreeAetherRiftStatsPanelSecondaryHeader < UIWidget
+  id: header
+  height: 42
+  image-source: /images/ui/windows/spelltree/aether_rift/attributes_header_background
+
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    font: poppins-14
+    text-auto-resize: true
+    text: Secondary Attributes
+  
+  UIWidget
+    id: right_text
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    font: poppins-14
+    text-auto-resize: true
+    text-color: #77D463
+    !text: tr('points available')
+  
+  UIWidget
+    id: points
+    anchors.right: right_text.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 5
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-color: #77D463
+    text: 0
+
+GameSpelltreeAetherRiftStatsPanelSecondaryAttributes < UIWidget
+  id: secondary_attributes_panel
+  margin-left: 20
+  margin-right: 20
+  &statNames: |
+    {
+        [STAT_CRITICAL_CHANCE] = 'precision',
+        [STAT_CRITICAL_DAMAGE] = 'impact',
+    }
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 9
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: precision
+  GameSpelltreeAetherRiftStatsPanelAttribute
+    id: impact
+
+GameSpelltreeAetherRiftStatsPanelAttribute < UIWidget
+  height: 25
+  phantom: false
+  @onSetup: |
+    self.name:setText(self:getId():titleCase())
+    self.icon:setImageSource("/images/ui/windows/character/icon_" .. self:getId())
+  $first:
+    margin-top: 10
+  UIWidget
+    id: icon
+    image-source: /images/ui/windows/character/icon_might
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 25 25
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: Might
+    font: poppins-14
+    margin-left: 15
+    text-auto-resize: true
+    text-offset: 0 2
+    text-color: #CED2D9
+    phantom: false
+  UIWidget
+    id: plus
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/character/icon_plus
+    size: 20 20
+    opacity: 1
+    image-color: white
+    $disabled:
+      image-color: #b1b1b1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 1.0
+    @onClick: modules.game_spelltree.GameSpellTree:addAetherRiftAttribute(self:getParent())
+  UIWidget
+    id: plus_text
+    anchors.bottom: plus.top
+    anchors.horizontalCenter: plus.horizontalCenter
+    font: poppins-semibold-10
+    text-offset: -1 0
+    text-color: #77D463
+    text-auto-resize: true
+  UIWidget
+    id: value
+    anchors.right: plus.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-18
+    size: 40 30
+    margin-top: 2
+    phantom: false
+  UIWidget
+    id: minus
+    anchors.right: value.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/character/icon_minus
+    size: 20 20
+    opacity: 1
+    image-color: white
+    $disabled:
+      image-color: #b1b1b1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 1.0
+    @onClick: modules.game_spelltree.GameSpellTree:removeAetherRiftAttribute(self:getParent())
+  UIWidget
+    id: minus_text
+    anchors.bottom: minus.top
+    anchors.horizontalCenter: minus.horizontalCenter
+    font: poppins-semibold-10
+    text-offset: -1 0
+    text-color: #FF5151
+    text-auto-resize: true
+
+GameSpelltreeAetherRiftStatsPanelStatic < Panel
+  id: static_panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 10
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  GameSpelltreeAetherRiftStatsPanelStaticHeader
+  GameSpelltreeAetherRiftStatsPanelStaticAttributes
+
+GameSpelltreeAetherRiftStatsPanelStaticHeader < UIWidget
+  id: header
+  height: 35
+  margin-left: 20
+  margin-right: 20
+
+  UIWidget
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #3A3D43
+    anchors.verticalCenter: parent.verticalCenter
+    height: 1
+  
+  Panel
+    size: 100 20
+    background-color: #131416ff
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-12
+    text-color: #CED2D9
+    text-offset: 0 2
+    !text: tr("Static Attributes")
+
+GameSpelltreeAetherRiftStatsPanelStaticAttributes < UIWidget
+  id: static_attributes_panel
+  margin-left: 20
+  margin-right: 20
+  &statNames: |
+    {
+      [STAT_PHYSICALATTACK] = "weapon_power",
+      [STAT_MAGICATTACK] = "spell_power",
+      [STAT_PHYSICALDEFENSE] = "weapon_defense",
+      [STAT_MAGICDEFENSE] = "spell_defense",
+      [STAT_HEAL] = "healing_power",
+      [STAT_MAXHITPOINTS] = "maximum_health",
+      [STAT_MAXMANAPOINTS] = "maximum_mana",
+      [STAT_HEALTH_REGENERATION] = "health_regeneration",
+      [STAT_MANA_REGENERATION] = "mana_regeneration",
+      [STAT_CRITICAL_CHANCE] = "precision",
+      [STAT_CRITICAL_DAMAGE] = "impact",
+      [STAT_HASTE] = "haste",
+    }
+  &subStatIds: |
+    {
+      "critical_chance_percent",
+      "critical_damage_percent",
+      "attack_speed",
+      "global_cooldown",
+      "casting_time"
+    }
+
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 7
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: spell_power
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: weapon_power
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: spell_defense
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: weapon_defense
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: healing_power
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: maximum_health
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: maximum_mana
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: health_regeneration
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: mana_regeneration
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: precision
+    &nameTitle: tr("Precision")
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: critical_chance_percent
+    &nameTitle: tr("Critical Chance (%%)")
+    &subCategory: true
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: impact
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: critical_damage_percent
+    &nameTitle: tr("Critical Damage (%%)")
+    &subCategory: true
+
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: haste
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: attack_speed
+    &nameTitle: tr("Attack Speed (s)")
+    &subCategory: true
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: global_cooldown
+    &nameTitle: tr("Global Cooldown (s)")
+    &subCategory: true
+  GameSpelltreeAetherRiftStatsPanelStaticAttribute
+    id: casting_time
+    &nameTitle: tr("Casting Time (%%)")
+    &subCategory: true
+    &last: true
+
+GameSpelltreeAetherRiftStatsPanelStaticAttribute < UIWidget
+  height: 25
+  phantom: false
+  @onSetup: |
+    self.name:setText(self.nameTitle and self.nameTitle or self:getId():gsub("_", " "):titleCase())
+    self.icon:setImageSource("/images/ui/windows/character/icon_" .. (self.subCategory and "sub_category" or self:getId()))
+  $first:
+    margin-top: 10
+  UIWidget
+    id: icon
+    image-source: /images/ui/windows/character/icon_might
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 25 25
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: Might
+    font: poppins-14
+    margin-left: 15
+    text-auto-resize: true
+    text-offset: 0 2
+    text-color: #CED2D9
+    phantom: false
+
+  UIWidget
+    id: value
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-18
+    size: 60 25
+    margin-top: 2
+    margin-right: 9
+    phantom: false
+    $on:
+      text-color: #ffa851
+    $!on:
+      text-color: white
+
+GameSpelltreeAetherRiftBottomPanel < Panel
+  id: aether_rift_bottom_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  height: 70
+  margin-bottom: 1
+  image-source: /images/ui/windows/adventurers_board/donate_bottom_panel_background
+
+  WarningButton
+    id: reset_stats_button
+    size: 120 50
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 25
+    text: Reset
+    @onClick: modules.game_spelltree.GameSpellTree:resetAetherRiftStats()
+
+  SuccessButton
+    id: save_stats_button
+    size: 120 50
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 25
+    text: Save
+    @onClick: modules.game_spelltree.GameSpellTree:saveAetherRiftStats()

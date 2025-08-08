@@ -1,0 +1,14 @@
+GameNotificationScreenMessagePanel < Panel
+  id: screenMessagePanel
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  margin-top: -150
+  image-source: /images/ui/windows/notification/middle_background
+  padding-left: 45
+  padding-right: 45
+  text-auto-resize: true
+  text-align: center
+  text-offset: 0 1
+  font: poppins-semibold-bordered-14
+  color: #FFA851
+  &baseMarginTop: -150

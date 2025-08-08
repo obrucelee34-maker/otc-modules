@@ -1,0 +1,83 @@
+SpellTreeWindow < MainWindow
+  id: spellTreeWindow
+  size: 1160 883
+  anchors.centerIn: parent
+  visible: false
+  &title: 'Skill Tree'
+  &hotkeyId: HOTKEYS_IDS.ARCHETYPES
+  &iconName: 'icon_spell_tree'
+  &isGeneralUIWindow: true
+  &extraHeight: 47
+  @onRaise: modules.game_spelltree.GameSpellTree.saveBuildPanel:raise()
+
+  MainWindowContent
+    id: contentPanel
+    padding: 10 20 10 20
+
+    TopPanel
+      id: topPanel
+
+    MainPanel
+      id: mainPanel
+      anchors.top: topPanel.bottom
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      anchors.left: parent.left
+      margin-top: 9
+      margin-bottom: 62
+
+    PointsPanel
+      id: pointsPanel
+
+    NeutralButton
+      id: resetArchetypes
+      &resizeText: true
+      !text: tr('Reset Archetypes')
+      anchors.bottom: parent.bottom
+      anchors.right: currencyPanel.left
+      margin-right: 20
+      @onClick: modules.game_spelltree.resetAbilities(self)
+
+    CurrencyPanel
+      id: currencyPanel
+
+    UIWidget
+      id: abilitiesLabel
+      text: Skills
+      anchors.verticalCenter: cards_toggle_button.verticalCenter
+      anchors.right: cards_toggle_button.left
+      margin-right: 20
+      font: poppins-semibold-14
+      text-auto-resize: true
+      text-color: #a6aab2
+      on: true
+      $on:
+        text-color: #36f991
+
+    UIWidget
+      id: cardsLabel
+      text: Cards
+      anchors.verticalCenter: cards_toggle_button.verticalCenter
+      anchors.left: cards_toggle_button.right
+      margin-left: 20
+      font: poppins-semibold-14
+      text-auto-resize: true
+      text-color: #a6aab2
+      $on:
+        text-color: #36f991
+
+    TrueFalseSelect
+      id: cards_toggle_button
+      anchors.verticalCenter: currencyPanel.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      checked: true
+      @onStateChange: |
+        local parent = self:getParent()
+        GameSpellTree:onToggleCards()
+        if self:isOn() then
+          parent.cardsLabel:setOn(true)
+          parent.abilitiesLabel:setOn(false)
+        else
+          parent.cardsLabel:setOn(false)
+          parent.abilitiesLabel:setOn(true)
+        end

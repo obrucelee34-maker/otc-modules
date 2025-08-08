@@ -1,0 +1,7 @@
+Module
+  name: game_subtitles
+  description: Subtitles
+  sandboxed: false
+  scripts: [ subtitles ]
+  @onLoad: GameSubtitles:init()
+  @onUnload: GameSubtitles:terminate()

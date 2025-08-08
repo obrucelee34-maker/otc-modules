@@ -1,0 +1,10 @@
+Module
+  name: game_abilitybar
+  description: Ability Bar
+  author: Archlight Team
+  website: www.archlightonline.com
+  sandboxed: false
+  autoload: false
+  scripts: [ abilitybar ]
+  @onLoad: AbilityBar.init()
+  @onUnload: AbilityBar.terminate()

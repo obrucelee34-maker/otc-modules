@@ -1,0 +1,132 @@
+GameNotificationBase < UIWidget
+  size: 400 100
+  margin-top: 30
+  phantom: true
+  &centerFunc: |
+    function(self)
+      -- set padding to achieve the correct size
+      local parentWidth = self:getParent():getWidth()
+      local padding = (parentWidth - 400) / 2
+      self:setPaddingLeft(padding)
+      self:setPaddingRight(padding)
+    end
+  @onGeometryChange: |
+    self:centerFunc()
+  @onSetup: |
+    self:centerFunc()
+
+  UIWidget
+    id: background
+    image-source: /images/ui/windows/notification/background
+    anchors.fill: parent
+    margin-bottom: 5
+    phantom: true
+  
+  UIWidget
+    id: color_edge
+    image-source: /images/ui/windows/notification/edge
+    anchors.fill: parent
+    image-border-top: 30
+    image-border-bottom: 30
+    margin-top: 3
+    margin-bottom: 8
+    phantom: true
+
+  UIWidget
+    id: content
+    anchors.fill: parent
+    margin: 15
+    phantom: true
+    //border: 1 red
+
+  MainWindowEdgeTop
+    height: 3
+    phantom: true
+  MainWindowEdgeBottom
+    height: 3
+    margin-bottom: 5
+    phantom: true
+
+  GameNotificationProgressBar
+    phantom: true
+
+GameNotificationIcon < UIWidget
+  id: icon
+  size: 25 25
+  margin-left: 15
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.left: parent.left
+  image-source: /images/ui/windows/notification/icon_info
+  phantom: true
+  @onImageChange: |
+    local imageTextureSize = self:getImageTextureSize()
+    self:setSize(imageTextureSize)
+
+GameNotificationIconClose < UIWidget
+  id: icon_close
+  margin-right: 10
+  margin-top: 10
+  anchors.right: parent.right
+  anchors.top: parent.top
+  image-source: /images/ui/windows/notification/icon_close
+  phantom: false
+
+GameNotificationIconText < UIWidget
+  id: icon_text
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  text-align: center
+  text: Notification text goes here. ANd its super very long wow WOW
+  text-auto-resize: true
+  font: poppins-semibold-13
+  text-wrap: true
+  margin-left: 50
+  margin-right: 50
+  phantom: true
+
+GameNotificationTitle < UIWidget
+  id: title
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.top: parent.top
+  font: poppins-semibold-15
+  text: Notification title goes here
+  text-auto-resize: true
+  margin-top: 10
+  phantom: true
+
+GameNotificationText < UIWidget
+  id: text
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  font: poppins-semibold-13
+  text: Notification text goes here
+  text-auto-resize: true
+  margin-top: 10
+  text-wrap: true
+  phantom: true
+
+GameNotificationProgressBar < UIProgressBar3
+  id: progress_bar
+  size: 401 3
+  image-source: /images/ui/windows/notification/timer_background
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  image-border: 5
+  &minWidth: 0
+  phantom: true
+  @onSetup: |
+    self:setPercent(10)
+
+  Panel
+    id: progress
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/windows/notification/timer
+    size: 401 3
+    phantom: true
+    image-border: 3

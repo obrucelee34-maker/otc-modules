@@ -1,0 +1,66 @@
+SaveBuildEditNameWindow < MainWindow
+  id: save_build_name_window
+  size: 400 280
+  &title: 'Build Name'
+  visible: false
+  anchors.centerIn: parent
+  draggable: false
+
+  MainWindowContent
+    padding: 0
+    padding-top: 15
+    layout:
+      type: verticalBox
+
+    SaveBuildEditNameWindowTitle
+      !text: tr('Enter a new name for your build.\n{(The build name should consist of 1 to 20 characters and may only include letters and numbers), #A6AAB2}')
+      text-wrap: true
+      text-align: center
+      margin-top: 10
+      @onTextChange: |
+        function(self, text)
+          self:setColoredText(GetHighlightedText(text), true)
+        end
+    SaveBuildEditNameWindowTextInput
+      preview: Type your build name...
+      id: textEdit
+      size: 320 40
+      max-length: 20
+      margin-top: 10
+      padding-left: 10
+      padding-top: 10
+    UIWidget
+      id: spacer
+      background-color: #3A3D43
+      height: 1
+      margin-top: 10
+
+    UIWidget
+      id: button_panel
+      height: 80
+      background-color: #3A3D4325
+      PrimaryButton
+        id: post_button
+        text: Change Name
+        &resizeText: true
+        anchors.centerIn: parent
+        @onClick: |
+          modules.game_spelltree.GameSpellTree:changeBuildName()
+
+SaveBuildEditNameWindowTitle < UIWidget
+  text-auto-resize: true
+  text-color: #CED2D9
+  font: poppins-14
+  text-align: left
+  margin-left: 20
+  margin-right: 20
+
+SaveBuildEditNameWindowTextInput < UITextEdit
+  image-source: /images/ui/windows/guild/text_input_background
+  image-border: 10
+  font: poppins-14
+  text-color: #CED2D9
+  margin-left: 20
+  margin-right: 20
+  padding: 5
+  selection-color: #3A3D43

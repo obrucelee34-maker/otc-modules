@@ -1,0 +1,190 @@
+ReplaceArchetypeButton < UIWidget
+  size: 76 76
+  opacity: 0.5
+  image-source: /images/ui/windows/spelltree/replace_archetype_popup/archetype_background_disabled
+  $hover !checked:
+    opacity: 1.0
+  $checked:
+    opacity: 1.0
+    image-source: /images/ui/windows/spelltree/replace_archetype_popup/archetype_background_active
+  @onSetup: |
+    connect(self, { onHoverChange = function(self, hovered)
+      if self.archetypeLogo then
+        self.archetypeLogo:setOpacity(hovered and 1.0 or 0.7)
+      end
+    end })
+
+  @onClick: |
+    local popupWindow = self:getParent():getParent()
+
+    -- disable all the siblings
+    if not popupWindow.selectMultiple then
+      -- if you are clicking on one that is already checked
+      -- lets uncheck it
+      if self:isChecked() then
+        self:setChecked(false)
+        popupWindow:recursiveGetChildById('confirmButton'):setEnabled(false)
+        return
+      end
+
+      for _, child in pairs(self:getParent():getChildren()) do
+        child:setChecked(false)
+      end
+    end
+
+    -- if it is already on, just set it to off
+    -- otherwise, turn it on
+    self:setChecked(not self:isChecked())
+
+    -- enable confirm button if there is at
+    -- least one button checked
+    local hasAtLeastOne = false
+    for _, child in pairs(self:getParent():getChildren()) do
+      if child:isChecked() then
+        hasAtLeastOne = true
+      end
+    end
+
+    popupWindow:recursiveGetChildById('confirmButton'):setEnabled(hasAtLeastOne)
+  
+  UIWidget
+    id: archetypeLogo
+    opacity: 0.7
+    size: 64 64
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    phantom: true
+
+NewArchetypeModal < PopupWindow
+  size: 500 270
+
+  PopupWindowLabel
+    id: descriptionLabel
+    !text: tr('You have to forget an archetype first, since you already know 3 archetypes. Your skill points will be refunded. Your archetype level will be retained, in case you learn this archetype in future.\n\nWhich archetype would you like to replace it with?')
+    @onSetup: |
+      addEvent(function()
+        local parent = self:getParent()
+        parent:setWidth(self:getWidth() + 24)
+      end)
+
+  ScrollablePanel
+    id: archetypesPanel
+    anchors.top: descriptionLabel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    height: 76
+    width: 268
+    vertical-scrollbar: scrollbar1
+    margin-top: 20
+    layout:
+      type: grid
+      num-columns: 3
+      num-rows: 5
+      cell-size: 76 76
+      cell-spacing: 20 20
+
+  VerticalScrollBar
+    id: scrollbar1
+    anchors.top: descriptionLabel.bottom
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    step: 200
+    pixels-scroll: true
+    visible: false
+
+  Panel
+    id: buttonsPanel
+    anchors.top: archetypesPanel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 20
+    height: 51
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    PopupWindowButton
+      id: confirmButton
+      !text: tr('Confirm')
+      @onSetup: self:setEnabled(false)
+
+    PopupWindowButton
+      id: cancelButton
+      !text: tr('Cancel')
+      @onClick: self:getParent():getParent():destroy()
+
+ReplaceArchetypeModal < PopupWindow
+  size: 500 270
+
+  PopupWindowLabel
+    id: descriptionLabel
+    !text: tr('You have to forget an archetype first, since you already know 3 archetypes. Your skill points will be refunded. Your archetype level will be retained, in case you learn this archetype in future.\n\nWhich archetype would you like to replace it with?')
+    @onSetup: |
+      addEvent(function()
+        local parent = self:getParent()
+        parent:setWidth(self:getWidth() + 24)
+      end)
+
+  Panel
+    id: archetypesPanel
+    anchors.top: descriptionLabel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    height: 76
+    margin-top: 20
+    layout:
+      type: horizontalBox
+      spacing: 20
+      fit-children: true
+
+  Panel
+    id: buttonsPanel
+    anchors.top: archetypesPanel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 20
+    height: 51
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    PopupWindowButton
+      id: confirmButton
+      !text: tr('Confirm')
+      @onSetup: self:setEnabled(false)
+
+    PopupWindowButton
+      id: cancelButton
+      !text: tr('Cancel')
+      @onClick: self:getParent():getParent():destroy()
+
+
+ReplaceArchetypeConfirmationModal < PopupWindow
+  size: 200 200
+
+  PopupWindowLabel
+    id: descriptionLabel
+    !text: tr('Warning: Changing to a lower-level Archetype may decrease your effective level,\nreducing the amount of skill points available.')
+    @onSetup: |
+      addEvent(function()
+        local parent = self:getParent()
+        parent:setWidth(self:getWidth() + 24)
+      end)
+
+  Panel
+    id: buttonsPanel
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 30
+    height: 51
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    PopupWindowButton
+      id: confirmButton
+      !text: tr('Confirm')
+
+    PopupWindowButton
+      id: cancelButton
+      !text: tr('Cancel')
+      @onClick: self:getParent():getParent():destroy()
