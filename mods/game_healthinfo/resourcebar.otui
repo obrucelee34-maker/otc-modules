@@ -1,0 +1,35 @@
+UIHealthBar
+  size: 108 129
+  draggable: true
+  phantom: false
+
+  EditModePanel
+    &title: 'Aether'
+
+  Panel
+    size: 73 73
+    image-source: /images/ui/windows/health_bars/aether_0
+    anchors.centerIn: parent
+    margin-top: 6
+
+  Panel
+    id: bar
+    size: 73 73
+    image-source: /images/ui/windows/health_bars/aether_10
+    anchors.centerIn: parent
+    margin-top: 6
+
+  Panel
+    id: background
+    image-source: /images/ui/windows/health_bars/aether_background
+    anchors.fill: parent
+
+  Label
+    id: text
+    text-auto-resize: true
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: 12
+    color: white
+    font: poppins-semibold-bordered-14
+    margin-bottom: -1

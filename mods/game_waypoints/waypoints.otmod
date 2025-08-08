@@ -1,0 +1,7 @@
+Module
+  name: game_waypoints
+  description: Waypoints management interface for the game
+  sandboxed: true
+  scripts: [ waypoints ]
+  @onLoad: GameWaypoints:init()
+  @onUnload: GameWaypoints:terminate()

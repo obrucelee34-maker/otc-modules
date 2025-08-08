@@ -1,0 +1,75 @@
+GameConditionsWindow < UIWidget
+  size: 390 51
+  phantom: true
+  draggable: true
+  EditModePanel
+    &title: 'Buff Conditions'
+    visible: false
+
+  UIWidget
+    id: content
+    phantom: true
+    anchors.fill: parent
+    layout:
+      type: grid
+      flow: true
+      num-columns: 9
+      cell-size: 34 51
+      cell-spacing: 5 0
+      fit-children: true
+      align: right
+      min-height: 51
+
+    @onLayoutUpdate: |
+      local size = self:getSize()
+      if size.width == 0 or size.height == 0 then
+        return
+      end
+
+      local parent = self:getParent()
+      if size.width == parent:getWidth() and size.height == parent:getHeight() then
+        return
+      end
+
+      parent:setHeight(math.max(51, self:getHeight()))
+
+GameConditionsWindowCondition < UIWidget
+  size: 34 51
+
+  UIWidget
+    id: icon
+    size: 30 30
+    anchors.centerIn: border
+    phantom: true
+
+  UISpellProgressRect
+    id: progress
+    phantom: true
+    anchors.fill: border
+    margin: 4
+    margin-right: 0
+    margin-bottom: 0
+    background: #00000070
+    UIWidget
+      id: text
+      visible: false
+
+  UIWidget
+    id: border
+    size: 34 34
+    phantom: true
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/icons/condition_bar_border
+
+  UIWidget
+    id: duration
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-bordered-12
+    text-horizontal-auto-resize: true
+
+    $on:
+      text-color: #FF5151
+    $!on:
+      text-color: #36F991

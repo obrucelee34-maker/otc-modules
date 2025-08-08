@@ -1,0 +1,92 @@
+GameDialogueViewerWindow < MainWindow
+  id: gameDialogueViewerWindow
+  size: 900 600
+  &title: 'Dialogue Viewer'
+  &shortcut: 'Ctrl+Alt+4'
+  anchors.centerIn: parent
+
+  MainWindowContent
+    GameDialogueViewerSearchPanel
+
+    GameDialogueViewerWindowNpcListPanel
+    GameDialogueViewerWindowNpcListPanelScrollBar
+
+    GameDialogueViewerSearchPanelDialogue
+    GameDialogueViewerWindowDialogueListPanel
+    GameDialogueViewerWindowDialogueListPanelScrollBar
+
+GameDialogueViewerSearchPanel < TextEdit
+  id: searchPanel
+  anchors.left: parent.left
+  anchors.top: parent.top
+  anchors.right: parent.right
+  height: 40
+  !preview: tr('Search...')
+  @onTextChange: |
+    GameDialogueViewer:searchNpcList(self:getText())
+
+GameDialogueViewerSearchPanelDialogue < TextEdit
+  id: searchPanelDialogue
+  anchors.left: npcListPanel.right
+  anchors.top: parent.top
+  anchors.right: parent.right
+  height: 40
+  !preview: tr('Search...')
+  @onTextChange: |
+    GameDialogueViewer:searchDialogueList(self:getText())
+
+GameDialogueViewerWindowNpcListPanel < ScrollablePanel
+  id: npcListPanel
+  anchors.left: parent.left
+  anchors.top: searchPanel.bottom
+  anchors.bottom: parent.bottom
+  width: 200
+  vertical-scrollbar: npcListPanelScrollbar
+  layout:
+    type: verticalBox
+
+GameDialogueViewerWindowNpcListPanelScrollBar < VerticalScrollBar
+  id: npcListPanelScrollbar
+  anchors.right: npcListPanel.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  pixels-scroll: true
+  step: 40
+
+GameDialogueViewerWindowNpcListPanelItem < UIWidget
+  font: poppins-14
+  text-auto-resize: true
+  text-align: left
+  text-color: white
+  text-wrap: true
+  $hover:
+    text-color: yellow
+  $on:
+    text-color: yellow
+  $checked:
+    text-color: #f0675d
+
+GameDialogueViewerWindowDialogueListPanel < ScrollablePanel
+  id: dialogueListPanel
+  anchors.left: npcListPanel.right
+  anchors.top: searchPanelDialogue.bottom
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  vertical-scrollbar: dialogueListPanelScrollbar
+  layout:
+    type: verticalBox
+
+GameDialogueViewerWindowDialogueListPanelScrollBar < VerticalScrollBar
+  id: dialogueListPanelScrollbar
+  anchors.right: dialogueListPanel.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  pixels-scroll: true
+  step: 40
+
+GameDialogueViewerWindowDialogueListPanelItem < UIWidget
+  margin-right: 10
+  layout:
+    type: verticalBox
+    spacing: 5
+    fit-children: true

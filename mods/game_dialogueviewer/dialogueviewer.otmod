@@ -1,0 +1,7 @@
+Module
+  name: game_dialogueviewer
+  reloadable: true
+  sandboxed: true
+  scripts: [dialogueviewer]
+  @onLoad: GameDialogueViewer:init()
+  @onUnload: GameDialogueViewer:terminate()

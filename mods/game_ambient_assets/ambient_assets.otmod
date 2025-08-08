@@ -1,0 +1,7 @@
+Module
+  name: game_ambient_assets
+  description: Ambient Assets
+  sandboxed: false
+  scripts: [ ambient_assets ]
+  @onLoad: GameAmbientAssets:init()
+  @onUnload: GameAmbientAssets:terminate()

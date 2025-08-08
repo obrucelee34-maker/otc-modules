@@ -1,0 +1,6 @@
+Module
+  name: game_conditions
+  sandboxed: true
+  scripts: [ conditions ]
+  @onLoad: GameConditions:init()
+  @onUnload: GameConditions:terminate()

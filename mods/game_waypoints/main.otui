@@ -1,0 +1,288 @@
+WaypointListItem < UIWidget
+  image-source: /images/ui/windows/waypoints/list_item
+  image-auto-resize: true
+  focusable: true
+
+  UIWidget
+    id: premium_icon
+    size: 22 22
+    anchors.right: next.left
+    anchors.verticalCenter: price_icon.verticalCenter
+    image-source: /images/ui/windows/premium_store/icon_premium_button
+    margin-right: 5
+    visible: false
+
+  UIWidget
+    id: premium_label
+    anchors.right: price.left
+    anchors.verticalCenter: price_icon.verticalCenter
+    text-auto-resize: true
+    text-color: #36F991
+    font: poppins-14
+    text: Free
+    margin-right: 10
+    visible: false
+
+  UIWidget
+    id: price_icon
+    size: 16 16
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    image-source: /images/ui/icons/silver_24
+
+  UIWidget
+    id: price
+    anchors.verticalCenter: price_icon.verticalCenter
+    anchors.right: price_icon.left
+    margin-right: 7
+    text: 450
+    text-auto-resize: true
+    font: poppins-14
+    text-color: #CED2D9
+    $on:
+      text-color: #FFA851
+
+    UIWidget
+      id: crossover
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.right: parent.right
+      anchors.left: parent.left
+      height: 1
+      background-color: #CED2D9
+      visible: false
+
+  UIWidget
+    id: radio
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    image-source: /images/ui/windows/waypoints/radio_icon
+    image-auto-resize: true
+
+    $on !disabled:
+      image-source: /images/ui/windows/waypoints/radio_icon_active
+    $disabled:
+      image-source: /images/ui/windows/waypoints/radio_icon_disabled
+
+  UIWidget
+    id: name
+    anchors.left: radio.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 25
+    text: -
+    text-auto-resize: true
+    font: poppins-14
+    text-color: #CED2D9
+    $disabled:
+      text-color: #7E828B
+    $on !disabled:
+      text-color: #36F991
+
+WaypointArrow < UIWidget
+  id: arrow
+  visible: true
+  image-source: /images/ui/windows/waypoints/arrow
+  image-auto-resize: true
+  margin-bottom: -10
+  phantom: true
+
+WaypointMapIcon < UIWidget
+  anchors.left: parent.left
+  anchors.top: parent.top
+  image-source: /images/ui/windows/waypoints/waypoint_disabled
+  image-auto-resize: true
+  opacity: 1
+  clipping: false
+
+  $on:
+    image-source: /images/ui/windows/waypoints/waypoint_active
+
+  $checked:
+    image-source: /images/ui/windows/waypoints/waypoint_current
+
+  $hover !on !checked:
+    opacity: 0.9
+
+
+WaypointsWindow < MainWindow
+  id: waypointsWindow
+  size: 1000 565
+  anchors.centerIn: parent
+  visible: false
+  &title: 'Waypoints'
+  &iconName: 'icon_waypoints'
+
+  MainWindowContent
+    id: contentPanel
+    padding: 2
+
+    UIWidget
+      id: map
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: locations.left
+
+    UIWidget
+      id: locations
+      width: 388
+      anchors.right: parent.right
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+
+      UIWidget
+        id: title
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: Select where you want to go
+        font: poppins-14
+        image-source: /images/ui/windows/waypoints/title_holder
+        image-auto-resize: true
+
+      Panel
+        id: travel_holder
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: non_premium_holder.top
+        image-source: /images/ui/windows/waypoints/travel_holder
+        image-auto-resize: true
+        border-width-top: 1
+        border-color-top: #3A3D43
+
+        PrimaryButton
+          id: travel_button
+          width: 190
+          anchors.horizontalCenter: parent.horizontalCenter
+          anchors.verticalCenter: parent.verticalCenter
+          text: Travel to Waypoint
+          @onClick: GameWaypoints:travel()
+
+      UIWidget
+        id: non_premium_holder
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        border-width-top: 1
+        border-color-top: #3A3D43
+        &maximumHeight: 85
+
+        YellowButton
+          id: get_premium_button
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          !text: tr('Get Patron')
+          width: 190
+          height: 57
+          margin-right: 15
+          &iconPath: '/images/ui/windows/premium_store/icon_premium_button'
+          &iconAlign: left
+          &iconOffset: '15 0'
+          &iconColor: white
+          &textAlign: left
+          &textMarginLeft: 45
+          @onSetup: |
+            self.icon:setChecked(true)
+          @onClick: |
+            modules.game_premium_store.GamePremiumStore:open()
+
+        UIWidget
+          id: price
+          anchors.bottom: parent.verticalCenter
+          anchors.left: parent.left
+          text-auto-resize: true
+          text: 450
+          font: poppins-14
+          text-color: #CED2D9
+          @onTextChange: |
+            -- center text between parent left and get_premium_button left
+            local parent = self:getParent()
+            local button = parent:getChildById('get_premium_button')
+            local marginLeft = (parent:getWidth() - button:getWidth() - self:getWidth()) / 2
+            self:setMarginLeft(marginLeft - 10)
+
+        UIWidget
+          id: price_icon
+          anchors.verticalCenter: price.verticalCenter
+          anchors.left: price.right
+          margin-left: 5
+          size: 16 16
+          image-source: /images/ui/icons/silver_24
+
+        UIWidget
+          id: spacer
+          anchors.bottom: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: get_premium_button.left
+          height: 1
+          background-color: #25272C
+          margin-left: 20
+          margin-right: 20
+        
+        UIWidget
+          id: premium
+          anchors.top: parent.verticalCenter
+          anchors.left: parent.left
+          anchors.right: get_premium_button.left
+          height: 22
+          margin-left: 25
+          margin-top: 5
+          layout:
+            type: horizontalBox
+
+          UIWidget
+            id: premium_icon
+            size: 22 22
+            image-source: /images/ui/windows/premium_store/icon_premium_button
+
+          UIWidget
+            text-auto-resize: true
+            margin-left: 5
+            text: Patron
+            text-color: #36F991
+            font: poppins-14
+
+          UIWidget
+            image-size: 9 7
+            image-offset: 4 7
+            image-source: /images/ui/windows/waypoints/arrow_small
+
+          UIWidget
+            id: price
+            margin-left: 5
+            text-auto-resize: true
+            text: 0
+            font: poppins-14
+            text-color: #CED2D9
+
+          UIWidget
+            id: price_icon
+            margin-left: 5
+            margin-top: 5
+            size: 16 16
+            image-size: 16 16
+            image-source: /images/ui/icons/silver_24
+
+      VerticalScrollBar
+        id: list_scrollbar
+        anchors.top: title.bottom
+        anchors.right: parent.right
+        anchors.bottom: travel_holder.top
+        margin-top: 5
+        margin-bottom: 5
+        step: 15
+
+      ScrollablePanel
+        id: list
+        anchors.top: title.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: travel_holder.top
+        margin-top: 10
+        padding-left: 20
+        padding-right: 20
+        vertical-scrollbar: list_scrollbar
+        layout:
+          type: verticalBox
+          spacing: 5

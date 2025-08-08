@@ -1,0 +1,298 @@
+TradeItem < Panel
+  image-source: /images/ui/windows/trade/panel_background
+  height: 75
+  phantom: false
+  border-color: #e7b131
+  border-width: 0
+  padding: 8
+  image-color: white
+  $hover: 
+    image-color: #cccccc
+
+  Item
+    id: item
+    size: 60 60
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/trade/item_background
+    font: poppins-semibold-bordered-14
+    virtual: true
+
+  Label
+    id: name
+    font: poppins-semibold-14
+    color: white
+    text-align: left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    anchors.right: parent.right
+    text-wrap: true
+    margin-left: 20
+    phantom: true
+    text-color: #ced2d9
+  
+  UIWidget
+    id: remove_button
+    size: 20 20
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 10
+    image-source: /images/ui/windows/trade/button_remove
+    image-color: white
+    $hover:
+      image-color: #cccccc
+    $pressed:
+      image-color: #aaaaaa
+    visible: false
+
+TradeName < Label
+  size: 150 70
+  font: poppins-18
+  color: #ffffff
+  text-auto-resize: true
+  text-align: bottom
+
+TradeOutfit < UICreature
+  size: 96 96
+
+TradeItems < Panel
+  width: 258
+  layout:
+    type: verticalBox
+    flow: true
+    spacing: 5
+
+TradeWindow < MainWindow
+  id: trade_window
+  size: 600 720
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 50
+  focusable: true
+  draggable: true
+  &title: 'Trade'
+  &iconName: 'icon_trade'
+  @onEscape: GameTrade.close()
+
+  MainWindowContent
+    id: content
+    padding: 0 0 0 0
+
+    Panel
+      id: player_content
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.horizontalCenter
+
+      Panel
+        id: playerPanel
+        height: 120
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 10
+
+        TradeOutfit
+          id: outfit
+          anchors.top: parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+
+        TradeName
+          id: name
+          height: 30
+          anchors.top: prev.bottom
+          anchors.horizontalCenter: parent.horizontalCenter
+          margin-top: 5
+
+      UIWidget
+        id: overlay
+        anchors.top: next.top
+        anchors.bottom: textEditPanel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin: 10
+        margin-top: -10
+        margin-bottom: -5
+        image-source: /images/ui/windows/trade/bgtrade
+        image-border: 10
+        image-color: alpha
+        $on:
+          image-color: white
+
+      TradeItems
+        id: playerItems
+        anchors.top: playerPanel.bottom
+        anchors.bottom: textEditPanel.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        margin-top: 15
+        TradeItem
+        TradeItem
+        TradeItem
+        TradeItem
+        TradeItem
+
+      UIWidget
+        id: textEditPanel
+        size: 170 40
+        image-source: /images/ui/windows/trade/currency_background
+        image-border: 5
+        anchors.bottom: playerBottomPanel.top
+        anchors.right: parent.right
+        margin-bottom: 10
+        margin-right: 20
+        UIWidget
+          id: icon
+          size: 30 30
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 15
+          image-source: /images/ui/icons/silver_30
+        UITextEdit
+          id: playerTextEdit
+          size: 150 35
+          anchors.right: parent.right
+          anchors.left: icon.right
+          margin-right: 10
+          margin-left: 10
+          anchors.verticalCenter: parent.verticalCenter
+          text-align: center
+          padding-top: 5
+          text: 0
+          font: poppins-semibold-14
+          text-color: #a6aab2
+          max-length: 11
+
+      UIWidget
+        id: playerBottomPanel
+        height: 70
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        SuccessButton
+          id: accept_button
+          width: 115
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: Accept
+          @onClick: function(self) GameTrade.acceptTrade(self) end
+
+    Panel
+      id: partner_content
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.horizontalCenter
+      anchors.right: parent.right
+
+      Panel
+        id: partnerPanel
+        height: 120
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin-top: 10
+
+        TradeOutfit
+          id: outfit
+          anchors.top: parent.top
+          anchors.horizontalCenter: parent.horizontalCenter
+
+        TradeName
+          id: name
+          height: 30
+          anchors.top: prev.bottom
+          anchors.horizontalCenter: parent.horizontalCenter
+          margin-top: 5
+
+      UIWidget
+        id: overlay
+        anchors.top: next.top
+        anchors.bottom: textEditPanel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        margin: 10
+        margin-top: -10
+        margin-bottom: -5
+        image-source: /images/ui/windows/trade/bgtrade
+        image-border: 10
+        image-color: alpha
+        $on:
+          image-color: white
+
+      TradeItems
+        id: partnerItems
+        anchors.top: partnerPanel.bottom
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: textEditPanel.top
+        margin-top: 15
+        TradeItem
+        TradeItem
+        TradeItem
+        TradeItem
+        TradeItem
+
+      UIWidget
+        id: textEditPanel
+        size: 170 40
+        image-source: /images/ui/windows/trade/currency_background
+        image-border: 5
+        anchors.bottom: partnerBottomPanel.top
+        anchors.right: parent.right
+        margin-bottom: 10
+        margin-right: 20
+        UIWidget
+          id: icon
+          size: 30 30
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          margin-left: 15
+          image-source: /images/ui/icons/silver_30
+        UITextEdit
+          id: partnerTextEdit
+          size: 150 35
+          anchors.right: parent.right
+          anchors.left: icon.right
+          margin-right: 10
+          margin-left: 10
+          anchors.verticalCenter: parent.verticalCenter
+          text-align: center
+          padding-top: 3
+          text: 0
+          font: poppins-semibold-14
+          text-color: #a6aab2
+          max-length: 11
+
+      UIWidget
+        id: partnerBottomPanel
+        height: 70
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+
+        NeutralButton
+          id: accept_button
+          width: 115
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: Waiting...
+          enabled: false
+          $checked:
+            text: Ready
+
+    UIWidget
+      phantom: true
+      image-source: /images/ui/windows/wagon_storage/icon
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 17
+    
+    UIWidget
+      phantom: true
+      image-border: 2
+      height: 200
+      image-source: /images/ui/windows/wagon_storage/line
+      anchors.top: prev.bottom
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter

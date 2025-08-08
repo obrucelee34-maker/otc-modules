@@ -1,0 +1,109 @@
+ExperienceBarSpacer < UIWidget
+  id: spacer
+  anchors.left: parent.left
+  anchors.verticalCenter: parent.verticalCenter
+  image-source: /images/ui/windows/health_bars/spacer
+
+ExperienceBar < UIHealthBar
+  size: 330 20
+  image-source: /images/ui/windows/health_bars/experience_horizontal_background
+  draggable: true
+  phantom: false
+  image-border-left: 25
+  image-border-right: 25
+  checked: true
+
+  EditModePanel
+    &title: 'Legacy Level'
+
+  Panel
+    id: bar
+    image-source: /images/ui/windows/health_bars/experience_fill
+    anchors.fill: parent
+    margin-top: 6
+    margin-bottom: 6
+    margin-left: 10
+
+  UIWidget
+    id: border
+    anchors.left: bar.left
+    anchors.verticalCenter: bar.verticalCenter
+    image-source: /images/ui/windows/health_bars/experience_border
+
+  Panel
+    id: debt
+    image-source: /images/ui/windows/health_bars/debt_fill
+    anchors.left: border.right
+    anchors.top: bar.top
+    margin-bottom: 6
+    image-rect: 0 0 1 8
+    visible: false
+
+  Panel
+    id: debtBorder
+    anchors.left: debt.left
+    anchors.verticalCenter: debt.verticalCenter
+    image-source: /images/ui/windows/health_bars/debt_border
+    visible: false
+
+  Panel
+    id: rested
+    image-source: /images/ui/windows/health_bars/rested_fill
+    anchors.left: border.right
+    anchors.top: bar.top
+    margin-bottom: 6
+    image-rect: 0 0 1 8
+    visible: false
+
+  Panel
+    id: restBorder
+    anchors.left: rested.left
+    anchors.verticalCenter: rested.verticalCenter
+    image-source: /images/ui/windows/health_bars/rest_border
+    visible: false
+
+  Panel
+    id: icon
+    image-source: /images/ui/windows/health_bars/icon_experience
+    anchors.horizontalCenter: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 28 28
+    margin-top: 1
+
+    UIWidget
+      id: level
+      size: 20 20
+      anchors.centerIn: parent
+      text-offset: 0 0
+      text-align: center
+      font: poppins-semibold-bordered-12
+
+  UILabel
+    id: text
+    anchors.right: parent.right
+    margin-right: 40
+    anchors.verticalCenter: parent.verticalCenter
+    text: 100/100
+    text-auto-resize: true
+    text-offset: 0 0
+    font: poppins-semibold-13
+    visible: false
+
+  Panel
+    id: rightBorder
+    image-source: /images/ui/windows/health_bars/border_right_experience
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 2
+    size: 17 20
+    $on:
+      image-source: /images/ui/windows/health_bars/icon_skull
+      size: 26 26
+      margin-right: 0
+
+  @onSetup: |
+    for i = 1, 9 do
+      local spacer = g_ui.createWidget('ExperienceBarSpacer', self)
+      -- margin left every widget gradually so they are evenly distributed across the bar
+      spacer:setMarginLeft((i * (self.bar:getWidth() - 12) / 10) + 10)
+    end

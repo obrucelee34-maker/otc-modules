@@ -1,0 +1,111 @@
+HealthBar < UIHealthBar
+  size: 359 45
+  image-source: /images/ui/windows/health_bars/horizontal_background
+  draggable: true
+  phantom: false
+  image-border-left: 50
+  image-border-right: 50
+  checked: true
+  $on:
+    size: 214 45
+
+  EditModePanel
+    &title: 'Life'
+
+  Panel
+    id: bar
+    image-source: /images/ui/windows/health_bars/health_fill
+    anchors.fill: parent
+    margin-top: 9
+    margin-bottom: 9
+    margin-left: 30
+    margin-right: 0
+
+  UIWidget
+    id: border
+    anchors.left: bar.left
+    anchors.verticalCenter: bar.verticalCenter
+    image-source: /images/ui/windows/health_bars/health_border
+
+  Panel
+    id: icon
+    image-source: /images/ui/windows/health_bars/icon_health
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-top: 1
+    size: 39 39
+
+  UILabel
+    id: text
+    anchors.right: parent.right
+    margin-right: 40
+    anchors.verticalCenter: parent.verticalCenter
+    text: 100/100
+    text-auto-resize: true
+    text-offset: 0 0
+    font: poppins-semibold-bordered-12
+
+  Panel
+    image-source: /images/ui/windows/health_bars/border_right_health
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 2
+
+HealthBarVertical < UIHealthBarVertical
+  size: 45 359
+  image-source: /images/ui/windows/health_bars/vertical_background
+  draggable: true
+  phantom: false
+  image-border-top: 50
+  image-border-bottom: 50
+  checked: true
+  $on:
+    size: 45 214
+
+  EditModePanelVertical
+    &title: 'Life'
+
+  Panel
+    id: bar
+    image-source: /images/ui/windows/health_bars/health_fill_vertical
+    anchors.fill: parent
+    margin-left: 9
+    margin-right: 6
+    margin-bottom: 20
+    margin-top: 25
+    rotation: 180
+
+  UIWidget
+    id: border
+    anchors.bottom: parent.bottom
+    anchors.left: bar.left
+    anchors.right: bar.right
+    image-source: /images/ui/windows/health_bars/health_border_vertical
+    margin-right: 2
+    image-offset: 0 -21
+
+  Panel
+    id: icon
+    image-source: /images/ui/windows/health_bars/icon_health
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-left: 4
+    margin-bottom: 0
+    size: 38 38
+
+  UILabel
+    id: text
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    margin-top: 70
+    text: 100/100
+    text-auto-resize: true
+    text-offset: 0 2
+    font: poppins-semibold-bordered-12
+    rotation: 270
+
+  Panel
+    image-source: /images/ui/windows/health_bars/border_top_health
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 2

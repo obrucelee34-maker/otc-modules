@@ -1,0 +1,118 @@
+StaminaBar < UIHealthBar
+  size: 294 43
+  image-source: /images/ui/windows/health_bars/mount/background
+
+  Panel
+    id: bar
+    image-source: /images/ui/windows/health_bars/mount/fill
+    anchors.left: parent.left
+    width: 241
+    anchors.verticalCenter: parent.verticalCenter
+    margin-top: 9
+    margin-bottom: 8
+    margin-left: 24
+    image-border-left: 12
+    image-border-bottom: 1
+
+  UIWidget
+    id: border
+    anchors.left: bar.left
+    anchors.top: bar.top
+    image-source: /images/ui/windows/health_bars/mount/border
+
+  UIWidget
+    id: moldure
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/health_bars/mount/moldure
+
+  Panel
+    id: mount_background
+    image-source: /images/ui/windows/health_bars/mount/mount_icon_background
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 3
+
+  UICreature
+    id: mount_icon
+    clipping: true
+    size: 22 24
+    margin-top: 11
+    margin-left: 9
+    anchors.left: parent.left
+    anchors.top: parent.top
+    outfit-scale: 0.7
+    outfit-offset: 3 30
+    outfit-direction: 1
+
+  Panel
+    id: mount_top_border
+    image-source: /images/ui/windows/health_bars/mount/mount_icon_border
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+  
+  UILabel
+    id: text
+    anchors.right: parent.right
+    margin-right: 35
+    margin-top: 1
+    anchors.verticalCenter: parent.verticalCenter
+    text: 100/100
+    text-auto-resize: true
+    text-offset: 0 0
+    font: poppins-semibold-bordered-12
+
+MountCondition < UIWidget
+  image-source: /images/ui/windows/health_bars/mount/circle
+  phantom: false
+  padding: 3
+  UIWidget
+    id: color
+    image-source: /images/ui/windows/health_bars/mount/color
+    anchors.fill: parent
+    phantom: true
+  UIWidget
+    id: icon
+    image-color: #1F2124
+    image-source: /images/ui/windows/health_bars/mount/hungry_icon
+    anchors.centerIn: parent
+    phantom: true
+
+MountConditions < Panel
+  size: 300 80
+  margin-top: 3
+  layout:
+    type: grid
+    cell-size: 26 26
+    cell-spacing: 2 2
+    flow: true
+
+  MountCondition
+    id: hungry
+    &tooltip: tr('Your mount is hungry')
+    visible: false
+  UIWidget
+    id: exhausted
+    visible: false
+    phantom: false
+    image-source: /images/ui/windows/health_bars/mount/exhausted_icon
+    &tooltip: tr('Beta')
+
+MountPanel < Panel
+  size: 300 100
+  draggable: true
+  phantom: false
+  checked: true
+  EditModePanel
+    &title: 'Moa'
+
+  StaminaBar
+    id: staminaBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+
+  MountConditions
+    id: conditions
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-left: 4

@@ -1,0 +1,175 @@
+PartyHealthBar < UIHealthBar
+  height: 30
+  margin-top: 3
+  draggable: false
+  phantom: false
+  @onClick: if not self:isOn() then modules.game_battle.selectHealTarget(self, self.name.fullName) else g_game.heal() end
+  @onStateChange: self.background:setOn(self:isOn())
+  @onEnableChange: self.name:setTextColor(self:isEnabled() and '#FFFFFF' or '#CED2D9')
+  @onCheckChange: |
+    local isChecked = self:isChecked()
+    for _, child in ipairs(self:getChildren()) do
+      if child:getId() ~= 'background' then
+        child:setOn(isChecked)
+      end
+    end
+
+  Panel
+    id: background
+    anchors.centerIn: parent
+    $on:
+      size: 132 40
+      image-source: /images/ui/windows/health_bars/party/background_on
+    $!on:
+      size: 124 34
+      image-source: /images/ui/windows/health_bars/party/background
+
+  Panel
+    id: separators
+    size: 103 27
+    image-source: /images/ui/windows/health_bars/party/border_overlay
+    anchors.centerIn: background
+
+  UIHealthBar
+    id: health
+    size: 96 20
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 1
+    padding-right: 19
+    margin-left: 20
+    phantom: true
+    $on:
+      opacity: 0.5
+    $!on:
+      opacity: 1.0
+
+    Panel
+      id: bar
+      size: 96 20
+      image-source: /images/ui/windows/health_bars/party/health_fill
+      image-rect: 0 0 96 20
+      anchors.fill: parent
+      margin-top: 3
+      $!disabled:
+        image-source: /images/ui/windows/health_bars/party/health_fill
+      $disabled:
+        image-source: /images/ui/windows/health_bars/party/health_fill_disabled
+
+    Panel
+      id: border
+      size: 5 18
+      anchors.left: prev.left
+      anchors.verticalCenter: prev.verticalCenter
+      image-source: /images/ui/windows/health_bars/party/health_border
+      visible: false
+
+  Panel
+    id: name
+    &ignoreTr: true
+    font: poppins-semibold-bordered-12
+    height: 15
+    anchors.verticalCenter: health.verticalCenter
+    anchors.left: parent.left
+    anchors.right: pareint.right
+    margin-top: 3
+    margin-left: 23
+    $!disabled:
+      text-color: #FFFFFF
+    $disabled:
+      text-color: #CED2D9
+    $on:
+      opacity: 0.5
+    $!on:
+      opacity: 1.0
+
+  UIHealthBar
+    id: mana
+    size: 96 4
+    anchors.left: health.left
+    anchors.top: health.bottom
+    padding-right: 19
+    phantom: true
+    margin-top: 2
+    $on:
+      opacity: 0.5
+    $!on:
+      opacity: 1.0
+
+    Panel
+      id: bar
+      image-source: /images/ui/windows/health_bars/party/mana_fill
+      image-rect: 0 0 96 4
+      anchors.fill: parent
+      $!disabled:
+        image-source: /images/ui/windows/health_bars/party/mana_fill
+      $disabled:
+        image-source: /images/ui/windows/health_bars/party/mana_fill_disabled
+
+    Panel
+      id: border
+      anchors.left: prev.left
+      anchors.verticalCenter: prev.verticalCenter
+      image-source: /images/ui/windows/health_bars/party/mana_border
+      visible: false
+
+  Panel
+    id: border_left
+    size: 21 34
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 3
+    $!disabled:
+      image-source: /images/ui/windows/health_bars/party/border_left
+    $disabled:
+      image-source: /images/ui/windows/health_bars/party/border_left_disabled
+
+  Panel
+    id: border_right
+    size: 21 34
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 3
+    $!disabled:
+      image-source: /images/ui/windows/health_bars/party/border_right
+    $disabled:
+      image-source: /images/ui/windows/health_bars/party/border_right_disabled
+
+  Panel
+    id: channel
+    font: poppins-semibold-12
+    image-source: /images/ui/windows/health_bars/party/circle_background
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-top: 3
+    margin-left: -8
+    text-align: center
+    text: 1
+    $on:
+      visible: true
+    $!on:
+      visible: false
+
+    Panel
+      id: icon
+      image-source: /images/ui/windows/health_bars/party/no_exp
+      anchors.centerIn: parent
+      visible: false
+
+Panel
+  size: 130 34
+  draggable: true
+  phantom: false
+    
+  EditModePanel
+    &title: 'Party'
+
+  Panel
+    id: partyPanel
+    size: 130 34
+    anchors.top: parent.top
+    anchors.left: parent.left
+    layout:
+      type: verticalBox
+      spacing: 4
+      fit-children: true

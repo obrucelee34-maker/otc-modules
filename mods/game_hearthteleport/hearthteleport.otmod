@@ -1,0 +1,7 @@
+Module
+  name: game_hearthteleport
+  sandboxed: true
+  scripts: [ hearthteleport ]
+  @onLoad: init()
+  @onUnload: terminate()
+  dependencies: [game_minimap]
