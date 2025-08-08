@@ -1,0 +1,453 @@
+GameSocialPartyPanel < UIWidget
+  id: party_panel
+  anchors.fill: parent
+
+  MainWindowScrollableContentScrollBar
+    margin-right: 10
+  MainWindowScrollableContent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: create_party_button.top
+    margin-bottom: 10
+    margin-right: 0
+    padding-left: 0
+    padding-top: 0
+    padding-bottom: 0
+    padding-right: 0
+    layout:
+      type: verticalBox
+      spacing: 10
+    GameSocialFriendsPanelRequestsPanel
+      padding-right: 28
+    GameSocialFriendsPanelActivePartyPanel
+      padding-right: 28
+
+  GameSocialHorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: create_party_button.top
+    margin-bottom: 10
+    margin-right: 0
+    margin-left: -28
+    height: 1
+
+  PrimaryButton
+    id: create_party_button
+    text: Create Party
+    width: 180
+    margin-bottom: 10
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    &iconPath: '/images/ui/windows/social/create_party_icon'
+    &iconAlign: left
+    &iconOffset: '20 0'
+    &textMarginLeft: 35
+    @onClick: |
+      GameSocial:onCreatePartyButtonClicked()
+    @onVisibilityChange: |
+      function(self, visible)
+        local parent = self:getParent()
+        parent.invite_player_button:setVisible(not visible)
+        parent.leave_party_button:setVisible(not visible)
+      end
+
+  PrimaryButton
+    id: invite_player_button
+    text: Invite Player
+    width: 180
+    margin-bottom: 10
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    &iconPath: '/images/ui/windows/social/add_friend_icon'
+    &iconAlign: left
+    &iconOffset: '20 0'
+    &textMarginLeft: 35
+    visible: false
+    @onClick: |
+      GameSocial:onInvitePartyButtonClicked()
+
+  DangerButton
+    id: leave_party_button
+    text: Leave Party
+    margin-right: 28
+    width: 180
+    margin-bottom: 10
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    &iconPath: '/images/ui/windows/social/leave_icon'
+    &iconAlign: left
+    &iconOffset: '20 0'
+    &textMarginLeft: 35
+    visible: false
+    @onClick: |
+      GameSocial:onLeavePartyButtonClicked()
+
+GameSocialFriendsPanelActivePartyPanel < UIWidget
+  id: active_party_panel
+  height: 26
+  &minHeight: 26
+
+  UIWidget
+    id: arrow
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 26 26
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local parent = self:getParent()
+      if not parent:isOn() then
+        parent:setHeight(parent.minHeight)
+        parent:setOn(true)
+      else
+        parent:setHeight(parent.maxHeight)
+        parent:setOn(false)
+      end
+
+  UIWidget
+    id: title
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: arrow.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    !text: tr('Active Party')
+
+  GameSocialHorizontalSeparator
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: title.right
+    anchors.right: level_range.left
+    margin-left: 15
+    height: 2
+
+  UIWidget
+    id: level_range
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.right: parent.right
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-align: right
+    padding-left: 15
+    $hidden:
+      padding-left: 0
+
+  UIWidget
+    id: list
+    anchors.top: arrow.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    &setup: |
+      function(self)
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom() + self:getLayout():getSpacing()
+        end
+
+        self:setHeight(height)
+        local parent = self:getParent()
+        parent:setHeight(height + parent.minHeight)
+        parent.maxHeight = parent:getHeight()
+      end
+    @onSetup: |
+      addEvent(function()
+        self:setup()
+      end)
+    layout:
+      type: verticalBox
+
+GameSocialFriendsPanelPartyMember < UIWidget
+  $first:
+    margin-top: 5
+  height: 37
+  image-color: alpha
+  image-source: /images/ui/windows/social/friend_background
+  image-rect: -18 0 438 37
+  $hover:
+    image-color: white
+  $on:
+    image-color: white
+  @onHoverChange: |
+    function(self, hovered)
+      self.options_panel:setOn(hovered)
+      self.class_panel:setOn(not hovered)
+    end
+  @onStateChange: |
+    function(self, state)
+      self.class_panel:setOn(not state)
+    end
+
+  UIWidget
+    id: leader
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/social/leader_icon
+    image-color: #fbfb79
+    phantom: true
+    size: 20 20
+    margin-left: 3
+
+  UIWidget
+    id: icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: leader.right
+    margin-left: 12
+    size: 8 16
+    image-source: /images/ui/windows/social/party_member_color_background
+    phantom: true
+
+  UIWidget
+    id: name
+    &ignoreTr: true
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: icon.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-offset: 0 3
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Name
+    text-align: center
+    phantom: true
+
+  UIWidget
+    id: class_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-align: right
+    phantom: true
+    text: Class [123]
+    on: true
+    $on:
+      visible: true
+    $!on:
+      visible: false
+
+  UIWidget
+    id: options_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    size: 135 37
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+    @onStateChange: |
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(self:isOn())
+      end
+
+    @onHoverChange: |
+      function(self, hovered)
+        self:setOn(hovered)
+      end
+
+    &setup: |
+      function(self)
+        local width = 0
+        local firstVisibleChild = nil
+        for _, child in ipairs(self:getChildren()) do
+          if child:isVisible() then
+            width = width + child:getWidth() + self:getLayout():getSpacing()
+            if not firstVisibleChild then
+              firstVisibleChild = child
+            end
+          end
+        end
+
+        -- set margin on the first children to align last child to the right
+        if firstVisibleChild then
+          firstVisibleChild:setMarginLeft(self:getWidth() - width)
+        end
+      end
+
+    UIWidget
+      id: channel_swap_button
+      image-source: /images/ui/windows/social/channel_change_icon
+      &tooltip: tr('Join Channel')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onChannelSwapButtonClicked(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end
+
+    UIWidget
+      id: pass_leader_button
+      image-source: /images/ui/windows/social/leader_icon
+      &tooltip: tr('Pass Leadership')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onPassPartyLeadershipButtonClicked(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end
+
+    UIWidget
+      id: add_friend_button
+      image-source: /images/ui/windows/social/add_friend_icon
+      &tooltip: tr('Send friend invitation')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onPartyAddFriendButtonClicked(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end
+
+    UIWidget
+      id: whisper_button
+      image-source: /images/ui/windows/social/whisper_icon
+      &tooltip: tr('Message player')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onWhisperButtonClicked(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end
+
+    UIWidget
+      id: remove_button
+      image-source: /images/ui/windows/social/remove_icon
+      &tooltip: tr('Kick player from party')
+      $checked:
+        image-source: /images/ui/windows/social/leave_icon
+        &tooltip: tr('Leave party')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onRemovePartyMemberButtonClicked(self:getParent():getParent(), self:isChecked())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end

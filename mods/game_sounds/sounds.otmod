@@ -1,0 +1,8 @@
+Module
+  name: game_sounds
+  description: Sounds
+  author: Archlight Team
+  website: www.archlightonline.com
+  sandboxed: false
+  scripts: [ sounds ]
+  @onUnload: g_sound.terminate()

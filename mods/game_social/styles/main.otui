@@ -1,0 +1,83 @@
+GameSocialWindow < MainWindow
+  id: gameSocialWindow
+  size: 447 704
+  anchors.centerIn: parent
+  &title: 'Social'
+  &hotkeyId: HOTKEYS_IDS.SOCIAL
+  &iconName: 'icon_social'
+  &isGeneralUIWindow: true
+
+  GameSocialTopPanelSelection
+  MainWindowContent
+    id: content
+    anchors.top: selection_panel.bottom
+    padding-bottom: 0
+    padding-right: 0
+
+GameSocialTopPanelSelection < UIWidget
+  id: selection_panel
+  anchors.top: parent.top
+  margin-top: 60
+  anchors.left: parent.left
+  anchors.right: parent.right
+  size: 447 47
+  image-source: /images/ui/windows/character/selection_panel_background
+  layout:
+    type: horizontalBox
+    spacing: 0
+
+  GameSocialTopPanelSelectionButton
+    id: friends
+  GameSocialTopPanelSelectionButton
+    id: party
+  GameSocialTopPanelSelectionButton
+    id: mail
+
+  @onSetup: |
+    -- distribute the buttons evenly
+    local width = self:getWidth() / self:getChildCount()
+    for i = 1, self:getChildCount() do
+      local child = self:getChildByIndex(i)
+      child:setWidth(width)
+    end
+
+GameSocialTopPanelSelectionButton < UIWidget
+  size: 130 47
+  font: poppins-semibold-14
+  text-offset: 0 5
+  text-color: #5b5b5b
+  image-source: /images/ui/windows/character/selection_button_background_on
+  image-color: alpha
+  $on:
+    text-color: white
+    image-color: white
+
+  UIWidget
+    id: content
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-14
+    text-color: #5b5b5b
+    image-color: #5b5b5b
+    opacity: 1
+    text-auto-resize: true
+    $on:
+      text-color: white
+      image-color: white
+    $hover:
+      text-color: white
+      image-color: white
+    $pressed:
+      opacity: 0.7
+    @onClick: GameSocial:selectTab(self:getParent():getId())
+    @onSetup: |
+      self:setImageSource('/images/ui/windows/social/' .. self:getParent():getId() .. '_icon')
+      local imageWidth = self:getImageTextureWidth()
+      local imageHeight = self:getImageTextureHeight()
+      self:setImageSize({width = imageWidth, height = imageHeight})
+      self:setImageOffset({x = 0, y = self:getHeight() / 2 - imageHeight / 2})
+      self:setTextOffset({x = imageWidth + 10, y = 1})
+
+  @onSetup: | 
+    self.content:setText(self:getId():titleCase())
+  @onStateChange: self.content:setOn(self:isOn())

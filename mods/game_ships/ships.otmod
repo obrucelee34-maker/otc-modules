@@ -1,0 +1,14 @@
+Module
+  name: game_ships
+  description: Ship
+  author: Living Phoenix Entertainment
+  website: -
+  version: 1.0
+
+  autoload: true
+  autoload-priority: 1000
+  sandboxed: false
+
+  scripts: [ ships ]
+  @onLoad: g_ships.init()
+  @onUnload: g_ships.terminate()

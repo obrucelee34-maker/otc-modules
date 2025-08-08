@@ -1,0 +1,328 @@
+GameSocialMailPanel < UIWidget
+  id: mail_panel
+  anchors.fill: parent
+
+  MainWindowScrollableContent
+    anchors.fill: parent
+    margin-bottom: 10
+    margin-right: 0
+    padding-left: 0
+    padding-top: 0
+    padding-bottom: 0
+    padding-right: 0
+    layout:
+      type: verticalBox
+      spacing: 10
+    GameSocialFriendsPanelMailPanel
+      padding-right: 28
+  MainWindowScrollableContentScrollBar
+    margin-right: 10
+
+  MailContentPanel
+  MailPanelPagination
+
+GameSocialFriendsPanelMailPanel < UIWidget
+  id: messages_panel
+  layout:
+    type: verticalBox
+    fit-children: true
+
+GameSocialFriendsPanelMailPanelItem < UIWidget
+  height: 37
+  image-color: alpha
+  image-source: /images/ui/windows/social/friend_background
+  image-rect: -18 0 438 37
+  $hover:
+    image-color: white
+  $on:
+    image-color: white
+  @onHoverChange: |
+    function(self, hovered)
+      self.options_panel:setOn(hovered)
+      self.time_panel:setOn(not hovered)
+    end
+  @onStateChange: |
+    function(self, state)
+      self.time_panel:setOn(not state)
+    end
+  @onClick: |
+    modules.game_social.GameSocial:openMail(self.data)
+
+  UIWidget
+    id: read
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/social/mail_icon
+    size: 23 17
+    image-color: #cccccc
+    $on:
+      image-source: /images/ui/windows/social/mail_read_icon
+      size: 17 21
+      image-color: #717272
+      margin-left: 6
+    phantom: true
+    margin-left: 3
+
+  UIWidget
+    id: title
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: read.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-offset: 0 3
+    text-color: #ffffff
+    text-auto-resize: true
+    text: title
+    text-align: top
+    phantom: true
+
+  UIWidget
+    id: sender
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: read.right
+    margin-left: 10
+    font: poppins-semibold-13
+    text-offset: 0 3
+    text-color: #d6c0a2
+    text-auto-resize: true
+    text: sender
+    text-align: bottom
+    phantom: true
+
+  UIWidget
+    id: time_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    font: poppins-semibold-13
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-align: right
+    phantom: true
+    on: true
+    $on:
+      visible: true
+    $!on:
+      visible: false
+
+  UIWidget
+    id: options_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    size: 100 37
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      align-right: true
+    @onStateChange: |
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(self:isOn())
+      end
+
+    @onHoverChange: |
+      function(self, hovered)
+        self:setOn(hovered)
+      end
+
+    UIWidget
+      id: remove_button
+      image-source: /images/ui/windows/social/remove_icon
+      &tooltip: tr('Delete mail')
+      opacity: 1.0
+      image-color: #FFFFFF
+      $hover:
+        image-color: #36F991
+      $pressed:
+        opacity: 0.7
+      $!on:
+        opacity: 0
+      @onClick: |
+        modules.game_social.GameSocial:onRemoveMailButtonClicked(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+          if hovered then
+            g_tooltip.display(self)
+          else
+            g_tooltip.hide()
+          end
+        end
+      @onDestroy: |
+        if g_tooltip then
+          g_tooltip.hide()
+        end
+
+MailContentPanel < MainWindowContent
+  id: mail_content
+  anchors.fill: parent
+  visible: false
+  padding: 0
+  padding-right: 28
+
+  WarningButton
+    id: back_button
+    &iconPath: '/images/ui/windows/social/back_icon'
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 30 30
+    @onClick: |
+      modules.game_social.GameSocial:closeMail()
+  
+  UIWidget
+    anchors.left: back_button.right
+    anchors.verticalCenter: back_button.verticalCenter
+    text-auto-resize: true
+    margin-left: 10
+    text: Back to list
+    font: poppins-semibold-13
+    text-color: #b8b8b8
+
+  UIWidget
+    id: read
+    anchors.left: parent.left
+    anchors.top: back_button.bottom
+    margin-top: 20
+    image-source: /images/ui/windows/social/mail_icon
+    size: 23 37
+    image-size: 23 17
+    image-color: #cccccc
+    image-offset: 0 10
+    phantom: true
+    margin-left: 3
+
+  UIWidget
+    id: title
+    anchors.top: read.top
+    anchors.left: read.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #ffffff
+    text-auto-resize: true
+    text: title
+    text-align: top
+    phantom: true
+
+  UIWidget
+    id: sender
+    anchors.bottom: read.bottom
+    anchors.left: read.right
+    margin-left: 10
+    font: poppins-semibold-13
+    text-color: #d6c0a2
+    text-auto-resize: true
+    text: sender
+    text-align: bottom
+    phantom: true
+
+  UIWidget
+    id: time
+    anchors.verticalCenter: read.verticalCenter
+    anchors.right: parent.right
+    font: poppins-semibold-13
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-align: right
+    phantom: true
+
+  UIWidget
+    id: message
+    anchors.top: prev.bottom
+    margin-top: 20
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    text-align: top-left
+    text-wrap: true
+    text-color: #b8b8b8
+    font: poppins-semibold-14
+
+MailPanelPagination < UIWidget
+  id: pagination_panel
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  size: 160 30
+  margin-bottom: 10
+  margin-right: 10
+
+  UITextEdit
+    id: page_edit
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 40 30
+    font: poppins-semibold-14
+    text-color: #a6aab2
+    text-align: center
+    text-offset: 0 0
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_backgorund
+    @onTextChange: |
+      function(self, text)
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+
+        -- update the page count
+        modules.game_social.GameSocial:changeMailboxPage(self:getText())
+      end
+
+  UIWidget
+    id: page_count
+    anchors.left: page_edit.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: of 1
+    font: poppins-semibold-14
+    text-color: #a6aab2
+    text-align: center
+    size: 50 30
+  
+  UIWidget
+    id: prev_button
+    anchors.left: page_count.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev
+    size: 30 30
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    @onClick: modules.game_social.GameSocial:changeMailboxPage('previous')
+
+  UIWidget
+    id: next_button
+    anchors.left: prev_button.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next
+    size: 30 30
+    margin-left: 10
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    @onClick: modules.game_social.GameSocial:changeMailboxPage('next')

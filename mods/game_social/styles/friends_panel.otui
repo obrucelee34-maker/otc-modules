@@ -1,0 +1,720 @@
+GameSocialHorizontalSeparator < HorizontalSeparator
+  background-color: #3A3D43
+
+GameSocialFriendsPanel < UIWidget
+  id: friends_panel
+  anchors.fill: parent
+
+  MainWindowScrollableContentScrollBar
+    margin-right: 10
+  MainWindowScrollableContent
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: add_friend_button.top
+    margin-bottom: 10
+    margin-right: 0
+    padding-left: 0
+    padding-top: 0
+    padding-bottom: 0
+    padding-right: 0
+    layout:
+      type: verticalBox
+      spacing: 10
+    //GameSocialFriendsPanelOnlineStatusPanel
+    GameSocialFriendsPanelRequestsPanel
+      padding-right: 28
+    GameSocialFriendsPanelOnlinePanel
+      padding-right: 28
+    GameSocialFriendsPanelOfflinePanel
+      padding-right: 28
+    GameSocialFriendsPanelIgnoredPanel
+      padding-right: 28
+
+  GameSocialHorizontalSeparator
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: add_friend_button.top
+    margin-bottom: 10
+    margin-right: 0
+    margin-left: -28
+    height: 1
+
+  PrimaryButton
+    id: add_friend_button
+    text: Add Friend
+    width: 160
+    margin-bottom: 10
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    margin-left: 25
+
+    &iconPath: '/images/ui/windows/social/add_friend_icon'
+    &iconAlign: left
+    &iconOffset: '20 0'
+    &textMarginLeft: 25 
+    @onClick: |
+      GameSocial:onAddFriendButtonClicked()
+
+  Button
+    id: refer_friend_button
+    &color: '#FBFB79'
+    text: Refer a Friend
+    width: 180
+    margin-bottom: 10
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 30
+    &iconPath: '/images/ui/windows/social/refer_a_friend'
+    &iconAlign: left
+    &iconOffset: '20 0'
+    &textMarginLeft: 25
+    @onClick: |
+      g_platform.openUrl('https://ravendawn.online/myaccount/refer-a-friend')
+
+GameSocialFriendsPanelOnlineStatusPanel < UIWidget
+  id: online_status_panel
+  height: 30
+  @onSetup: |
+    addEvent(function()
+      local width = 0
+      for _, child in ipairs(self:getChildren()) do
+        width = width + child:getWidth() + child:getMarginLeft() + child:getMarginRight()
+      end
+
+      self.icon:setMarginLeft((self:getWidth() - width) / 2)
+    end)
+
+  UIWidget
+    id: icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    size: 17 17
+    image-source: /images/ui/windows/social/online_icon
+    $on !checked:
+      // online, same channel
+      image-color: #77d463
+    $!on checked:
+      // away / dont disturb
+      image-color: #d46363
+    $!on !checked:
+      // offline / hidden
+      image-color: #b8b8b8
+    $on checked:
+      // online, different channel
+      image-color: #fbfb79
+  
+  UIWidget
+    id: arrow
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: next.right
+    margin-left: 10
+    image-source: /images/ui/windows/social/arrow_down
+    size: 12 10
+    $on:
+      image-source: /images/ui/windows/social/arrow_up
+
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: icon.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Status: Offline
+    @onTextChange: |
+      local parent = self:getParent()
+      local width = 0
+      for _, child in ipairs(parent:getChildren()) do
+        width = width + child:getWidth() + child:getMarginLeft() + child:getMarginRight()
+      end
+      parent:setWidth(width)
+
+GameSocialFriendsPanelRequestsPanel < UIWidget
+  id: request_panel
+  height: 26
+  &minHeight: 26
+
+  UIWidget
+    id: arrow
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 26 26
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local parent = self:getParent()
+      if not parent:isOn() then
+        parent:setHeight(parent.minHeight)
+        parent:setOn(true)
+      else
+        parent:setHeight(parent.maxHeight)
+        parent:setOn(false)
+      end
+
+  UIWidget
+    id: title
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: arrow.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Requests
+  
+  GameSocialHorizontalSeparator
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: title.right
+    anchors.right: next.left
+    margin-left: 15
+    margin-right: 15
+    height: 2
+
+  UIWidget
+    id: counter
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.right: parent.right
+    image-source: /images/ui/windows/social/count_background
+    size: 26 26
+    font: poppins-semibold-14
+    text-color: #ffffff
+    text-offset: 0 2
+    text: 0
+
+  UIWidget
+    id: list
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    padding-left: 36
+    &setup: |
+      function(self)
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom() + self:getLayout():getSpacing()
+        end
+
+        self:setHeight(height)
+        local parent = self:getParent()
+        parent:setHeight(height + parent.minHeight)
+        parent.maxHeight = parent:getHeight()
+      end
+    @onSetup: |
+      addEvent(function()
+        self:setup()
+      end)
+    layout:
+      type: verticalBox
+
+GameSocialFriendsPanelIgnoredPanel < UIWidget
+  id: ignored_panel
+  height: 26
+  &minHeight: 26
+
+  UIWidget
+    id: arrow
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 26 26
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local parent = self:getParent()
+      if not parent:isOn() then
+        parent:setHeight(parent.minHeight)
+        parent:setOn(true)
+      else
+        parent:setHeight(parent.maxHeight)
+        parent:setOn(false)
+      end
+
+  UIWidget
+    id: title
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: arrow.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Ignored
+  
+  GameSocialHorizontalSeparator
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: title.right
+    anchors.right: next.left
+    margin-left: 15
+    margin-right: 15
+    height: 2
+
+  UIWidget
+    id: counter
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.right: parent.right
+    image-source: /images/ui/windows/social/count_background_gray
+    size: 26 26
+    font: poppins-semibold-14
+    text-color: #ffffff
+    text-offset: 0 2
+    text: 0
+
+  UIWidget
+    id: list
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    padding-left: 36
+    &setup: |
+      function(self)
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom() + self:getLayout():getSpacing()
+        end
+
+        self:setHeight(height)
+        local parent = self:getParent()
+        parent:setHeight(height + parent.minHeight)
+        parent.maxHeight = parent:getHeight()
+      end
+    @onSetup: |
+      addEvent(function()
+        self:setup()
+      end)
+    layout:
+      type: verticalBox
+
+GameSocialFriendsPanelFriendButton < UIWidget
+  opacity: 1.0
+  image-color: #FFFFFF
+  $hover:
+    image-color: #36F991
+  $pressed:
+    opacity: 0.7
+  $!on:
+    opacity: 0
+  @onSetup: |
+    local width = self:getImageTextureWidth()
+    local height = self:getImageTextureHeight()
+    self:setSize({width = width, height = height})
+    self:setImageSize({width = width, height = height})
+    self:setMarginTop(self:getParent():getHeight() - height)
+  @onHoverChange: |
+    function(self, hovered)
+      signalcall(UIWidget.onHoverChange, self, hovered)
+      self:getParent():getParent():setOn(hovered)
+      self:getParent():setOn(hovered)
+    end
+
+GameSocialFriendsPanelFriend < UIWidget
+  $first:
+    margin-top: 5
+  height: 37
+  image-color: alpha
+  image-source: /images/ui/windows/social/friend_background
+  image-rect: -64 0 448 37
+  $hover:
+    image-color: white
+  $on:
+    image-color: white
+  @onHoverChange: |
+    function(self, hovered)
+      self.options_panel:setOn(hovered)
+      if hovered then
+        -- bring scrollbar to front
+        self:getParent():getParent():getParent():getParent():getChildById('main_window_scrollbar'):raise()
+      end
+    end
+
+  UIWidget
+    id: icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    size: 16 16
+    image-source: /images/ui/windows/social/online_icon
+    phantom: true
+    $on !checked:
+      // online, same channel
+      image-color: #77d463
+    $!on checked:
+      // away / dont disturb
+      image-color: #d46363
+    $!on !checked:
+      // offline / hidden
+      image-color: #b8b8b8
+    $on checked:
+      // online, different channel
+      image-color: #fbfb79
+
+  UIWidget
+    id: name
+    &ignoreTr: true
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: icon.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-offset: 0 3
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Name
+    text-align: center
+    phantom: true
+
+  UIWidget
+    id: options_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    size: 135 37
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      align-right: true
+    @onStateChange: |
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(self:isOn())
+      end
+
+    @onHoverChange: |
+      function(self, hovered)
+        self:setOn(hovered)
+      end
+
+    GameSocialFriendsPanelFriendButton
+      id: channel_swap_button
+      image-source: /images/ui/windows/social/channel_change_icon
+      margin-right: 15
+      &tooltip: 'Swap Channel'
+      @onClick: |
+        modules.game_social.GameSocial:onChannelSwapButtonClicked(self:getParent():getParent())
+
+    GameSocialFriendsPanelFriendButton
+      id: party_invite_button
+      image-source: /images/ui/windows/social/create_party_icon
+      margin-right: 15
+      &tooltip: 'Invite to Party'
+      @onClick: |
+        modules.game_social.GameSocial:invitePlayer(self:getParent():getParent():getChildById('name'):getText())
+
+    GameSocialFriendsPanelFriendButton
+      id: whisper_button
+      image-source: /images/ui/windows/social/whisper_icon
+      margin-right: 15
+      &tooltip: 'Private Message'
+      @onClick: |
+        modules.game_social.GameSocial:onWhisperButtonClicked(self:getParent():getParent())
+
+    GameSocialFriendsPanelFriendButton
+      id: remove_button
+      image-source: /images/ui/windows/social/remove_icon
+      margin-right: 15
+      &tooltip: 'Remove Friend'
+      @onClick: |
+        modules.game_social.GameSocial:onRemoveFriendButtonClicked(self:getParent():getParent())
+
+GameSocialFriendsPanelRequest < UIWidget
+  $first:
+    margin-top: 5
+  height: 37
+  image-color: alpha
+  image-source: /images/ui/windows/social/friend_background
+  image-rect: -64 0 448 37
+  $hover:
+    image-color: white
+  $on:
+    image-color: white
+  @onHoverChange: |
+    function(self, hovered)
+      self.request_panel:setOn(hovered)
+    end
+
+  UIWidget
+    id: name
+    &ignoreTr: true
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-offset: 0 3
+    text: Name
+    text-align: center
+    phantom: true
+
+  UIWidget
+    id: request_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    size: 100 37
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      align-right: true
+
+    UIWidget
+      id: accept_button
+      size: 26 26
+      image-source: /images/ui/windows/social/accept_icon
+      opacity: 1.0
+      margin-right: 15
+      $hover:
+        opacity: 0.9
+      $pressed:
+        opacity: 0.7
+      @onClick: |
+        modules.game_social.GameSocial:acceptFriendRequest(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+        end
+
+    UIWidget
+      id: reject_button
+      size: 26 26
+      image-source: /images/ui/windows/social/reject_icon
+      opacity: 1.0
+      $hover:
+        opacity: 0.9
+      $pressed:
+        opacity: 0.7
+      @onClick: |
+        modules.game_social.GameSocial:rejectFriendRequest(self:getParent():getParent())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+        end
+
+GameSocialFriendsPanelOnlinePanel < UIWidget
+  id: online_panel
+  height: 26
+  &minHeight: 26
+
+  UIWidget
+    id: arrow
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 26 26
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local parent = self:getParent()
+      if not parent:isOn() then
+        parent:setHeight(parent.minHeight)
+        parent:setOn(true)
+      else
+        parent:setHeight(parent.maxHeight)
+        parent:setOn(false)
+      end
+
+  UIWidget
+    id: title
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: arrow.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Online
+  
+  GameSocialHorizontalSeparator
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: title.right
+    anchors.right: parent.right
+    margin-left: 15
+    height: 2
+
+  UIWidget
+    id: list
+    anchors.top: arrow.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    padding-left: 36
+    &setup: |
+      function(self)
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom() + self:getLayout():getSpacing()
+        end
+
+        self:setHeight(height)
+        local parent = self:getParent()
+        parent:setHeight(height + parent.minHeight)
+        parent.maxHeight = parent:getHeight()
+      end
+    @onSetup: |
+      addEvent(function()
+        self:setup()
+      end)
+    layout:
+      type: verticalBox
+
+GameSocialFriendsPanelOfflinePanel < UIWidget
+  id: offline_panel
+  height: 26
+  &minHeight: 26
+
+  UIWidget
+    id: arrow
+    anchors.top: parent.top
+    anchors.left: parent.left
+    size: 26 26
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:setOn(not self:isOn())
+    @onStateChange: |
+      local parent = self:getParent()
+      if not parent:isOn() then
+        parent:setHeight(parent.minHeight)
+        parent:setOn(true)
+      else
+        parent:setHeight(parent.maxHeight)
+        parent:setOn(false)
+      end
+
+  UIWidget
+    id: title
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: arrow.right
+    margin-left: 10
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text: Offline
+  
+  GameSocialHorizontalSeparator
+    anchors.verticalCenter: arrow.verticalCenter
+    anchors.left: title.right
+    anchors.right: parent.right
+    margin-left: 15
+    height: 2
+
+  UIWidget
+    id: list
+    anchors.top: arrow.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    padding-left: 36
+    &setup: |
+      function(self)
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom() + self:getLayout():getSpacing()
+        end
+
+        self:setHeight(height)
+        local parent = self:getParent()
+        parent:setHeight(height + parent.minHeight)
+        parent.maxHeight = parent:getHeight()
+      end
+    @onSetup: |
+      addEvent(function()
+        self:setup()
+      end)
+    layout:
+      type: verticalBox
+
+GameSocialFriendsPanelIgnored < UIWidget
+  $first:
+    margin-top: 5
+  height: 37
+  image-color: alpha
+  image-source: /images/ui/windows/social/friend_background
+  image-rect: -64 0 448 37
+  $hover:
+    image-color: white
+  $on:
+    image-color: white
+  @onHoverChange: |
+    function(self, hovered)
+      self.request_panel:setOn(hovered)
+    end
+
+  UIWidget
+    id: name
+    &ignoreTr: true
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    font: poppins-semibold-14
+    text-color: #b8b8b8
+    text-auto-resize: true
+    text-offset: 0 3
+    text: Name
+    text-align: center
+    phantom: true
+
+  UIWidget
+    id: request_panel
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    size: 100 37
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      align-right: true
+
+    UIWidget
+      id: reject_button
+      size: 26 26
+      image-source: /images/ui/windows/social/reject_icon
+      opacity: 1.0
+      $hover:
+        opacity: 0.9
+      $pressed:
+        opacity: 0.7
+      @onClick: |
+        modules.game_social.GameSocial:removeIgnored(self:getParent():getParent().name:getText())
+      @onSetup: |
+        local width = self:getImageTextureWidth()
+        local height = self:getImageTextureHeight()
+        self:setSize({width = width, height = height})
+        self:setImageSize({width = width, height = height})
+        self:setMarginTop(self:getParent():getHeight() - height)
+      @onHoverChange: |
+        function(self, hovered)
+          self:getParent():getParent():setOn(hovered)
+          self:getParent():setOn(hovered)
+        end

@@ -1,0 +1,6 @@
+Module
+  name: game_social
+  sandboxed: true
+  scripts: [ social ]
+  @onLoad: GameSocial:init()
+  @onUnload: GameSocial:terminate()
