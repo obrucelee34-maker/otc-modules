@@ -1,0 +1,137 @@
+GameMarketCategoriesPanel < ScrollablePanel
+  id: categories
+  anchors.left: parent.left
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  width: 305
+  margin-top: 10
+  padding-right: 5
+  padding-bottom: 5
+  vertical-scrollbar: categories_scrollbar
+  layout:
+    type: verticalBox
+    spacing: 5
+
+GameMarketCategoriesPanelScrollBar < VerticalScrollBar
+  id: categories_scrollbar
+  anchors.top: categories.top
+  anchors.right: categories.right
+  anchors.bottom: categories.bottom
+  step: 48
+  pixels-scroll: true
+  margin-bottom: 5
+
+GameMarketCategoriesPanelCategory < UIWidget
+  id: category
+  height: 40
+  font: poppins-14
+  color: #CED2D9
+  image-source: /images/ui/windows/market/category_background
+  image-size: 290 40
+  @onCheckChange: |
+    for _, child in pairs(self:getChildren()) do
+      child:setChecked(self:isChecked())
+    end
+  @onStateChange: |
+    for _, child in pairs(self:getChildren()) do
+      child:setOn(self:isOn())
+    end
+  @onClick: |
+    if self:isChecked() then
+      modules.game_market.GameMarket:selectMarketCategory(self.categoryId)
+      return
+    end
+
+    local totalHeight = 0
+    local content = self.content
+    local button = self.button
+    local children = content:getChildren()
+    local childCount = #children
+    local layout = content:getLayout()
+    local spacing = layout:getSpacing()
+
+    for i = 1, childCount do
+      local child = children[i]
+      totalHeight = totalHeight + child:getHeight()
+    end
+
+    totalHeight = totalHeight + (childCount - 1) * spacing
+
+    if self:getHeight() == 40 then
+      self:setHeight(40 + totalHeight + 5) -- 5 is the margin-bottom of the last element
+      button:setOn(true)
+    else
+      self:setHeight(40)
+      button:setOn(false)
+    end
+
+  UIWidget
+    id: icon
+    anchors.left: parent.left
+    anchors.top: parent.top
+    size: 30 30
+    margin-left: 10
+    image-source: /images/ui/windows/market/category_weapons
+    phantom: true
+    margin-top: 5
+  
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.right: parent.right
+    anchors.top: parent.top
+    text: Weapons
+    text-align: left
+    color: #CED2D9
+    margin-left: 10
+    font: poppins-14
+    phantom: true
+    margin-top: 10
+    text-auto-resize: true
+    $checked:
+      color: #FEFEC6
+    $checked on:
+      color: #36F991
+      font: poppins-semibold-14
+
+  UIWidget
+    id: button
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-right: 20
+    size: 24 24
+    image-source: /images/ui/windows/market/button_plus
+    phantom: true
+    margin-top: 8
+    $on:
+      image-source: /images/ui/windows/market/button_minus
+
+  UIWidget
+    id: content
+    anchors.fill: parent
+    margin-top: 40
+    height: 0
+    layout:
+      type: verticalBox
+      spacing: 2
+
+GameMarketCategoriesPanelCategoryElement < UIWidget
+  id: element
+  height: 40
+  image-source: /images/ui/windows/market/category_element_background
+  image-border: 5
+  text: Element
+  text-color: #CED2D9
+  font: poppins-14
+  text-align: left
+  text-offset: 50 0
+  image-size: 290 40
+  $first:
+    margin-top: 5
+  $checked:
+    margin-top: 0
+  $on:
+    text-color: #36F991
+    font: poppins-semibold-14
+  @onClick: |
+    modules.game_market.GameMarket:selectMarketCategory(self.categoryId)

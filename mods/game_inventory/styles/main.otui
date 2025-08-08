@@ -1,0 +1,27 @@
+InventoryItem < Item
+  &hasHover: true
+  Panel
+    id: lock
+    visible: false
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/inventory/icon_lock
+  opacity: 1.0
+  $disabled:
+    opacity: 0.4
+
+GameInventoryWindow < MainWindow
+  id: gameInventoryWindow
+  size: 450 704
+  anchors.centerIn: parent
+  &title: 'Inventory'
+  &hotkeyId: HOTKEYS_IDS.INVENTORY
+  &iconName: 'icon_inventory'
+  &isGeneralUIWindow: true
+
+  MainWindowContent
+    padding-left: 0
+    padding-right: 0
+    padding-top: 0
+    GameInventoryPanelSelection
+    GameInventoryPanelFilterPanel
+    GameInventoryPanelBottomPanel

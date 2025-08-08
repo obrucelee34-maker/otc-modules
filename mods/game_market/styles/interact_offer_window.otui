@@ -1,0 +1,624 @@
+GameMarketInteractOfferWindow < MainWindow
+  id: buy_offer_window
+  size: 770 248
+  anchors.centerIn: parent
+  &title: 'Buy Offer'
+  draggable: false
+  visible: false
+  MainWindowContent
+    padding: 0
+    layout:
+      type: verticalBox
+    GameMarketInteractOfferWindowListHeader
+    GameMarketInteractOfferWindowListItemPanel
+    GameMarketInteractOfferWindowInfoPanel
+    GameMarketInteractOfferWindowDetailsPanel
+  
+  @onVisibilityChange: |
+    function(self, visible)
+      local window = modules.game_market.GameMarket.window
+      if window then
+        window:blockInputPanel(visible)
+      end
+    end
+
+GameMarketInteractOfferWindowListHeader < UIWidget
+  id: list_header
+  margin-top: 10
+  margin-left: 20
+  margin-right: 20
+  height: 40
+  image-source: /images/ui/windows/market/offer_list_header_background
+  image-border-left: 3
+  image-border-right: 3
+
+  layout:
+    type: horizontalBox
+
+  GameMarketInteractOfferWindowListHeaderColumn
+  GameMarketInteractOfferWindowListHeaderColumn
+  GameMarketInteractOfferWindowListHeaderColumn
+  GameMarketInteractOfferWindowListHeaderColumn
+
+GameMarketInteractOfferWindowListHeaderColumn < UIWidget
+  $first:
+    margin-left: 12
+  id: column
+  height: 40
+  &columnSizes: |
+    {
+      [1] = 262,
+      [2] = 180,
+      [3] = 113,
+      [4] = 150
+    }
+  &titles: |
+    {
+      [1] = "Item",
+      [2] = "Seller",
+      [3] = "Amount",
+      [4] = "Price p/piece"
+    }
+
+  UIWidget
+    id: title
+    text-auto-resize: true
+    text: Title
+    text-align: left
+    font: poppins-14
+    font-color: #CED2D9
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+
+  UIWidget
+    size: 1 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+  
+  UIWidget
+    size: 1 40
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+    self.title:setText(self.titles[index])
+
+    -- center title
+    local width = self.title:getWidth()
+    local margin = (self:getWidth() - width) / 2
+    self.title:setMarginLeft(margin)
+
+GameMarketInteractOfferWindowListItemPanel < UIWidget
+  id: offer
+  height: 60
+  image-source: /images/ui/windows/market/offer_list_item_background
+  $alternate:
+    image-source: /images/ui/windows/market/offer_list_item_background_alternate
+  layout:
+    type: horizontalBox
+  padding-left: 12
+  margin-top: 5
+  margin-left: 20
+  margin-right: 20
+  
+  GameMarketInteractOfferWindowListItemPanelColumn
+  GameMarketInteractOfferWindowListItemPanelColumn
+  GameMarketInteractOfferWindowListItemPanelColumn
+  GameMarketInteractOfferWindowListItemPanelColumn
+
+GameMarketInteractOfferWindowListItemPanelColumn < UIWidget
+  id: column
+  &columnSizes: |
+    {
+      [1] = 262,
+      [2] = 180,
+      [3] = 113,
+      [4] = 150
+    }
+  @onEnableChange: |
+    function (self, enabled)
+      for _, child in ipairs(self:getChildren()) do
+        child:setEnabled(enabled)
+      end
+    end
+
+  Item
+    id: item
+    size: 40 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    visible: false
+    margin-left: 15
+    image-color: white
+    font: poppins-semibold-bordered-14
+    virtual: true
+    $disabled:
+      image-color: gray
+  
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    text-align: left
+    font: poppins-semibold-16
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    text-offset: 0 5
+    margin-left: 0
+    text-vertical-auto-resize: true
+    phantom: true
+    text-color: white
+    $on:
+      text-offset: 70 5
+      text-align: left
+    $checked:
+      text-align: left
+      anchors.left: icon.right
+      margin-left: 10
+      text-offset: 0 5
+    $disabled:
+      text-color: gray
+    @onTextChange: |
+      function(self, text)
+        if not tonumber(text) then return end
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+  
+  UIWidget
+    id: icon
+    size: 40 40
+    anchors.centerIn: parent
+    visible: false
+    font: poppins-20
+    text-offset: 0 5
+    image-color: white
+    $disabled:
+      image-color: gray
+    $on:
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: none
+    &update: |
+      function(self)
+        if self:isOn() then
+          addEvent(function()
+            -- center icon and text by margin
+            local parent = self:getParent()
+            local width = self:getWidth() + (parent.text:isVisible() and parent.text:getTextSize().width + parent.text:getMarginLeft() or 0)
+            local margin = (parent:getWidth() - width) / 2
+            self:setMarginLeft(margin)
+          end)
+        end
+      end
+
+    @onStateChange: |
+      self:update()
+
+  UIWidget
+    id: expandButton
+    visible: false
+    size: 25 25
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    image-source: /images/ui/windows/base_window/close_button_down
+    $!on hover:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $on hover:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_up
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+
+    if index == 1 then
+      self.item:setVisible(true)
+      self.text:setOn(true)
+    elseif index == 4 then
+      self.icon:setVisible(true)
+      self.icon:setOn(true)
+      self.text:setChecked(true)
+      self.icon:setImageSource('/images/ui/icons/silver_44')
+    end
+
+GameMarketInteractOfferWindowDetailsPanel < UIWidget
+  id: details_panel
+  height: 80
+  image-source: /images/ui/windows/market/interact_offer_bottom_panel
+  image-border: 5
+  margin-top: 10
+  padding-bottom: 6
+
+  UIWidget
+    id: separator
+    height: 1
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    background-color: #3A3D43
+
+  SuccessButton
+    id: buy_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    height: 50
+    text: Buy Now
+    margin-right: 30
+    &resizeText: true
+
+  UIWidget
+    id: amount_panel
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 178 50
+    margin-left: 20
+    TextEdit
+      id: amount_edit
+      anchors.left: button_minus.right
+      anchors.top: parent.top
+      font: poppins-15
+      font-color: #CED2D9
+      text: 1
+      padding-top: 5
+      image-source: /images/ui/windows/market/interact_offer_amount_background
+      size: 51 30
+      margin-left: -2
+      max-length: 4
+      text-align: center
+      @onTextChange: |
+        function(self, text, oldText)
+          if oldText == text then
+            return
+          end
+
+          -- only allow numbers in the edit
+          local newText = ""
+          for i = 1, #text do
+            local char = text:sub(i, i)
+            if char:match("%d") then
+              newText = newText .. char
+            end
+          end
+
+          if newText ~= text then
+            self:setText(newText)
+          end
+          local parent = self:getParent()
+
+          -- min 1, max 1000
+          local amount = tonumber(newText)
+          if not amount then
+            return
+          end
+
+          self:setCursorPos(#self:getText())
+
+          -- update slider
+          local parent = self:getParent()
+          local slider = parent.count_slider
+          if slider then
+            if amount < slider:getMinimum() then
+              self:setText(slider:getMinimum())
+            elseif amount > slider:getMaximum() then
+              self:setText(slider:getMaximum())
+            end
+            amount = tonumber(self:getText())
+
+            slider:setValue(amount, true)
+
+            -- update total price
+            parent = parent:getParent()
+            local price = parent.total_amount_panel.price
+            price:setText(amount * (price.pricePerPiece or 0))
+
+            -- update new balance
+            local balance = parent.new_balance_panel.balance
+            balance:setText((balance.amount or 0) - ((balance.offerType == 0 and amount or -amount) * (price.pricePerPiece or 0)))
+          end
+        end
+    UIWidget
+      id: button_minus
+      anchors.left: parent.left
+      anchors.top: parent.top
+      image-source: /images/ui/windows/market/button_amount_minus
+      opacity: 1
+      $hover:
+        opacity: 0.8
+      $pressed:
+        opacity: 0.6
+      @onClick: |
+        function(self)
+          local parent = self:getParent()
+          local amount_edit = parent.amount_edit
+          local amount = tonumber(amount_edit:getText())
+          if not amount then
+            amount = 0
+          end
+
+          amount = amount - 1
+          if amount < 1 then
+            amount = 1
+          end
+
+          amount_edit:setText(amount)
+          amount_edit:setCursorPos(#amount_edit:getText())
+        end
+    UIWidget
+      id: button_plus
+      anchors.left: amount_edit.right
+      anchors.top: parent.top
+      image-source: /images/ui/windows/market/button_amount_plus
+      margin-left: -4
+      opacity: 1
+      $hover:
+        opacity: 0.8
+      $pressed:
+        opacity: 0.6
+      @onClick: |
+        function(self)
+          local parent = self:getParent()
+          local amount_edit = parent.amount_edit
+          local amount = tonumber(amount_edit:getText())
+          if not amount then
+            amount = 0
+          end
+
+          amount = amount + 1
+          if amount > self.maximumValue then
+            amount = self.maximumValue
+          end
+
+          amount_edit:setText(amount)
+          amount_edit:setCursorPos(#amount_edit:getText())
+        end
+    
+    UIWidget
+      id: button_max
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      text: max.
+      font: poppins-16
+      text-color: #77D463
+      text-auto-resize: true
+      margin-right: 15
+      $hover:
+        text-color: #A0E38C
+      $pressed:
+        text-color: #77D463
+      UIWidget
+        id: underscore
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.bottom: parent.bottom
+        height: 1
+        background-color: #77D463
+
+        @onSetup: |
+          self:setWidth(self:getParent():getTextSize().width + 2)
+
+    SettingsSlider
+      id: count_slider
+      step: 1
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      size: 105 10
+      focusable: false
+      show-value: false
+      @onValueChange: |
+        function(self, value)
+          local parent = self:getParent()
+          local amount_edit = parent.amount_edit
+          amount_edit:setText(value)
+        end
+
+    UIWidget
+      id: vertical_separator
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      width: 1
+      background-color: #3A3D43
+
+  UIWidget
+    id: total_amount_panel
+    anchors.left: amount_panel.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 123 50
+
+    UIWidget
+      id: label
+      text: Total
+      anchors.top: parent.top
+      anchors.left: parent.left
+      font: poppins-13
+      text-color: #A6AAB2
+      text-auto-resize: true
+      margin-top: 8
+      margin-left: 20
+    
+    UIWidget
+      id: icon
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      size: 18 18
+      image-source: /images/ui/icons/silver_24
+      margin-left: 20
+      margin-bottom: 8
+    
+    UIWidget
+      id: price
+      anchors.left: icon.right
+      anchors.verticalCenter: icon.verticalCenter
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      text-offset: 0 5
+      text: 0
+      font: poppins-16
+      text-color: #CED2D9
+      margin-left: 10
+      @onTextChange: |
+        function(self, text)
+          -- format text to cotain commas
+          local length = 0
+          local text = self:getText()
+          local formatted = ''
+          for i = #text, 1, -1 do
+            formatted = text:sub(i, i) .. formatted
+            length = length + 1
+            if length == 3 and i ~= 1 then
+              formatted = ',' .. formatted
+              length = 0
+            end
+          end
+          self:setText(formatted, true)
+
+          local parent = self:getParent()
+          parent:setWidth(math.max(120, self:getTextSize().width + 20 + parent.icon:getWidth() + 10 + 20))
+        end
+    
+    UIWidget
+      id: vertical_separator
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      width: 1
+      background-color: #3A3D43
+
+
+  UIWidget
+    id: new_balance_panel
+    anchors.left: total_amount_panel.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 300 50
+
+    UIWidget
+      id: label
+      text: New Balance
+      anchors.top: parent.top
+      anchors.left: parent.left
+      font: poppins-13
+      text-color: #A6AAB2
+      text-auto-resize: true
+      margin-top: 8
+      margin-left: 20
+    
+    UIWidget
+      id: icon
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      size: 18 18
+      image-source: /images/ui/icons/silver_24
+      margin-left: 20
+      margin-bottom: 8
+    
+    UIWidget
+      id: balance
+      anchors.left: icon.right
+      anchors.verticalCenter: icon.verticalCenter
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      text-offset: 0 5
+      text: 0
+      font: poppins-16
+      text-color: #CED2D9
+      margin-left: 10
+      @onTextChange: |
+        function(self, text)
+          -- format text to contain commas
+          local length = 0
+          local isNegative = false  -- flag to track negative numbers
+          local text = self:getText()
+          local formatted = ''
+
+          -- check if the number is negative
+          if text:sub(1, 1) == '-' then
+            isNegative = true
+            text = text:sub(2)  -- remove the negative sign temporarily
+          end
+
+          -- loop through the text in reverse
+          for i = #text, 1, -1 do
+            formatted = text:sub(i, i) .. formatted
+            length = length + 1
+            if length == 3 and i ~= 1 then
+              formatted = ',' .. formatted
+              length = 0
+            end
+          end
+
+          -- add the negative sign back if necessary
+          if isNegative then
+            formatted = '-' .. formatted
+          end
+
+          self:setText(formatted, true)
+        end
+    
+GameMarketInteractOfferWindowInfoPanel < UIWidget
+  id: info_panel
+  height: 44
+  margin-top: 10
+  margin-left: 20
+  margin-right: 20
+  image-source: /images/ui/windows/market/interact_window_info_background
+  image-border: 5
+  font: poppins-14
+  text-color: #CED2D9
+
+ItemSelectionPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/market/item_selection_background
+  image-border: 10
+  padding: 10 10 10 10
+  width: 200
+
+ItemSelectionPopupMenuButton < UIWidget
+  id: subitem
+  height: 60
+  image-source: /images/ui/windows/market/item_selection_entry_background
+  image-border: 5
+  $on:
+    image-source: /images/ui/windows/market/item_selection_entry_background_selected
+  $hover:
+    image-source: /images/ui/windows/market/item_selection_entry_background_selected
+
+  Item
+    id: item
+    size: 40 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    font: poppins-semibold-bordered-14
+  
+  UIWidget
+    id: name
+    anchors.left: item.right
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    text-align: left
+    text-offset: 0 5
+    text-auto-resize: true
+    font: poppins-16
+    margin-left: 15
+    phantom: true

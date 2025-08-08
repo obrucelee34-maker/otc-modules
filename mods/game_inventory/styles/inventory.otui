@@ -1,0 +1,746 @@
+GameInventoryPanelSelection < UIWidget
+  id: selection_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 41
+  margin-top: 12
+  margin-left: 0
+  &defaultHeight: 41
+
+  GameInventoryTabBarScrollLeftButton
+  GameInventoryTabBarScrollRightButton
+
+  ScrollablePanel
+    id: content
+    clipping: true
+    anchors.fill: parent
+    anchors.left: scroll_left.right
+    anchors.right: scroll_right.left
+
+    GameInventoryTabBar
+
+GameInventoryPanelHolder < ScrollablePanel
+  id: inventory_panel_holder
+  anchors.top: filter_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: bottom_panel.top
+  margin-right: 28
+  margin-left: 28
+  margin-bottom: 10
+  @onSetup: |
+    local scrollbar = g_ui.createWidget('GameInventoryPanelScrollBar', self:getParent())
+    scrollbar:setId('inventory_panel_scrollbar')
+    self:setVerticalScrollBar(scrollbar)
+
+GameInventoryPanel < Panel
+  height: 100
+  id: inventory_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  padding: 1
+  visible: false
+  layout:
+    type: grid
+    cell-size: 60 60
+    cell-spacing: 6 6
+    flow: true
+    fit-children: true
+
+GameInventoryPanelScrollBar < VerticalScrollBar
+  anchors.top: inventory_panel_holder.top
+  anchors.right: parent.right
+  anchors.bottom: inventory_panel_holder.bottom
+  step: 48
+  pixels-scroll: true
+  margin-top: 5
+  margin-bottom: 5
+  margin-right: 13
+
+GameInventoryUnlockPanel < Panel
+  size: 390 75
+  image-source: /images/ui/windows/inventory/unlock_background
+  image-border: 5
+  anchors.top: inventory_panel.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 3
+
+  Panel
+    id: slots
+    height: 60
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 0
+    margin-bottom: 1
+    layout:
+      type: grid
+      cell-size: 60 60
+      cell-spacing: 6 6
+      flow: true
+      fit-children: true
+
+  SuccessButton
+    id: unlock_button
+    anchors.centerIn: parent
+    &resizeText: true
+    &minWidth: 80
+    &iconPath: '/images/ui/icons/silver_30'
+    &iconAlign: left
+    &iconOffset: '30 0'
+    &textMarginLeft: 40
+    &iconColor: white
+    @onSetup: self.icon:setChecked(true)
+    @onClick: |
+      modules.game_inventory.GameInventory:unlockInventorySlotsRow()
+
+GameInventoryPanelSortButton < UIWidget
+  image-source: /images/ui/windows/inventory/sort
+  size: 25 25
+  margin-top: 15
+  &tooltip: 'Auto Sort (hold \'Ctrl\' to sort items to their respective backpack category)'
+  @onClick: |
+    GameInventory:sortInventory()
+  $hover:
+    image-source: /images/ui/windows/inventory/sort_on
+  $on:
+    image-color: white
+  $!on:
+    image-color: #A6AAB2
+
+GameInventoryPanelEditButton < UIWidget
+  image-source: /images/ui/windows/inventory/edit
+  visible: false
+  size: 25 25
+  image-size: 25 25
+  margin-top: 15
+  &tooltip: 'Edit Tab'
+  @onClick: GameInventory:editTab(self.tab)
+  $hover:
+    image-source: /images/ui/windows/inventory/edit_on
+  $on:
+    image-color: white
+  $!on:
+    image-color: #A6AAB2
+
+GameInventoryPanelFilterPanel < UIWidget
+  id: filter_panel
+  anchors.top: selection_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 55
+  font: poppins-16
+  text-color: #a6aab2
+  text-align: right
+  margin-top: 2
+  margin-right: 28
+  margin-left: 28
+  padding-top: 7
+  padding-bottom: 7
+  text-offset: 0 5
+  layout:
+    type: horizontalBox
+    spacing: 2
+  GameInventoryPanelEditButton
+    id: edit
+  GameInventoryPanelSortButton
+    id: sort
+  GameInventoryPanelFilterButton
+    id: all
+  GameInventoryPanelFilterButton
+    id: infusion
+  GameInventoryPanelFilterButton
+    id: food
+  GameInventoryPanelFilterButton
+    id: potion
+  GameInventoryPanelFilterButton
+    id: helmet
+  GameInventoryPanelFilterButton
+    id: armor
+  GameInventoryPanelFilterButton
+    id: legs
+  GameInventoryPanelFilterButton
+    id: boots
+  GameInventoryPanelFilterButton
+    id: weapon
+
+GameInventoryPanelFilterButton < UIWidget
+  size: 24 24
+  @onSetup: |
+    self:setTooltip(self:getId():titleCase())
+  @onStateChange: |
+    self.icon:setOn(self:isOn())
+
+  UIWidget
+    id: icon
+    anchors.centerIn: parent
+    phantom: true
+    text-auto-resize: true
+    font: poppins-semibold-13
+    image-color: #8a8a8b
+    text-color: #8a8a8b
+    $on:
+      image-color: white
+      text-color: white
+    @onSetup: |
+      local parentId = self:getParent():getId()
+      if parentId == 'all' then
+        self:setText(parentId:upper())
+        return
+      end
+      self:setImageSource(string.format('/images/ui/windows/inventory/icon_%s', parentId))
+      local textureWidth = self:getImageTextureWidth()
+      local textureHeight = self:getImageTextureHeight()
+      self:setImageSize({width = textureWidth, height = textureHeight})
+      self:setSize({width = textureWidth, height = textureHeight})
+      self:getParent():setSize({width = textureWidth, height = textureHeight})
+
+  @onClick: GameInventory:applyInventoryFilter(self:getId())
+
+GameInventoryPanelBottomPanel < UIWidget
+  id: bottom_panel
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 53
+  margin-right: 28
+  margin-left: 28
+  GameInventoryPanelBottomPanelCurrency
+  GameInventoryPanelBottomPanelButtonPanel
+
+GameInventoryPanelBottomPanelCurrency < UIWidget
+  id: currency
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.right: parent.right
+  size: 250 54
+
+  UIWidget
+    id: silver
+    image-source: /images/ui/windows/inventory/currency_background
+    image-border: 15
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    padding: 5
+    padding-left: 10
+    @onGeometryChange: |
+      self:setSize({width = math.max(75, self:getWidth()), height = self:getHeight()})
+    &setText: |
+      function(self, value)
+        self.value:setText(value)
+      end
+    
+    UIWidget
+      id: image
+      image-source: /images/ui/icons/silver_44
+      size: 44 44
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+
+    UIWidget
+      id: value
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: image.right
+      margin-left: 12
+      font: poppins-18
+      text-color: #a6aab2
+      text-offset: 0 8
+      text-auto-resize: true
+      text-align: left
+      text: 0
+      @onGeometryChange: |
+        local parent = self:getParent()
+        local textSize = self:getTextSize()
+        parent:setSize({width = textSize.width + parent.image:getWidth() + 30, height = parent.image:getHeight()})
+      @onTextChange: |
+        local amount = tonumber(self:getText())
+        if not amount then
+          return
+        end
+        amount = math.min(9999999999, amount)
+        self:setText(amount, true)
+        -- format currency
+        local text = self:getText()
+        local formatted = ''
+        local count = 0
+        for i = text:len(), 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          count = count + 1
+          if count == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            count = 0
+          end
+        end
+        self:setText(formatted, true)
+
+  UIWidget
+    id: gold
+    font: poppins-18
+    text-color: #a6aab2
+    text-offset: 54 8
+    text-auto-resize: true
+    image-source: /images/ui/windows/inventory/currency_background
+    image-border: 15
+    text: 0
+    anchors.right: silver.left
+    anchors.verticalCenter: parent.verticalCenter
+    text-align: right
+    icon: /images/ui/icons/experience
+    icon-align: topleft
+    icon-size: 44 44
+    icon-offset: 18 -2
+    padding: 5
+    padding-right: 10
+    image-offset: 10 0
+    margin-right: 10
+    &tooltip: tr("Gold is accumulated when gaining silver. At the daily Server Save all gold is converted into SBT based on the amount of Gold earned proportional to all other players.")
+    @onGeometryChange: |
+      self:setSize({width = math.max(75, self:getWidth()), height = self:getHeight()})
+    @onTextChange: |
+      local amount = tonumber(self:getText())
+      amount = math.min(9999999999, amount)
+      self:setText(amount, true)
+      -- format currency
+      local text = self:getText()
+      local formatted = ''
+      local count = 0
+      for i = text:len(), 1, -1 do
+        formatted = text:sub(i, i) .. formatted
+        count = count + 1
+        if count == 3 and i ~= 1 then
+          formatted = ',' .. formatted
+          count = 0
+        end
+      end
+      self:setText(formatted, true)
+
+GameInventoryPanelBottomPanelButtonPanel < UIWidget
+  id: button_panel
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.left: parent.left
+  anchors.right: currency.left
+  height: 52
+  layout:
+    type: horizontalBox
+    spacing: 10
+    cell-size: 60 52
+  
+  PrimaryButton
+    size: 60 52
+    id: character
+    &tooltip: 'Character'
+    &iconPath: '/images/ui/windows/inventory/icon_character'
+    @onClick: |
+      modules.game_character.GameCharacter.toggle()
+
+  PrimaryButton
+    size: 60 52
+    id: infusion
+    &tooltip: 'Infusion'
+    &iconPath: '/images/ui/windows/inventory/icon_sword'
+    @onClick: |
+      modules.game_infusion.GameInfusion.toggle()
+
+GameInventoryTabBar < MoveableTabBar
+  id: tab_bar
+  height: 40
+  padding: 0
+  anchors.fill: parent
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  background-color: #181A1D
+  &tabsMoveable: false
+  &maxMargin: 0
+  &scrollable: true
+  &scrollStep: 30
+  &scrollInverted: false
+  &hideTabsOnResize: false
+  @onTabChange: |
+    function(self, tab, lastTab)
+      GameInventory:onTabChange(tab, lastTab)
+    end
+  @onTabSizeChange: |
+    function(self, widget, oldRect, newRect)
+      --if true then return end -- disable for now
+
+      local parent = self:getParent():getParent()
+      if self:isOverflowing() then
+        --parent.scroll_left:setWidth(25)
+        parent.scroll_left:show()
+        --parent.scroll_right:setWidth(25)
+        parent.scroll_right:show()
+      else
+        --parent.scroll_left:setWidth(0)
+        parent.scroll_left:hide()
+        --parent.scroll_right:setWidth(0)
+        parent.scroll_right:hide()
+      end
+    end
+  @onScroll: |
+    function(self, offset, margin, vertical)
+      if self.scrollDelayEvent then
+        self.scrollDelayEvent:cancel()
+      end
+      self.scrollDelayEvent = scheduleEvent(function()
+        GameInventory:onTabBarScroll(self, offset, margin, vertical)
+      end, 50)
+    end
+
+GameInventoryTabBarButton < MoveableTabBarButton
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  width: 20
+  padding-left: 0
+  padding-right: 0
+  image-size: 25 25
+  image-offset: 7 7
+  image-color: white
+  text-offset: -1 3
+  text-align: center
+  text-auto-resize: false
+  font: poppins-semibold-12
+  border: 1 #25272C
+  on: false
+  opacity: 1
+  $disabled:
+    opacity: 0.5
+  @onTextChange: |
+    function(self, text, extraWidth)
+      self:setWidth(self:getTextSize().width + 20 + (self.extraWidth or 0))
+
+      if self.tabBar then
+        self.tabBar:updateTabs()
+      end
+    end
+  @onHoverChange: |
+    function(self, hovered)
+      g_tooltip.onWidgetHoverChange(self, hovered)
+
+      if hovered then
+        local draggingWidget = g_ui.getDraggingWidget()
+        if not draggingWidget or not draggingWidget:instanceof(UIItem) then
+          return
+        end
+
+        if self.hoverDelayEvent then
+          self.hoverDelayEvent:cancel()
+        end
+        self.hoverDelayEvent = scheduleEvent(function()
+          if self:isHovered() then
+            self.tabBar:selectTab(self)
+          end
+        end, 350)
+      else
+        if self.hoverDelayEvent then
+          self.hoverDelayEvent:cancel()
+          self.hoverDelayEvent = nil
+        end
+      end
+    end
+
+  $checked:
+    background-color: #000000CC
+  $!checked:
+    background-color: #181A1D
+  $on:
+    image-color: #F6B97C
+  $!on:
+    image-color: white
+
+  UIWidget
+    id: exclamation
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/inventory/exclamation
+    image-size: 9 13
+    size: 9 13
+    margin: 2
+    phantom: true
+    visible: false
+
+  UIWidget
+    id: bottom_line
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 2
+    background-color: #36F991
+    visible: false
+
+GameInventoryTabBarAddButton < GameInventoryTabBarButton
+  width: 50
+  padding-top: 0
+  padding-left: 0
+  padding-right: 0
+  image-offset: 12 8
+  image-source: /images/ui/windows/inventory/add
+  image-color: white
+  text-auto-resize: false
+  &tooltip: 'Add new tab'
+  $pressed on:
+    image-color: white
+    image-source: /images/ui/windows/inventory/add_active
+  $on:
+    image-color: white
+  $!on:
+    image-source: /images/ui/windows/inventory/add_inactive
+
+GameInventoryTabBarScrollLeftButton < UIWidget
+  id: scroll_left
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  image-source: /images/ui/windows/chat/scroll_left
+  @onMousePress: |
+    self:getParent().content.tab_bar:scrollDecrement()
+    self:monitorMousePress(function()
+      self:getParent().content.tab_bar:scrollDecrement()
+    end, 100)
+  $on:
+    opacity: 0.6
+  $!on:
+    opacity: 1
+
+  UIWidget
+    id: exclamation
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/inventory/exclamation
+    image-size: 9 13
+    size: 9 13
+    margin: 2
+    phantom: true
+    visible: false
+
+GameInventoryTabBarScrollRightButton < UIWidget
+  id: scroll_right
+  anchors.top: parent.top
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  image-source: /images/ui/windows/chat/scroll_right
+  opacity: 1
+  @onMousePress: |
+    self:getParent().content.tab_bar:scrollIncrement()
+    self:monitorMousePress(function()
+      self:getParent().content.tab_bar:scrollIncrement()
+    end, 100)
+  $on:
+    opacity: 0.6
+
+  UIWidget
+    id: exclamation
+    anchors.right: parent.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/inventory/exclamation
+    image-size: 9 13
+    size: 9 13
+    margin: 2
+    phantom: true
+    visible: false
+
+GameInventoryCategoryComboBox < MultiComboBox
+  id: categoryComboBox
+  &placeholder: tr('Select Categories')
+  &multiSelectText: tr('Select Categories')
+  &multiSelectFormat: '%s {[%s/%s], #36f991}'
+  &disableScroll: true
+  @onSetup: |
+    if self.placeholder then
+      self:setText(self.placeholder)
+    end
+  @onTextChange: |
+    function(self, text, oldText)
+      if text == '' then
+        self:setText(self.placeholder)
+      end
+    end
+  @onMenuSetup: |
+    function(self, menu)
+      GameInventory:onCategoryMenuSetup(menu)
+    end
+GameInventoryCategoryComboBoxPopupMenu < MultiComboBoxPopupMenu
+  background-color: #000000F2
+GameInventoryCategoryComboBoxPopupMenuButton < MultiComboPopupMenuButton
+  icon: /images/ui/windows/inventory/radio
+  icon-align: left
+  icon-offset: 10 0
+  text-offset: 35 3
+  height: 50
+  background-color: #000000F2
+  @onCheckChange: |
+    if self:isChecked() then
+      self:setIcon('/images/ui/windows/inventory/radio_active')
+      self.check:setVisible(true)
+
+      if not self:isEnabled() then
+        self:setEnabled(true)
+      end
+    else
+      self:setIcon('/images/ui/windows/inventory/radio')
+      self.check:setVisible(false)
+    end
+
+  UIWidget
+    id: check
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 14
+    image-source: /images/ui/windows/inventory/check
+    visible: false
+
+GameInventoryUnlockButton < SuccessButton
+  id: unlock_button
+  anchors.centerIn: parent
+  margin-top: 7
+  text: 1350
+  &resizeText: true
+  &minWidth: 80
+  &iconPath: '/images/ui/icons/icon_ravencoin'
+  &iconAlign: left
+  &iconOffset: '30 0'
+  &textMarginLeft: 40
+  &iconColor: white
+  @onSetup: self.icon:setChecked(true)
+  @onClick: |
+    GameInventory:acceptPurchaseUnlock()
+
+GameInventorySaveTabButton < SuccessButton
+  id: save_button
+  anchors.centerIn: parent
+  margin-top: 7
+  !text: tr('Save Tab')
+  &resizeText: true
+  &minWidth: 80
+  &iconColor: white
+  @onSetup: self.icon:setChecked(true)
+  @onClick: |
+    GameInventory:createOrSaveTab(self.tab)
+
+GameBackpackModal < MainWindow
+  size: 412 262
+  anchors.centerIn: parent
+  visible: true
+  &title: 'Modal'
+  background-color: #181A1D
+
+  UIWidget
+    id: separator
+    height: 1
+    anchors.top: content.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #3A3D43
+
+  MainWindowContent
+    id: content
+    padding: 10 20 20 20
+    anchors.bottom: next.top
+
+  Panel
+    id: bottom_panel
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 80
+    padding-bottom: 20
+    background-color: #00000040
+
+    UIWidget
+      id: content
+      anchors.fill: parent
+
+    UIWidget
+      id: separator
+      height: 1
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      background-color: #3A3D43
+
+GamePurchaseBackpackContent < UIWidget
+  id: purchaseBackpackContent
+  anchors.fill: parent
+  text-auto-resize: true
+  text-wrap: true
+  !text: tr('Backpacks unlock Additional Inventory Space in a separate & fully Customizable tab. Selected Item Types will automatically be sorted into the chosen Backpack when obtained.')
+  font: poppins-14
+
+GamePurchaseBackpackModal < GameBackpackModal
+  id: purchaseBackpackModal
+  &title: 'Add New Tab'
+  &onSetupContent: |
+    function(self, content)
+      g_ui.createWidget('GamePurchaseBackpackContent', content)
+    end
+  &onSetupBottomContent: |
+    function(self)
+      g_ui.createWidget('GameInventoryUnlockButton', self.bottom_panel.content)
+    end
+
+GameEditBackpackContent < UIWidget
+  id: editBackpackContent
+  anchors.fill: parent
+  padding-top: 10
+  padding-left: 30
+  padding-right: 30
+
+  Label
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 7
+    !text: tr('Enter a name for this Tab (optional)')
+    text-align: center
+    font: poppins-14
+
+  TextEdit
+    id: nameTextEdit
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    background-color: #00000080
+    border: 1 #1F2124
+    height: 40
+    font: poppins-12
+    max-length: 20
+
+  Label
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    !text: tr('Select your Tab Category (optional)')
+    text-align: center
+    font: poppins-14
+    margin-top: 15
+
+  GameInventoryCategoryComboBox
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-top: 10
+    background-color: #00000080
+    border: 1 #1F2124
+    height: 40
+    font: poppins-14
+    &selectLimit: 2
+
+GameBackpackEditModal < GameBackpackModal
+  id: editBackpackModal
+  height: 320
+  &title: 'Edit Backpack Tab'
+  &onSetupContent: |
+    function(self, content)
+      g_ui.createWidget('GameEditBackpackContent', content)
+    end
+  &onSetupBottomContent: |
+    function(self)
+      g_ui.createWidget('GameInventorySaveTabButton', self.bottom_panel.content)
+    end

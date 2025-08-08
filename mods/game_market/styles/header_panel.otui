@@ -1,0 +1,157 @@
+GameMarketHeaderPanel < UIWidget
+  id: header_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-top: 50
+  height: 40
+  image-source: /images/ui/windows/ravencards/collection/list_layout_title_background
+  image-border: 10
+  layout:
+    type: horizontalBox
+    spacing: 30
+  GameMarketHeaderPanelItem
+    id: marketplace
+  GameMarketHeaderPanelItem
+    id: my orders
+  GameMarketHeaderPanelItem
+    id: completed orders
+  GameMarketHeaderPanelSilver
+    id: silver
+
+GameMarketHeaderPanelItem < UIWidget
+  id: header_panel_item
+  $first:
+    margin-left: 50
+  @onHoverChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setChecked(self:isHovered())
+    end
+  @onClick: |
+    GameMarket:selectPanel(self:getId())
+  @onStateChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setOn(self:isOn())
+    end
+
+  UIWidget
+    id: holder
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    height: 40
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      fit-children: true
+    @onStateChange: |
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(self:isOn())
+      end
+
+    UIWidget
+      id: text
+      font: poppins-15
+      text-color: #7E828B
+      text-auto-resize: true
+      text-offset: 0 5
+      phantom: true
+      $on:
+        text-color: white
+      $checked:
+        text-color: white
+      @onSetup: |
+        function(self)
+          self:setText(self:getParent():getParent():getId():gsub("_", " "):titleCase())
+          self:setOn(self:getParent():getParent():getId() == 'marketplace')
+          local parent = self:getParent():getParent()
+          parent:setWidth(self:getTextSize().width + 50)
+        end
+
+  UIWidget
+    id: highlight
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    phantom: true
+    anchors.right: parent.right
+    height: 2
+    background-color: alpha
+    $on:
+      background-color: #36F991
+    $checked:
+      background-color: #36F991
+    @onSetup: |
+      function(self)
+        self:setOn(self:getParent():getId() == 'marketplace')
+      end
+
+GameMarketHeaderPanelSilver < UIWidget
+  size: 80 40
+
+  UIWidget
+    id: premium_token_icon
+    anchors.right: ravencoin_amount.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/market/category_ravencoin
+    size: 24 24
+    margin-right: 10
+
+  UIWidget
+    id: ravencoin_amount
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    text-offset: 0 7
+    text: 0
+    font: poppins-16
+    text-color: #FEFEC6
+    text-auto-resize: true
+
+  UIWidget
+    id: silver_icon
+    anchors.right: silver_amount.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/icons/silver_24
+    image-auto-resize: true
+    size: 24 24
+    margin-right: 10
+
+  UIWidget
+    id: silver_amount
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 5
+    text-offset: 0 7
+    text: 0
+    font: poppins-16
+    text-color: #FFFFFF
+    text-auto-resize: true
+    @onTextChange: |
+      function(self, text)
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+
+  @onSetup: |
+    local parent = self:getParent()
+    -- set size to fill parent
+    local children = parent:getChildren()
+    local width = 0
+    for _, child in ipairs(children) do
+      if child ~= self then
+        width = width + child:getWidth()
+      end
+    end
+    width = width + parent:getLayout():getSpacing() * (#children - 1) - parent:getMarginLeft() - parent:getMarginRight() + 70
+    self:setWidth(parent:getWidth() - width)

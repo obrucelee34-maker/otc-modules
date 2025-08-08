@@ -1,0 +1,62 @@
+CountWindow < PopupWindow
+  id: countWindow
+  !text: tr('Move Items')
+  size: 250 195
+  padding-left: 25
+  padding-right: 25
+  focusable: true
+  @onDestroy: |
+    modules.game_interface.getMapPanel():focus()
+
+  Item
+    id: item
+    text-offset: 0 22
+    text-align: right
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 4
+    focusable: false
+    virtual: true
+    phantom: true
+    size: 50 50
+
+  SettingsSlider
+    id: countScrollBar
+    step: 1
+    anchors.verticalCenter: item.verticalCenter
+    anchors.left: item.right
+    margin-left: 18
+    focusable: false
+    width: 90
+
+  PopupWindowButton
+    id: buttonCancel
+    !text: tr('Cancel')
+    size: 90 40
+    anchors.right: parent.right
+    anchors.top: item.bottom
+    focusable: false
+    text-auto-resize: false
+    margin-top: 15
+    focusable: false
+
+  SpinBox
+    id: spinBox
+    anchors.centerIn: next
+    width: 1
+    height: 1
+    phantom: true
+    focusable: true
+    opacity: 0
+
+  PopupWindowButton
+    id: buttonOk
+    !text: tr('Ok')
+    size: 90 40
+    anchors.left: parent.left
+    anchors.top: item.bottom
+    focusable: false
+    text-auto-resize: false
+    margin-top: 15
+    margin-left: 0
+    focusable: false

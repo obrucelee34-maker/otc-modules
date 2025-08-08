@@ -1,0 +1,61 @@
+GameEscMenuList < ScrollablePanel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  margin-top: 50
+  margin-bottom: 20
+  width: 250
+  layout:
+    type: verticalBox
+    spacing: 5
+    fit-children: true
+  
+  @onLayoutUpdate: |
+    local parent = self:getParent()
+    parent:setHeight(self:getHeight() + self:getMarginTop() + self:getMarginBottom())
+
+GameEscMenuButton < UIWidget
+  height: 40
+  font: poppins-semibold-14
+  image-source: /images/ui/windows/esc_menu/background
+  text-align: left
+  text-offset: 38 0
+  text-color: #CED2D9
+  icon-align: left
+  icon-offset: 5 0
+  icon-color: #CED2D9
+  margin-left: 20
+  margin-right: 20
+  $hover:
+    image-source: /images/ui/windows/esc_menu/background_on
+    text-color: #36F991
+    icon-color: #36F991
+
+GameEscMenuButtonPremium < UIWidget
+  height: 80
+  font: poppins-semibold-16
+  image-source: /images/ui/windows/esc_menu/background_premium
+  text-align: center
+  text-color: #CED2D9
+  text-offset: 1 5
+  image-size: 274 87
+  image-offset: -12 0
+  $hover:
+    image-source: /images/ui/windows/esc_menu/background_premium_on
+    text-color: #FFA851
+
+GameEscMenu < MainWindow
+  id: gameEscMenu
+  size: 250 550
+  anchors.centerIn: parent
+  &title: 'Menu'
+  &iconName: 'icon_menu'
+  &shortcut: 'ESC'
+  draggable: false
+  
+  GameEscMenuList
+    id: list
+
+GameEscMenuSeparator < UIWidget
+  height: 10
+  phantom: true
+

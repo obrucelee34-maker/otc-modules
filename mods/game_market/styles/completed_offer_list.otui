@@ -1,0 +1,400 @@
+GameMarketCompletedOffersListPanel < UIWidget
+  id: offers_panel
+  anchors.fill: parent
+  anchors.top: prev.bottom
+  padding-left: 20
+  padding-right: 20
+  padding-bottom: 0
+  margin-top: 20
+  layout:
+    type: verticalBox
+    spacing: 2
+  GameMarketCompletedOffersPanelListHeader
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_1
+    margin-top: 5
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_2
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_3
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_4
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_5
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_6
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_7
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_8
+  GameMarketCompletedOffersPanelListItemPanel
+    id: offer_9
+  GameMarketCompletedOffersPanelPagination
+    margin-top: 10
+
+GameMarketCompletedOffersPanelListHeader < UIWidget
+  id: list_header
+  height: 40
+  image-source: /images/ui/windows/market/offer_list_header_background
+  image-border-left: 3
+  image-border-right: 3
+
+  layout:
+    type: horizontalBox
+
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+  GameMarketCompletedOffersPanelListHeaderColumn
+
+GameMarketCompletedOffersPanelListHeaderColumn < UIWidget
+  $first:
+    margin-left: 5
+  id: column
+  height: 40
+  &columnSizes: |
+    {
+      [1] = 145,
+      [2] = 140,
+      [3] = 120,
+      [4] = 280,
+      [5] = 80,
+      [6] = 80,
+      [7] = 124,
+      [8] = 160,
+      [9] = 171,
+    }
+  &sortButton: |
+    {
+      [1] = true,
+      [2] = true,
+      [3] = true,
+      [6] = true,
+      [7] = true,
+    }
+  &titles: |
+    {
+      [1] = "Transaction",
+      [2] = "Status",
+      [3] = "Date",
+      [4] = "Item",
+      [5] = "Attr.1",
+      [6] = "Attr.2",
+      [7] = "Amount",
+      [8] = "Price p/piece",
+      [9] = "Total Price",
+    }
+  
+  @onClick: |
+    local sort_button = self.sort_button
+    local order = sort_button.asc:isOn() and 'desc' or 'asc'
+    modules.game_market.GameMarket:setCompletedOffersSortOrder(order, self:getParent():getChildIndex(self))
+
+  UIWidget
+    id: title
+    text-auto-resize: true
+    text: Title
+    text-align: left
+    font: poppins-14
+    font-color: #CED2D9
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+
+  UIWidget
+    id: sort_button
+    size: 9 40
+    anchors.left: title.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    visible: false
+    UIWidget
+      id: asc
+      image-source: /images/ui/windows/market/offer_list_header_sort_descending
+      anchors.bottom: base.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 2
+      $on:
+        image-source: /images/ui/windows/market/offer_list_header_sort_descending_on
+      @onClick: |
+        local parent = self:getParent():getParent()
+        modules.game_market.GameMarket:setSortOrder('asc', parent:getParent():getChildIndex(parent))
+    UIWidget
+      id: base
+      image-source: /images/ui/windows/market/offer_list_header_sort_base
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+    UIWidget
+      id: desc
+      image-source: /images/ui/windows/market/offer_list_header_sort_ascending
+      anchors.top: base.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 2
+      $on:
+        image-source: /images/ui/windows/market/offer_list_header_sort_ascending_on
+      @onClick: |
+        local parent = self:getParent():getParent()
+        modules.game_market.GameMarket:setSortOrder('desc', parent:getParent():getChildIndex(parent))
+
+  UIWidget
+    size: 1 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+  
+  UIWidget
+    size: 1 40
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+    self.sort_button:setVisible(self.sortButton[index])
+    if self.sortButton[index] then
+      self.title:setTextOffset({x = -15, y = 0})
+    end
+    self.title:setText(self.titles[index])
+
+    -- center title and sort button by margin
+    local width = self.title:getWidth() + (self.sort_button:isVisible() and self.sort_button:getWidth() or 0)
+    local margin = (self:getWidth() - width) / 2
+    self.title:setMarginLeft(margin)
+
+GameMarketCompletedOffersPanelListItemPanel < UIWidget
+  id: offer
+  height: 60
+  image-source: /images/ui/windows/market/offer_list_item_background
+  $alternate:
+    image-source: /images/ui/windows/market/offer_list_item_background_alternate
+  layout:
+    type: horizontalBox
+  padding-left: 5
+  
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+  GameMarketCompletedOffersPanelListItemPanelColumn
+
+GameMarketCompletedOffersPanelListItemPanelColumn < UIWidget
+  id: column
+  &columnSizes: |
+    {
+      [1] = 145,
+      [2] = 140,
+      [3] = 120,
+      [4] = 280,
+      [5] = 80,
+      [6] = 80,
+      [7] = 124,
+      [8] = 160,
+      [9] = 171,
+    }
+  @onEnableChange: |
+    function (self, enabled)
+      for _, child in ipairs(self:getChildren()) do
+        child:setEnabled(enabled)
+      end
+    end
+
+  Item
+    id: item
+    size: 40 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    visible: false
+    margin-left: 15
+    image-color: white
+    font: poppins-semibold-bordered-14
+    virtual: true
+    $disabled:
+      image-color: gray
+  
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    text-align: left
+    font: poppins-semibold-16
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    text-offset: 0 5
+    margin-left: 0
+    text-vertical-auto-resize: true
+    phantom: true
+    $on:
+      text-offset: 70 5
+      text-align: left
+    $checked:
+      text-align: left
+      anchors.left: icon.right
+      margin-left: 10
+      text-offset: 0 5
+    $disabled:
+      text-color: gray
+    @onTextChange: |
+      function(self, text)
+        if not tonumber(text) then return end
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+  
+  UIWidget
+    id: icon
+    size: 40 40
+    anchors.centerIn: parent
+    visible: false
+    font: poppins-semibold-14
+    text-offset: 0 2
+    phantom: true
+    image-color: white
+    $disabled:
+      image-color: gray
+    $on:
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: none
+    @onStateChange: |
+      if self:isOn() then
+        self:update()
+      end
+    &update: |
+      function(self)
+        addEvent(function()
+          -- center icon and text by margin
+          local parent = self:getParent()
+          local width = self:getWidth() + (parent.text:getTextSize().width + parent.text:getMarginLeft()) + 20
+          local margin = (parent:getWidth() - width) / 2
+          self:setMarginLeft(margin)
+        end)
+      end
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+
+    if index == 1 then
+      self.icon:setSize({width = 48, height = 20})
+      self.icon:setVisible(true)
+    elseif index == 4 then
+      self.item:setVisible(true)
+      self.text:setOn(true)
+    elseif index == 5 or index == 6 then
+      self.text:hide()
+      self.icon:setVisible(true)
+    elseif index == 8 or index == 9 then
+      self.icon:setVisible(true)
+      self.icon:setOn(true)
+      self.text:setChecked(true)
+      self.icon:setImageSource('/images/ui/icons/silver_44')
+    end
+  @onClick: |
+    local parent = self:getParent()
+    parent:onClick()
+
+GameMarketCompletedOffersPanelPagination < UIWidget
+  id: pagination_panel
+  size: 160 30
+  margin-top: 5
+
+  UITextEdit
+    id: page_edit
+    anchors.right: page_count.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 40 30
+    font: poppins-semibold-14
+    margin-right: 10
+    text-color: #a6aab2
+    text-align: center
+    text-offset: 0 0
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_backgorund
+    @onTextChange: |
+      function(self, text, oldText)
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+
+        -- update the page count
+        modules.game_market.GameMarket:scheduleForABit(function() modules.game_market.GameMarket:changeCompletedOffersListPage(self:getText()) end)
+      end
+
+  UIWidget
+    id: page_count
+    anchors.right: prev_button.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: of 1
+    font: poppins-semibold-14
+    text-color: #a6aab2
+    text-align: center
+    text-horizontal-auto-resize: true
+    size: 50 30
+    margin-right: 10
+  
+  UIWidget
+    id: prev_button
+    anchors.right: next_button.left
+    margin-right: 10
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev
+    size: 30 30
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    @onClick: modules.game_market.GameMarket:changeCompletedOffersListPage('previous')
+
+  UIWidget
+    id: next_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next
+    size: 30 30
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    @onClick: modules.game_market.GameMarket:changeCompletedOffersListPage('next')

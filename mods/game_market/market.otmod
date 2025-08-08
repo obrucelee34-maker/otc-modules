@@ -1,0 +1,6 @@
+Module
+  name: game_market
+  sandboxed: true
+  scripts: [ market ]
+  @onLoad: GameMarket:init()
+  @onUnload: GameMarket:terminate()

@@ -1,0 +1,417 @@
+SearchPopupMenuButton < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  $checked:
+// title
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+
+SearchPopupMenuShortcutLabel < UIWidget
+  text-align: right
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  text-auto-resize: true
+  font: poppins-semibold-14
+  text-color: #fbfb79
+  phantom: true
+
+SearchPopupMenuSeparator < UIWidget
+  background-color: #25272C
+  height: 1
+  phantom: true
+
+SearchPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/market/search_popup_background
+  image-border: 5
+  padding: 10
+  width: 240
+
+FilterPopupMenuButton < UIWidget
+  height: 30
+  text-align: left
+    font: poppins-12
+  text-horizontal-auto-resize: true
+  text-align: top-left
+  text-color: #CED2D9
+  text-offset: 0 10
+  $on:
+    text-color: #36F991
+  $disabled:
+    text-color: #3A3D43
+  $hover:
+    text-color: #36F991
+  @onStateChange: |
+    function(self, state)
+      self.arrow:setOn(state)
+    end
+  @onCheckChange: |
+    function(self, state)
+      self.arrow:setChecked(state)
+    end
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 5
+    image-source: /images/ui/windows/market/filter_panel_icon_expand
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_expanded
+    $disabled:
+      image-source: /images/ui/windows/market/filter_panel_icon_expand_disabled
+    $checked:
+      visible: false
+
+  UIWidget
+    id: content
+    anchors.left: parent.left
+    anchors.right: arrow.left
+    anchors.top: parent.top
+    margin-top: 30
+    layout:
+      type: verticalBox
+      fit-children: true
+
+FilterPopupMenuSubItem < UIWidget
+  id: subitem
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+
+FilterPopupMenuButtonExpanded < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  text-offset: 40 1
+  $checked:
+// title
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onClick: |
+    self.checkbox:setChecked(not self.checkbox:isChecked())
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 10
+    @onCheckChange: |
+      function(self, state)
+        modules.game_market.GameMarket:onFilterPanelCheckboxChange(self, state)
+      end
+
+FilterPopupMenuShortcutLabel < UIWidget
+  text-align: right
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  text-auto-resize: true
+  font: poppins-semibold-14
+  text-color: #fbfb79
+  phantom: true
+
+FilterPopupMenuSeparator < UIWidget
+  background-color: #25272C
+  height: 1
+  phantom: true
+
+FilterPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/market/search_popup_background
+  image-border: 5
+  padding: 10
+  width: 240
+
+FilterPopupMenuClearAll < UIWidget
+  id: clear_button
+  text: Clear all
+  font: poppins-semibold-14
+  text-color: #CED2D9
+  $disabled:
+    text-color: #7E828B
+  enabled: false
+  margin-top: 5
+  opacity: 1
+  $hover:
+    opacity: 0.75
+  $pressed:
+    opacity: 0.5
+  text-auto-resize: true
+  text-align: center
+  @onClick: |
+    modules.game_market.GameMarket:clearAllFilters()
+  @onEnableChange: |
+    if not self.underscore then
+      return
+    end
+    self.underscore:setOn(self:isEnabled())
+
+  UIWidget
+    id: underscore
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    height: 1
+    background-color: #595c64
+
+    @onSetup: |
+      self:setWidth(self:getParent():getTextSize().width + 2)
+
+GameMarketWindowSearch < UIWidget
+  id: search
+  anchors.left: categories.right
+  anchors.right: parent.right
+  anchors.top: parent.top
+  height: 40
+  margin-left: 10
+  GameMarketWindowSearchPanel
+    GameMarketWindowSearchPanelInputPanel
+  GameMarketWindowSearchFilterPanel
+  GameMarketWindowSearchTypePanel
+
+GameMarketWindowSearchPanel < UIWidget
+  id: search_panel
+  anchors.left: parent.left
+  size: 300 40
+  anchors.top: parent.top
+  height: 60
+
+GameMarketWindowSearchPanelInputPanel < UIWidget
+  id: search_input_panel
+  anchors.left: parent.left
+  anchors.verticalCenter: parent.verticalCenter
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  size: 300 40
+  image-color: white
+  $disabled:
+    image-color: #7E828B
+  @onClick: |
+    if not self.input:isEnabled() then
+      if self:containsPoint(g_window.getMousePosition()) then
+        -- lets let the player write down whatever he want
+        self.input.selectedText = self.input:getText()
+        self.input.editingText = true
+        self.input:setText("", true)
+        self.input:setTextPreview(self.input.selectedText)
+        self.input:setEnabled(true)
+        self.input.editingText = false
+      end
+    end
+
+  UIWidget
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    image-source: /images/ui/windows/market/search_panel_icon
+    size: 20 20
+    phantom: true
+    image-color: white
+    $disabled:
+      image-color: #7E828B
+  
+  UITextEdit
+    id: input
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    height: 30
+    padding-top: 5
+    margin-left: 40
+    margin-right: 10
+    font: poppins-14
+    !preview: tr('Search...')
+    editable: true
+    focusable: true
+    shift-navigation: true
+    selection-color: #7E828B
+    color: white
+    $disabled:
+      color: #7E828B
+    @onTextChange: |
+      function(self, text)
+        GameMarket:onSearchInputTextChange(self, text)
+      end
+    @onEnableChange: |
+      if not self.editingText then
+        self:getParent().clear_button:setVisible(not self:isEnabled())
+      end
+
+      self:setPhantom(not self:isEnabled())
+
+  UIWidget
+    id: clear_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    image-source: /images/ui/windows/market/search_panel_clear_button
+    font: poppins-semibold-14
+    visible: false
+    image-color: white
+    $disabled:
+      image-color: #7E828B
+    $hover:
+      image-color: #FF5151
+    @onClick: |
+      modules.game_market.GameMarket:clearSearchInput()
+
+GameMarketWindowSearchFilterPanel < UIWidget
+  id: filter_panel
+  anchors.left: search_panel.right
+  anchors.top: parent.top
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  size: 240 40
+  margin-top: 10
+  margin-left: 10
+  image-color: white
+  $disabled:
+    image-color: #7E828B
+  @onStateChange: |
+    function(self, state)
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(state)
+      end
+    end
+  @onClick: |
+    local state = self:isOn()
+    self:setOn(not state)
+    GameMarket:onFilterPanelClick(self, not state)
+
+  UIWidget
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    image-source: /images/ui/windows/market/filter_panel_icon
+    size: 20 20
+    image-color: white
+    phantom: true
+    $on:
+      image-color: #36F991
+    $disabled:
+      image-color: #7E828B
+  
+  UIWidget
+    id: text
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: Filter
+    font: poppins-14
+    text-color: #CED2D9
+    margin-left: 10
+    phantom: true
+    text-auto-resize: true
+    text-offset: 0 1
+    $on:
+      text-color: #36F991
+    $disabled:
+      text-color: #7E828B
+
+  UIWidget
+    id: indicative
+    size: 20 20
+    anchors.left: text.right
+    anchors.verticalCenter: text.verticalCenter
+    image-source: /images/ui/windows/market/filter_indicative
+    text-color: #18181B
+    text-offset: 1 2
+    font: poppins-14
+    margin-left: 5
+    visible: true
+    opacity: 1.0
+    @onSetup: |
+      function(self)
+        self:setEnabled(false)
+      end
+    @onClick: |
+      modules.game_market.GameMarket:clearAllFilters()
+    $hover:
+      opacity: 1.0
+      image-source: /images/ui/windows/market/filter_indicative_clear
+      text-offset: 50 50
+    $hover disabled:
+      visible: false
+    $pressed:
+      opacity: 0.9
+    $pressed disabled:
+      visible: false
+    $disabled:
+      visible: false
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/market/filter_panel_arrow_down
+    size: 20 20
+    phantom: true
+    margin-right: 10
+    image-color: white
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_active
+    $disabled:
+      image-color: #7E828B
+
+GameMarketWindowSearchTypePanel < UIWidget
+  id: type_panel
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  size: 272 40
+  image-source: /images/ui/windows/market/offer_type_background
+  margin-right: 20
+  image-border: 10
+  margin-top: 10
+
+  UIWidget
+    id: buy_offers
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 135 40
+    text: Buy Offers
+    font: poppins-14
+    text-align: center
+    image-source:
+    image-border: 10
+    text-color: #7E828B
+    $on:
+      image-source: /images/ui/windows/market/offer_type_selected
+      text-color: #36F991
+    @onClick: |
+      modules.game_market.GameMarket:onOfferTypeChanged(modules.game_market.cfg.offerType[self:getId()])
+      local parent = self:getParent()
+      parent.sell_offers:setOn(false)
+      parent.buy_offers:setOn(true)
+
+  UIWidget
+    id: sell_offers
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 135 40
+    text: Sell Offers
+    font: poppins-14
+    text-align: center
+    image-border: 10
+    image-source: 
+    text-color: #7E828B
+    on: true
+    $on:
+      image-source: /images/ui/windows/market/offer_type_selected
+      text-color: #36F991
+    @onClick: |
+      modules.game_market.GameMarket:onOfferTypeChanged(modules.game_market.cfg.offerType[self:getId()])
+      local parent = self:getParent()
+      parent.sell_offers:setOn(true)
+      parent.buy_offers:setOn(false)

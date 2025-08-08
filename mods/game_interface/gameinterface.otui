@@ -1,0 +1,193 @@
+GameSidePanel < UIMiniWindowContainer
+  padding: 4
+  width: 210
+  layout:
+    type: verticalBox
+    spacing: -7
+
+GameBottomPanel < Panel
+  image-border: 4
+
+GameBackPanel < Panel
+  color: #000000
+
+GameMapPanel < UIGameMap
+
+GameOverlayPanel < Panel
+  background-color: #00000099
+  anchors.fill: parent
+  $on:
+    visible: true
+    phantom: false
+  $!on:
+    visible: false
+    phantom: true
+
+//
+//Archlight
+
+GameInfoPanel < Panel
+  width: 600
+  height: 97
+  padding: 0
+
+GameChatPanel < Panel
+  draggable: true
+  phantom: false
+  padding: 4
+  enabled: false
+
+  ResizeBorder
+    id: rightResizeBorder
+    minimum: 200
+    maximum: 1700
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+
+  ResizeBorder
+    id: leftResizeBorder
+    minimum: 200
+    maximum: 1700
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+
+  ResizeBorder
+    id: bottomResizeBorder
+    minimum: 200
+    maximum: 700
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+
+  ResizeBorder
+    id: topResizeBorder
+    minimum: 200
+    maximum: 700
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: parent.right
+
+//GameMinimapPanel < Panel
+  //image-source: /images/ui/temp/panel_minimap
+
+//
+//
+
+UIWidget
+  id: gameRootPanel
+  anchors.fill: parent
+
+  GameBackPanel
+    anchors.fill: parent
+    opacity: 1
+
+  GameMapPanel
+    id: gameMapPanel
+    focusable: true
+
+    Panel
+      id: fadePanel
+      background-color: #000000
+      anchors.fill: parent
+      opacity: 1.0
+      visible: false
+
+  NeutralButton
+    id: screenshotButton
+    text: Take Screenshot
+    anchors.top: gameMapPanel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    &resizeText: true
+    @onClick: function() g_app.doScreenshot() end
+
+  GameChatPanel
+    id: gameChatPanel
+    opacity: 0.9
+    focusable: false
+
+  GameBottomPanel
+    id: gameBottomPanel
+    height: 240
+    anchors.left: gameLeftPanel.right
+    anchors.right: gameRightPanel.left
+    anchors.bottom: parent.bottom
+    opacity: 0.7
+    focusable: false
+
+  GameSidePanel
+    id: gameLeftPanel
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-top: 30
+    focusable: false
+    visible: true
+    on: true
+    $!on:
+      width: 0
+      visible: false
+
+  GameSidePanel
+    id: gameRightPanel
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-top: 30
+    focusable: false
+    on: true
+
+  Panel
+    id: gameHUDPanel
+    anchors.fill: parent
+    focusable: true
+
+    Panel
+      id: gameMessagePanel
+      anchors.fill: parent
+      focusable: false
+      phantom: true
+      layout:
+        type: verticalBox
+        spacing: 10
+
+  Panel
+    id: gameWindowPanel
+    anchors.fill: parent
+    focusable: false
+
+  UIWidget
+    id: mouseGrabber
+    focusable: false
+    visible: false
+
+  Label
+    id: centerLabel
+    width: 1000
+    font: myriad-pro-semibold-40
+    color: #e7b131
+    anchors.centerIn: parent
+    text-auto-resize: true
+    text-align: top
+    visible: false
+
+  UIWidget
+    id: countdownLabel
+    font: myriad-pro-semibold-30
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    margin-top: 350
+    phantom: true
+    text-auto-resize: true
+    text-align: top
+
+  GameOverlayPanel
+    id: gameOverlayPanel
+    focusable: false
+    visible: false
+
+  Panel
+    id: overlay
+    anchors.fill: parent
+    visible: false

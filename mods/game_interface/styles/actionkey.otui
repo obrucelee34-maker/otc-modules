@@ -1,0 +1,48 @@
+ActionKey < UIWidget
+  id: actionKeyPanel
+  image-source: /images/ui/misc/textmessage_background
+  image-border: 14
+  padding: 6
+  phatom: true
+  height: 32
+  layout:
+    type: horizontalBox
+    fit-children: true
+    spacing: 5
+
+  UIWidget
+    id: keyHolder
+    width: 32
+
+    UIWidget
+      id: key
+      size: 24 24
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/ui/windows/dialogue/f
+      image-auto-resize: false
+
+  UIWidget
+    id: text
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text: Interact
+
+  UIWidget
+    id: iconHolder
+    width: 32
+
+    UIWidget
+      id: icon
+      size: 24 24
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.verticalCenter: parent.verticalCenter
+      image-source: /images/ui/icons/interactions/woodcutting
+      image-auto-resize: false
+
+ActionIcon < UIWidget
+  id: actionIconPanel
+  size: 48 48
+  image-source: /images/ui/icons/interactions/rounded/fishing
+  phatom: true
+

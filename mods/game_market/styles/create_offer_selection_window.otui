@@ -1,0 +1,93 @@
+GameMarketCreateOfferSelectionWindow < MainWindow
+  id: create_offer_selection_window
+  size: 400 285
+  &title: 'Select offer type'
+  anchors.centerIn: parent
+  draggable: false
+  visible: false
+  @onVisibilityChange: |
+    function(self, visible)
+      local window = modules.game_market.GameMarket.window
+      if window then
+        window:blockInputPanel(visible)
+      end
+      if not visible then
+        modules.game_market.GameMarket:selectCreateOfferPanel('sell_offers')
+      end
+    end
+
+  UIWidget
+    id: content
+    margin-top: 60
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    height: 138
+    layout:
+      type: horizontalBox
+      spacing: 12
+      fit-children: true
+    
+    GameMarketCreateOfferSelectionWindowItem
+      id: items
+      @onSetup: |
+        self:onClick()
+    GameMarketCreateOfferSelectionWindowItem
+      id: ravencoins
+
+  UIWidget
+    id: spacer
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    background-color: #3A3D43
+
+  PrimaryButton
+    id: confirm_button
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: spacer.bottom
+    margin-top: 15
+    text: Next
+    @onClick: |
+      local parent = self:getParent()
+      parent:hide()
+      modules.game_market.GameMarket:displayCreateOfferWindow(parent.selected_offer_type)
+
+GameMarketCreateOfferSelectionWindowItem < UIWidget
+  size: 175 99
+  image-source: /images/ui/windows/market/offer_selection_background_off
+  $on:
+    image-source: /images/ui/windows/market/offer_selection_background_on
+
+  @onStateChange: |
+    for _, child in pairs(self:getChildren()) do
+      child:setOn(self:isOn())
+    end
+
+  @onClick: |
+    local parent = self:getParent()
+    for _, child in ipairs(parent:getChildren()) do
+      child:setOn(false)
+    end
+    parent:getParent().selected_offer_type = self:getId()
+    self:setOn(true)
+
+  UIWidget
+    id: icon
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    margin-top: 30
+    phantom: true
+    @onSetup: |
+      self:setImageSource(string.format('/images/ui/windows/market/create_offer_select_icon_%s', self:getParent():getId()))
+
+  UIWidget
+    id: text
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 20
+    font: poppins-16
+    text-align: center
+    text-auto-resize: true
+    phantom: true
+    @onSetup: |
+      self:setText(self:getParent():getId():gsub('_', ' '):titleCase())

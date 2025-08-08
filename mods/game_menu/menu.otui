@@ -1,0 +1,142 @@
+MenuTooltip < UIWidget
+  font: myriad-pro-semibold-14
+  height: 60
+  image-source: /images/ui/windows/tooltip/window
+  image-border: 15
+  text-align: center
+  padding: 14 20 14 20
+  text-horizontal-auto-resize: true
+  visible: false
+  focusable: false
+  phantom: true
+
+MenuIcon < UIWidget
+  id: menuIcon
+  image-source: /images/ui/windows/menu/base_logo_selected
+  image-auto-resize: true
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin: 15
+  focusable: false
+  $!on:
+    image-source: /images/ui/windows/menu/base_logo
+  @onClick: |
+    if signalcall(modules.game_menu.Menu.onMenuIconClick) then
+      return
+    end
+    self:setOn(not self:isOn())
+  @onStateChange: |
+    if not self:isOn() then
+      Menu.window:collapse(nil, function()
+        Menu.minimizeButton:setVisible(false)
+      end)
+      if g_game.isRavenQuest() then
+        self.logo:setImageColor('#36F991')
+      end
+      Menu.window:raise()
+      self:raise()
+    else
+      Menu.window:expand(nil, function()
+        Menu.minimizeButton:setVisible(true)
+        Menu.minimizeButton:raise()
+      end)
+      if g_game.isRavenQuest() then
+        self.logo:setImageColor('#131416')
+      end
+    end
+
+  UIWidget
+    id: logo
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/menu/ravendawn_online_logo
+    image-auto-resize: true
+    phantom: true
+    @onSetup: |
+      if g_game.isRavenQuest() then
+        self:setImageSource('/images/ui/windows/menu/raven_quest_logo')
+        self:setImageColor('#36F991')
+      end
+
+MenuMinimizeButton < UIWidget
+  id: menuMinimizeButton
+  image-source: /images/ui/buttons/select/btnArrow
+  image-auto-resize: true
+  anchors.right: menuWidget.left
+  anchors.verticalCenter: menuWidget.verticalCenter
+  margin-right: -12
+  focusable: false
+  @onSetup: |
+    self:setVisible(Menu.window:isVisible())
+  @onClick: |
+    Menu.icon:setOn(false)
+
+  $hover:
+    image-source: /images/ui/buttons/select/btnArrowActive
+
+MenuDivisorBar < UIWidget
+  image-source: /images/ui/windows/menu/divisor_bar
+  image-auto-resize: true
+  focusable: false
+
+MenuSeparatorBar < UIWidget
+  image-source: /images/ui/windows/menu/separator
+  image-auto-resize: true
+  focusable: false
+  phantom: true
+
+MenuWidgetIcon < UIWidget
+  width: 25
+  image-color: #7E828B
+  $hover:
+    image-color: white
+
+  UIWidget
+    id: lock
+    image-source: /images/ui/icons/icon_lock
+    size: 13 16
+    anchors.verticalCenter: parent.top
+    anchors.horizontalCenter: parent.right
+    phantom: true
+
+MenuWidget < UIWidget
+  id: menuWidget
+  width: 420
+  image-source: /images/ui/windows/menu/background_main_menu
+  image-auto-resize: true
+  anchors.right: menuIcon.right
+  anchors.verticalCenter: menuIcon.verticalCenter
+  margin-right: 48
+  focusable: false
+  visible: false
+  dont-raise-on-expand: true
+
+  MenuDivisorBar
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  MenuDivisorBar
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+  Panel
+    id: iconList
+    layout:
+      type: horizontalBox
+      spacing: 10
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 25
+    anchors.verticalCenter: parent.verticalCenter
+    margin: 10
+    margin-left: 20
+    margin-right: 30
+
+MenuNotificationIcon < UIWidget
+  id: notificationIcon
+  image-source: /images/ui/windows/menu/icon_notification
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin: 5
+  phantom: true

@@ -1,0 +1,12 @@
+GameMarketActiveOffersPanel < UIWidget
+  anchors.fill: parent
+  draggable: false
+  visible: false
+  MainWindowContent
+    padding: 0
+    layout:
+      type: verticalBox
+    GameMarketInteractOfferWindowListHeader
+    GameMarketInteractOfferWindowListItemPanel
+    GameMarketInteractOfferWindowInfoPanel
+    GameMarketInteractOfferWindowDetailsPanel

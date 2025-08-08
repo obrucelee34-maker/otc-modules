@@ -1,0 +1,7 @@
+Module
+  name: game_inventory
+  description: Inventory management interface for the game
+  sandboxed: true
+  scripts: [ inventory ]
+  @onLoad: GameInventory:init()
+  @onUnload: GameInventory:terminate()

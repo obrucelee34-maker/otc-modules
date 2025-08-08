@@ -1,0 +1,52 @@
+GameMarketListPanel < MainWindowContent
+  visible: false
+GameMarketActiveOffersPanel < MainWindowContent
+  visible: false
+GameMarketCompletedOffersPanel < MainWindowContent
+  visible: false
+
+GameMarketWindow < MainWindow
+  id: game_market_window
+  size: 1350 811
+  anchors.centerIn: parent
+  &title: 'Market'
+  &iconName: 'icon_market'
+  &isGeneralUIWindow: true
+  @onEscape: addEvent(function() modules.game_market.GameMarket:close() end)
+  GameMarketHeaderPanel
+
+  GameMarketListPanel
+    id: content_list
+    anchors.top: prev.bottom
+    padding-right: 0
+    padding-top: 0
+    padding-bottom: 0
+    GameMarketCategoriesPanel
+    GameMarketCategoriesPanelScrollBar
+    GameMarketWindowSearch
+    GameMarketOffersPanel
+  GameMarketActiveOffersPanel
+    id: content_active_offers
+    anchors.top: prev.top
+    padding-right: 0
+    padding-top: 0
+    padding-bottom: 0
+    GameMarketActiveOffersPanelSearch
+    GameMarketActiveOffersListPanel
+  GameMarketCompletedOffersPanel
+    id: content_completed_offers
+    anchors.top: prev.top
+    padding-right: 0
+    padding-top: 0
+    padding-bottom: 0
+    GameMarketCompletedOffersPanelSearch
+    GameMarketCompletedOffersListPanel
+
+  UIWidget
+    id: loading_icon
+    anchors.fill: parent
+    visible: false
+
+  GameMarketInteractOfferWindow
+  GameMarketCreateOfferWindow
+  GameMarketCreateOfferSelectionWindow

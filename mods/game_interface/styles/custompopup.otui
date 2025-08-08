@@ -1,0 +1,64 @@
+ExchangeGiftPopupWindowTitle < UIWidget
+  text-auto-resize: true
+  text-color: #CED2D9
+  font: poppins-14
+  text-align: left
+  margin-left: 20
+  margin-right: 20
+
+ExchangeGiftPopupWindowTextInput < UITextEdit
+  image-source: /images/ui/windows/guild/text_input_background
+  image-border: 10
+  font: poppins-14
+  text-color: #CED2D9
+  margin-left: 20
+  margin-right: 20
+  padding: 5
+  selection-color: #3A3D43
+
+ExchangeGiftPopupWindow < MainWindow
+  id: exchangeGiftWindow
+  size: 320 240
+  anchors.centerIn: parent
+  draggable: false
+
+  MainWindowContent
+    padding: 0
+    layout:
+      type: verticalBox
+
+    ExchangeGiftPopupWindowTitle
+      !text: tr('Enter the gift amount:')
+      text-wrap: true
+      text-align: center
+      margin-top: 10
+      @onTextChange: |
+        function(self, text)
+          self:setColoredText(GetHighlightedText(text), true)
+        end
+    ExchangeGiftPopupWindowTextInput
+      id: textEdit
+      size: 320 40
+      max-length: 20
+      margin-top: 10
+      padding-left: 10
+      padding-top: 10
+    UIWidget
+      id: spacer
+      background-color: #3A3D43
+      height: 1
+      margin-top: 10
+
+    UIWidget
+      id: button_panel
+      height: 80
+      background-color: #3A3D4325
+      PrimaryButton
+        id: post_button
+        text: Gift Exchange
+        &resizeText: true
+        anchors.centerIn: parent
+        @onClick: |
+          function(self)
+            modules.game_interface.onExchangeGiftButtonClick(self)
+          end

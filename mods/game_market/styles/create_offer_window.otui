@@ -1,0 +1,1679 @@
+GameMarketCreateOfferWindow < MainWindow
+  id: create_offer_window
+  size: 950 587
+  &title: 'Create Offer'
+  anchors.centerIn: parent
+  draggable: false
+  visible: false
+  HorizontalSeparator
+    background-color: #3A3D43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+  GameMarketCreateOfferWindowTypePanel
+    margin-top: 48
+  HorizontalSeparator
+    background-color: #3A3D43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+  MainWindowContent
+    id: content_sell_offers
+    padding: 0 0 0 0
+    padding-top: 10
+    anchors.top: prev.bottom
+    
+    GameMarketCreateOfferWindowSellOfferLeftPanel
+    GameMarketCreateOfferWindowSellOfferRightPanel
+  @onVisibilityChange: |
+    function(self, visible)
+      local window = modules.game_market.GameMarket.window
+      if window then
+        window:blockInputPanel(visible)
+      end
+      if not visible then
+        modules.game_market.GameMarket:hideCreateOfferWindow()
+        modules.game_market.GameMarket:selectCreateOfferPanel('sell_offers')
+      end
+    end
+  MainWindowContent
+    id: content_buy_offers
+    padding: 0 0 0 0
+    padding-top: 10
+    anchors.top: content_sell_offers.top
+    GameMarketCreateOfferWindowSelectItemPanel
+    GameMarketCreateOfferWindowBuyOfferLeftPanel
+      visible: false
+    GameMarketCreateOfferWindowBuyOfferRightPanel
+      visible: false
+  GameMarketCreateOfferWindowSellOfferPlaceOfferPanel
+
+GameMarketCreateOfferWindowTypePanel < UIWidget
+  id: type_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  image-source: /images/ui/windows/market/offer_type_background
+  image-size: 274 40
+  image-offset: 0 15
+  image-border: 10
+  background-color: #00000080
+  height: 70
+  @onSetup: |
+    -- image offset to center
+    local imageSize = self:getImageSize()
+    local imageOffset = self:getImageOffset()
+    self:setImageOffset({x = (self:getWidth() - imageSize.width) / 2, y = imageOffset.y})
+    -- offset sell offers to beginning of image offset
+    local sellOffers = self:getChildById('sell_offers')
+    sellOffers:setMarginLeft(self:getImageOffset().x)
+
+  UIWidget
+    id: buy_offers
+    anchors.left: sell_offers.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 135 40
+    text: Buy Offers
+    font: poppins-14
+    text-align: center
+    image-source:
+    image-border: 10
+    text-color: #7E828B
+    margin-left: 5
+    $on:
+      image-source: /images/ui/windows/market/offer_type_selected
+      text-color: #36F991
+    @onClick: |
+      modules.game_market.GameMarket:selectCreateOfferPanel(self:getId())
+
+  UIWidget
+    id: sell_offers
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 135 40
+    text: Sell Offers
+    font: poppins-14
+    text-align: center
+    image-border: 10
+    image-source: 
+    text-color: #7E828B
+    on: true
+    $on:
+      image-source: /images/ui/windows/market/offer_type_selected
+      text-color: #36F991
+    @onClick: |
+      modules.game_market.GameMarket:selectCreateOfferPanel(self:getId())
+
+GameMarketCreateOfferWindowSellOfferLeftPanel < UIWidget
+  id: left_panel
+  size: 450 369
+  anchors.left: parent.left
+  anchors.top: parent.top
+  margin-left: 20
+  image-source: /images/ui/windows/market/left_panel_background
+  image-border: 5
+  UIWidget
+    id: place_item_panel
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: parent.right
+    height: 94
+    image-source: /images/ui/windows/market/dotted_border_background
+    image-border: 3
+    margin: 1
+    $checked:
+      image-source: /images/ui/windows/market/new_offer_item_background
+
+    Item
+      id: item
+      size: 64 64
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 15
+      font: poppins-semibold-bordered-14
+      virtual: true
+      @onMousePress: |
+        if not modules.game_market.GameMarket.ravencoinTransaction then
+          modules.game_market.GameMarket:clearCreateOfferItem()
+        end
+    UIWidget
+      id: text
+      anchors.left: item.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 10
+      text-auto-resize: true
+      text-align: left
+      text: Drag and drop the item here.
+      text-color: #FFA851
+      font: poppins-16
+      text-offset: 0 5
+      phantom: true
+    
+    UIWidget
+      id: item_name
+      anchors.left: item.right
+      anchors.top: item.top
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-16
+      margin-top: 7
+      margin-left: 20
+      phantom: true
+    UIWidget
+      id: item_grade
+      anchors.left: item_name.left
+      anchors.top: item_name.bottom
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-15
+      phantom: true
+    UIWidget
+      id: item_type
+      anchors.left: item_name.left
+      anchors.top: item_grade.bottom
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-14
+      phantom: true
+
+  UIWidget
+    id: quantity_panel
+    anchors.left: parent.left
+    anchors.top: place_item_panel.bottom
+    anchors.right: parent.right
+    height: 80
+    UIWidget
+      id: quantity_label
+      anchors.left: parent.left
+      anchors.top: parent.top
+      text: Quantity
+      text-color: #CED2D9
+      text-auto-resize: true
+      font: poppins-14
+      margin-top: 15
+      margin-left: 15
+
+    GameMarketCreateOfferWindowAmountPanel
+    VerticalSeparator
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      anchors.bottom: parent.bottom
+      margin-top: 10
+      background-color: #3A3D43
+      margin-left: 15
+      margin-right: 15
+  GameMarketCreateOfferWindowPricePanel
+    HorizontalSeparator
+      background-color: #3A3D43
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-left: 15
+      margin-right: 15
+  GameMarketCreateOfferWindowInfoPanel
+
+GameMarketCreateOfferWindowSellOfferPlaceOfferPanel < UIWidget
+  id: place_offer_panel
+  background-color: #00000040
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 80
+  HorizontalSeparator
+    background-color: #3A3D43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: next.top
+    margin-top: -15
+
+  PrimaryButton
+    id: place_offer_button
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: Place Sell Offer
+    &resizeText: true
+    @onClick: |
+      modules.game_market.GameMarket:displayCreateOfferWindow()
+
+
+GameMarketCreateOfferWindowAmountPanel < UIWidget
+  id: amount_panel
+  anchors.left: parent.left
+  anchors.top: quantity_label.bottom
+  size: 178 30
+  margin-left: 15
+  margin-top: 5
+  TextEdit
+    id: amount_edit
+    anchors.left: button_minus.right
+    anchors.top: parent.top
+    font: poppins-15
+    font-color: #CED2D9
+    text: 1
+    padding-top: 5
+    image-source: /images/ui/windows/market/interact_offer_amount_background
+    size: 51 30
+    margin-left: -2
+    max-length: 4
+    text-align: center
+    @onTextChange: |
+      function(self, text, oldText)
+        if oldText == text then
+          return
+        end
+
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+        local parent = self:getParent()
+
+        local amount = tonumber(newText)
+        if not amount then
+          return
+        end
+
+        self:setCursorPos(#self:getText())
+
+        local parent = self:getParent()
+        local min = parent.minimum or 0
+        local max = parent.maximum or 0
+        if amount > max then
+          self:setText(max)
+        end
+        amount = tonumber(self:getText())
+
+        if amount < min then
+          self:setText(min)
+        end
+      end
+  UIWidget
+    id: button_minus
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/ui/windows/market/button_amount_minus
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    @onClick: |
+      function(self)
+        local parent = self:getParent()
+        local amount_edit = parent.amount_edit
+        local amount = tonumber(amount_edit:getText())
+        if not amount then
+          amount = 0
+        end
+
+        local min = parent.minimum or 0
+
+        amount = amount - 1
+        if amount < min then
+          amount = min
+        end
+
+        amount_edit:setText(amount)
+        amount_edit:setCursorPos(#amount_edit:getText())
+      end
+  UIWidget
+    id: button_plus
+    anchors.left: amount_edit.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/market/button_amount_plus
+    margin-left: -4
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    @onClick: |
+      function(self)
+        local parent = self:getParent()
+        local amount_edit = parent.amount_edit
+        local amount = tonumber(amount_edit:getText())
+        if not amount then
+          amount = 0
+        end
+
+        local max = parent.maximum or 0
+        amount = amount + 1
+        if amount > max then
+          amount = max
+        end
+
+        amount_edit:setText(amount)
+        amount_edit:setCursorPos(#amount_edit:getText())
+      end
+  
+  UIWidget
+    id: button_max
+    anchors.left: button_plus.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: max.
+    font: poppins-16
+    text-color: #77D463
+    text-auto-resize: true
+    margin-left: 10
+    $hover:
+      text-color: #A0E38C
+    $pressed:
+      text-color: #77D463
+    UIWidget
+      id: underscore
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      height: 1
+      background-color: #77D463
+
+      @onSetup: |
+        self:setWidth(self:getParent():getTextSize().width + 2)
+    @onClick: |
+      function(self)
+        local parent = self:getParent()
+        local amount_edit = parent.amount_edit
+        local amount = tonumber(amount_edit:getText())
+        if not amount then
+          amount = 0
+        end
+
+        local max = parent.maximum or 0
+        amount = max
+
+        amount_edit:setText(amount)
+        amount_edit:setCursorPos(#amount_edit:getText())
+      end
+
+GameMarketCreateOfferWindowPricePanel < UIWidget
+  id: price_panel
+  anchors.left: parent.left
+  anchors.top: prev.bottom
+  height: 95
+  anchors.right: parent.right
+
+  UIWidget
+    id: price_label
+    anchors.left: parent.left
+    anchors.top: parent.top
+    !text: tr('Price per piece (min. 20)')
+    text-color: #CED2D9
+    text-auto-resize: true
+    font: poppins-14
+    margin-top: 15
+    margin-left: 15
+  
+  UITextEdit
+    id: price_input
+    anchors.left: parent.left
+    anchors.top: price_label.bottom
+    size: 190 40
+    margin-left: 15
+    margin-top: 5
+    font: poppins-semibold-14
+    !preview: tr('Your price offer')
+    image-source: /images/ui/windows/market/price_input_background
+    image-border: 5
+    padding-top: 10
+    padding-left: 5
+    padding-bottom: 5
+    max-length: 9
+    @onTextChange: |
+      function(self, text, oldText)
+        if oldText == text then
+          return
+        end
+
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+        local parent = self:getParent()
+        local min = 20
+        local max = 999999999
+
+        local amount = tonumber(newText)
+        if not amount then
+          return
+        end
+
+        self:setCursorPos(#self:getText())
+
+        local parent = self:getParent()
+        if amount > max then
+          self:setText(max)
+        end
+        amount = tonumber(self:getText())
+
+        if amount < min then
+          self:setColor('#FF0000')
+        else
+          self:setColor('#CED2D9')
+        end
+      end
+
+  UIWidget
+    id: total_amount_panel
+    anchors.left: price_input.right
+    anchors.top: parent.top
+    anchors.bottom: price_input.bottom
+    width: 200
+    margin-left: 20
+
+    UIWidget
+      id: vertical_separator
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      width: 1
+      background-color: #3A3D43
+      margin-top: 15
+
+    UIWidget
+      id: label
+      text: Total to receive
+      anchors.top: parent.top
+      anchors.left: parent.left
+      font: poppins-14
+      text-color: #CED2D9
+      text-auto-resize: true
+      margin-left: 20
+      margin-top: 15
+    
+    UIWidget
+      id: icon
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      size: 18 18
+      image-source: /images/ui/icons/silver_24
+      margin-left: 20
+      margin-bottom: 12
+    
+    UIWidget
+      id: price
+      anchors.left: icon.right
+      anchors.verticalCenter: icon.verticalCenter
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      text-offset: 0 5
+      text: 0
+      font: poppins-16
+      text-color: #CED2D9
+      margin-left: 10
+      @onTextChange: |
+        function(self, text)
+          -- format text to cotain commas
+          local length = 0
+          local text = self:getText()
+          local formatted = ''
+          for i = #text, 1, -1 do
+            formatted = text:sub(i, i) .. formatted
+            length = length + 1
+            if length == 3 and i ~= 1 then
+              formatted = ',' .. formatted
+              length = 0
+            end
+          end
+          self:setText(formatted, true)
+
+          local parent = self:getParent()
+          parent:setWidth(math.max(150, self:getTextSize().width + 20 + parent.icon:getWidth() + 10 + 20))
+        end
+
+GameMarketCreateOfferWindowInfoPanel < UIWidget
+  id: info_panel
+  image-source: /images/ui/windows/market/interact_window_info_background
+  image-border: 5
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  text-vertical-auto-resize: true
+  text-wrap: true
+  padding: 5
+  margin-left: 15
+  margin-right: 15
+  &premiumText: 'The marketplace charges a tax of |2%| of total sale price upon listing items and an additional |2%| when the item is sold.'
+  &normalText: 'The marketplace charges a tax of |4%| of total sale price upon listing items and an additional |4%| when the item is sold.'
+  text-color: #CED2D9
+  font: poppins-14
+  text-offset: 0 5
+  margin-top: 15
+  @onVisibilityChange: |
+    function(self, visible)
+      if visible then
+        local player = g_game.getLocalPlayer()
+        if player then
+          if player:isPremium() then
+            self:setText(self.premiumText)
+          else
+            self:setText(self.normalText)
+          end
+        end
+      end
+    end
+
+GameMarketCreateOfferWindowSellOfferRightPanel < UIWidget
+  id: right_panel
+  size: 450 369
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-right: 20
+  layout:
+    type: verticalBox
+    spacing: 2
+
+  UIWidget
+    id: title
+    image-source: /images/ui/windows/market/create_offer_right_panel_title_background
+    image-border: 5
+    text: Current sell offers
+    text-color: #FFFFFF
+    font: poppins-13
+    height: 30
+    text-align: center
+    text-offset: 0 2
+  GameMarketCreateOfferWindowPanelListHeader
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_1
+    margin-top: 5
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_2
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_3
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_4
+  GameMarketCreateOfferWindowNoOffersLabel
+  HorizontalSeparator
+    background-color: #3A3D43
+    margin-top: 2
+  GameMarketCreateOfferWindowPanelPagination
+    margin-top: 7
+
+GameMarketCreateOfferWindowPanelPagination < UIWidget
+  id: pagination_panel
+  size: 160 30
+  margin-top: 12
+
+  UITextEdit
+    id: page_edit
+    anchors.right: page_count.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 40 30
+    font: poppins-semibold-14
+    margin-right: 10
+    text-color: #a6aab2
+    text-align: center
+    text-offset: 0 0
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_backgorund
+    @onTextChange: |
+      function(self, text, oldText)
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+
+        -- update the page count
+        modules.game_market.GameMarket:scheduleForABit(function() modules.game_market.GameMarket:changeSimilarOffersListPage(self:getText()) end)
+      end
+
+  UIWidget
+    id: page_count
+    anchors.right: prev_button.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: of 1
+    font: poppins-semibold-14
+    text-color: #a6aab2
+    text-align: center
+    text-horizontal-auto-resize: true
+    size: 50 30
+    margin-right: 10
+  
+  UIWidget
+    id: prev_button
+    anchors.right: next_button.left
+    margin-right: 10
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev
+    size: 30 30
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_prev_active
+      opacity: 0.8
+    @onClick: modules.game_market.GameMarket:changeSimilarOffersListPage('previous')
+
+  UIWidget
+    id: next_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next
+    size: 30 30
+    opacity: 1
+    $hover:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    $on:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+    $pressed:
+      image-source: /images/ui/windows/ravencards/collection/view_panel_pagination_next_active
+      opacity: 0.8
+    @onClick: modules.game_market.GameMarket:changeSimilarOffersListPage('next')
+
+GameMarketCreateOfferWindowPanelListHeaderColumn < GameMarketOffersPanelListHeaderColumn
+  $first:
+    margin-left: 11
+  &columnSizes: |
+    {
+      [1] = 117,
+      [2] = 113,
+      [3] = 200,
+    }
+  &sortButton: |
+    {
+      [2] = true,
+      [3] = true,
+    }
+  &titles: |
+    {
+      [1] = "Item",
+      [2] = "Amount",
+      [3] = "Price p/piece",
+    }
+
+GameMarketCreateOfferWindowPanelListHeader < GameMarketOffersPanelListHeader
+  @onSetup: |
+    self:destroyChildren()
+    for _ = 1, 3 do
+      local column = g_ui.createWidget('GameMarketCreateOfferWindowPanelListHeaderColumn', self)
+    end
+
+GameMarketCreateOfferWindowPanelListItemPanelColumn < GameMarketOffersPanelListItemPanelColumn
+  $first:
+    margin-left: 8
+  &columnSizes: |
+    {
+      [1] = 117,
+      [2] = 113,
+      [3] = 200,
+    }
+  
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+
+    if index == 1 then
+      self.item:setVisible(true)
+      self.text:setOn(true)
+    elseif index == 3 then
+      self.icon:setVisible(true)
+      self.icon:setOn(true)
+      self.text:setChecked(true)
+      self.icon:setImageSource('/images/ui/icons/silver_44')
+    end
+
+GameMarketCreateOfferWindowPanelListItemPanel < GameMarketOffersPanelListItemPanel
+  visible: false
+  @onSetup: |
+    self:destroyChildren()
+    for i = 1, 4 do
+      local column = g_ui.createWidget('GameMarketCreateOfferWindowPanelListItemPanelColumn', self)
+      if i == 1 then
+        column.item:setChecked(true)
+      end
+    end
+
+GameMarketCreateOfferWindowNoOffersLabel < UIWidget
+  id: no_offers_label
+  text: List of similar items on the marketplace.
+  text-wrap: true
+  text-color: #CED2D9
+  font: poppins-14
+  text-align: center
+  text-offset: 0 5
+  margin-top: 5
+  size: 450 246
+  image-source: /images/ui/windows/market/category_background
+  image-border: 5
+  visible: true
+
+GameMarketCreateOfferWindowSearch < UIWidget
+  id: search
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  height: 40
+  margin-left: 10
+  GameMarketCreateOfferWindowSearchPanel
+    GameMarketCreateOfferWindowSearchPanelInputPanel
+    GameMarketCreateOfferWindowSelectItemInfoPanel
+
+GameMarketCreateOfferWindowSearchPanel < GameMarketWindowSearchPanel
+  id: search_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-right: 20
+  margin-top: -10
+
+GameMarketCreateOfferWindowSearchPanelInputPanel < GameMarketWindowSearchPanelInputPanel
+  id: search_input_panel
+  margin-left: 10
+  @onSetup: |
+    self.input.onTextChange = function(self, text)
+        GameMarket:onCreateOfferSearchInputTextChange(self, text)
+    end
+    self.clear_button.onClick = function()
+        modules.game_market.GameMarket:clearCreateOfferSearchInput()
+    end
+
+GameMarketCreateOfferWindowSelectItemInfoPanel < UIWidget
+  id: info_panel
+  image-source: /images/ui/windows/market/interact_window_info_background
+  image-border: 5
+  anchors.left: search_input_panel.right
+  anchors.right: parent.right
+  anchors.top: search_input_panel.top
+  anchors.bottom: search_input_panel.bottom
+  text: Select the item you want to buy.
+  font: poppins-14
+  margin-left: 10
+
+GameMarketCreateOfferWindowListHeader < UIWidget
+  id: list_header
+  height: 40
+  image-source: /images/ui/windows/market/offer_list_header_background
+  image-border-left: 3
+  image-border-right: 3
+  margin-right: 10
+
+  layout:
+    type: horizontalBox
+
+  GameMarketCreateOfferWindowListHeaderColumn
+  GameMarketCreateOfferWindowListHeaderColumn
+
+GameMarketCreateOfferWindowListHeaderColumn < UIWidget
+  $first:
+    margin-left: 8
+  id: column
+  height: 40
+  &columnSizes: |
+    {
+      [1] = 500,
+      [2] = 80,
+    }
+  &titles: |
+    {
+      [1] = "Item",
+      [2] = "Tier",
+    }
+
+  UIWidget
+    id: title
+    text-auto-resize: true
+    text: Title
+    text-align: left
+    font: poppins-14
+    font-color: #CED2D9
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+
+  UIWidget
+    size: 1 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+  
+  UIWidget
+    size: 1 40
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #25272C
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+    self.title:setText(self.titles[index])
+
+    -- center title and sort button by margin
+    local width = self.title:getWidth()
+    local margin = (self:getWidth() - width) / 2
+    self.title:setMarginLeft(margin)
+
+GameMarketCreateOfferWindowListItemPanel < UIWidget
+  id: offer
+  height: 60
+  image-source: /images/ui/windows/market/offer_list_item_background
+  $alternate:
+    image-source: /images/ui/windows/market/offer_list_item_background_alternate
+  layout:
+    type: horizontalBox
+  padding-left: 5
+  $first:
+    margin-top: 5
+  margin-right: 10
+  GameMarketCreateOfferWindowListItemPanelColumn
+  GameMarketCreateOfferWindowListItemPanelColumn
+
+GameMarketCreateOfferWindowListItemPanelColumn < UIWidget
+  id: column
+  &columnSizes: |
+    {
+      [1] = 500,
+      [2] = 80,
+    }
+  @onEnableChange: |
+    function (self, enabled)
+      for _, child in ipairs(self:getChildren()) do
+        child:setEnabled(enabled)
+      end
+    end
+
+  Item
+    id: item
+    size: 40 40
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    visible: false
+    margin-left: 15
+    image-color: white
+    font: poppins-semibold-bordered-14
+    virtual: true
+    $disabled:
+      image-color: gray
+  
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    text-align: left
+    font: poppins-semibold-16
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    text-offset: 0 5
+    margin-left: 0
+    text-vertical-auto-resize: true
+    phantom: true
+    text-color: white
+    $on:
+      text-offset: 70 5
+      text-align: left
+    $checked:
+      text-align: left
+      anchors.left: icon.right
+      margin-left: 10
+      text-offset: 0 5
+    $disabled:
+      text-color: gray
+    @onTextChange: |
+      function(self, text)
+        if not tonumber(text) then return end
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+  
+  UIWidget
+    id: icon
+    size: 40 40
+    anchors.centerIn: parent
+    visible: false
+    font: poppins-20
+    text-offset: 0 5
+    phantom: true
+    image-color: white
+    $disabled:
+      image-color: gray
+    $on:
+      size: 16 16
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.horizontalCenter: none
+    @onStateChange: |
+      if self:isOn() then
+        self:update()
+      end
+    &update: |
+      function(self)
+        addEvent(function()
+          -- center icon and text by margin
+          local parent = self:getParent()
+          local width = self:getWidth() + (parent.text:getTextSize().width + parent.text:getMarginLeft()) + 20
+          local margin = (parent:getWidth() - width) / 2
+          self:setMarginLeft(margin)
+        end)
+      end
+
+  @onSetup: |
+    local parent = self:getParent()
+    local index = parent:getChildIndex(self)
+    self:setWidth(self.columnSizes[index])
+
+    if index == 1 then
+      self.item:setVisible(true)
+      self.text:setOn(true)
+    end
+  @onClick: |
+    local parent = self:getParent()
+    parent:onClick()
+
+GameMarketCreateOfferWindowItemListPanel < ScrollablePanel
+  id: list_panel
+  anchors.left: categories.right
+  anchors.right: parent.right
+  anchors.top: categories.top
+  anchors.bottom: categories.bottom
+  margin-left: 0
+  margin-right: 15
+  vertical-scrollbar: list_panel_scrollbar
+  padding-bottom: 5
+  layout:
+    type: verticalBox
+    spacing: 2
+
+GameMarketCreateOfferWindowItemListPanelScrollBar < VerticalScrollBar
+  id: list_panel_scrollbar
+  anchors.top: list_panel.top
+  anchors.right: list_panel.right
+  anchors.bottom: list_panel.bottom
+  margin-right: -5
+  step: 48
+  pixels-scroll: true
+  margin-bottom: 5
+
+GameMarketCreateOfferWindowSelectItemPanel < UIWidget
+  id: select_item_panel
+  anchors.fill: parent
+  GameMarketCreateOfferWindowSearch
+  GameMarketCategoriesPanel
+    anchors.top: prev.bottom
+    margin-left: 20
+    margin-top: 10
+  GameMarketCategoriesPanelScrollBar
+  GameMarketCreateOfferWindowItemListPanel
+  GameMarketCreateOfferWindowItemListPanelScrollBar
+  
+
+  @onVisibilityChange: |
+    function(self, visible)
+      local parent = self:getParent():getParent()
+      parent.place_offer_panel:setVisible(not visible)
+    end
+
+GameMarketCreateOfferWindowBuyOfferLeftPanel < UIWidget
+  id: left_panel
+  size: 450 369
+  anchors.left: parent.left
+  anchors.top: parent.top
+  margin-left: 20
+  image-source: /images/ui/windows/market/left_panel_background
+  image-border: 5
+  UIWidget
+    id: place_item_panel
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: parent.right
+    height: 94
+    image-source: /images/ui/windows/market/new_offer_item_background
+    image-border: 3
+    margin: 1
+
+    Item
+      id: item
+      size: 64 64
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 15
+      font: poppins-semibold-bordered-14
+      virtual: true
+      @onMousePress: |
+        if not modules.game_market.GameMarket.ravencoinTransaction then
+          modules.game_market.GameMarket:clearCreateOfferItem()
+        end
+    
+    UIWidget
+      id: item_name
+      anchors.left: item.right
+      anchors.top: item.top
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-16
+      margin-top: 7
+      margin-left: 20
+      phantom: true
+    UIWidget
+      id: item_grade
+      anchors.left: item_name.left
+      anchors.top: item_name.bottom
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-15
+      phantom: true
+    UIWidget
+      id: item_type
+      anchors.left: item_name.left
+      anchors.top: item_grade.bottom
+      anchors.right: parent.right
+      text-auto-resize: true
+      text-align: left
+      font: poppins-14
+      phantom: true
+
+  UIWidget
+    id: details_panel
+    anchors.left: parent.left
+    anchors.top: place_item_panel.bottom
+    anchors.right: parent.right
+    height: 100
+    UIWidget
+      id: rarity_label
+      anchors.left: parent.left
+      anchors.top: parent.top
+      text: Rarity
+      text-color: #CED2D9
+      text-auto-resize: true
+      font: poppins-14
+      margin-top: 15
+      margin-left: 15
+    GameMarketCreateOfferWindowRarityPanel
+      anchors.top: rarity_label.bottom
+      anchors.left: parent.left
+      margin-left: 15
+    UIWidget
+      id: attributes_label
+      anchors.left: parent.horizontalCenter
+      anchors.top: parent.top
+      text: Attributes
+      text-color: #CED2D9
+      text-auto-resize: true
+      font: poppins-14
+      margin-top: 15
+      margin-left: 20
+    GameMarketCreateOfferWindowAttributesPanel
+      anchors.top: attributes_label.bottom
+      anchors.left: parent.horizontalCenter
+      margin-left: 20
+
+    HorizontalSeparator
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.bottom
+      background-color: #3A3D43
+      margin-left: 15
+      margin-right: 15
+
+  UIWidget
+    id: quantity_panel
+    anchors.left: parent.left
+    anchors.top: details_panel.bottom
+    anchors.right: parent.right
+    height: 100
+    UIWidget
+      id: quantity_label
+      anchors.left: parent.left
+      anchors.top: parent.top
+      text: Quantity
+      text-color: #CED2D9
+      text-auto-resize: true
+      font: poppins-14
+      margin-top: 15
+      margin-left: 15
+
+    GameMarketCreateBuyOfferWindowAmountPanel
+      margin-top: 10
+
+    HorizontalSeparator
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: amount_panel.bottom
+      margin-top: 20
+      background-color: #3A3D43
+      margin-left: 15
+      margin-right: 15
+
+    GameMarketCreateBuyOfferWindowPricePanel
+      margin-left: 5
+
+  VerticalSeparator
+    anchors.top: details_panel.top
+    anchors.bottom: details_panel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 1
+    background-color: #3A3D43
+    margin-top: 20
+    margin-bottom: 15
+
+  VerticalSeparator
+    anchors.top: quantity_panel.top
+    anchors.bottom: quantity_panel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    width: 1
+    background-color: #3A3D43
+    margin-top: 20
+    margin-bottom: 20
+
+  GameMarketCreateBuyOfferWindowTotalPricePanel
+    anchors.top: quantity_panel.bottom
+
+GameMarketCreateBuyOfferWindowPricePanel < UIWidget
+  id: price_panel
+  anchors.left: parent.horizontalCenter
+  anchors.top: parent.top
+  size: 200 95
+
+  UIWidget
+    id: price_label
+    anchors.left: parent.left
+    anchors.top: parent.top
+    text: Price per piece (min. 20)
+    text-color: #CED2D9
+    text-auto-resize: true
+    font: poppins-14
+    margin-top: 15
+    margin-left: 15
+  
+  UITextEdit
+    id: price_input
+    anchors.left: parent.left
+    anchors.top: price_label.bottom
+    size: 190 40
+    margin-left: 15
+    margin-top: 5
+    font: poppins-semibold-14
+    !preview: tr('Your price offer')
+    image-source: /images/ui/windows/market/price_input_background
+    image-border: 5
+    padding-top: 10
+    padding-left: 5
+    padding-bottom: 5
+    max-length: 9
+    @onTextChange: |
+      function(self, text, oldText)
+        if oldText == text then
+          return
+        end
+
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+        local parent = self:getParent()
+        local min = 20
+        local max = 999999999
+
+        local amount = tonumber(newText)
+        if not amount then
+          amount = 0
+        end
+
+        self:setCursorPos(#self:getText())
+
+        local parent = self:getParent()
+        if amount > max then
+          self:setText(max)
+        end
+        amount = tonumber(self:getText())
+        if not amount then
+          amount = 0
+        end
+
+        if amount < min then
+          self:setColor('#FF0000')
+        else
+          self:setColor('#CED2D9')
+        end
+
+        amount = tonumber(self:getText())
+        if not amount then
+          amount = 0
+        end
+
+        local parent = self:getParent():getParent()
+        local player = g_game.getLocalPlayer()
+        local tax = player:isPremium() and modules.game_market.cfg.taxCreateBuyOfferPremiumMultiplier or modules.game_market.cfg.taxCreateBuyOfferMultiplier
+        local total = math.floor(amount * tonumber(parent.amount_panel.amount_edit:getText()) * tax)
+        parent:getParent().total_price_panel.text:setText(total)
+      end
+
+GameMarketCreateBuyOfferWindowAmountPanel < UIWidget
+  id: amount_panel
+  anchors.left: parent.left
+  anchors.top: quantity_label.bottom
+  size: 178 30
+  margin-left: 15
+  margin-top: 5
+  TextEdit
+    id: amount_edit
+    anchors.left: button_minus.right
+    anchors.top: parent.top
+    font: poppins-15
+    font-color: #CED2D9
+    text: 1
+    padding-top: 5
+    image-source: /images/ui/windows/market/interact_offer_amount_background
+    size: 51 30
+    margin-left: -2
+    max-length: 4
+    text-align: center
+    @onTextChange: |
+      function(self, text, oldText)
+        if oldText == text then
+          return
+        end
+
+        -- only allow numbers in the edit
+        local newText = ""
+        for i = 1, #text do
+          local char = text:sub(i, i)
+          if char:match("%d") then
+            newText = newText .. char
+          end
+        end
+
+        if newText ~= text then
+          self:setText(newText)
+        end
+        local parent = self:getParent()
+
+        local amount = tonumber(newText)
+        if not amount then
+          amount = parent.minimum or 1
+        end
+
+        self:setCursorPos(#self:getText())
+
+        local min = parent.minimum or 1
+        local max = parent.maximum or 1
+        if amount > max then
+          self:setText(max)
+        end
+        amount = tonumber(self:getText()) or 1
+
+        if amount < min then
+          self:setText(min)
+        end
+        amount = tonumber(self:getText()) or 1
+
+        parent = parent:getParent()
+        if parent.price_panel then
+          local price = tonumber(parent.price_panel.price_input:getText()) or 0
+          local player = g_game.getLocalPlayer()
+          local tax = player:isPremium() and modules.game_market.cfg.taxCreateBuyOfferPremiumMultiplier or modules.game_market.cfg.taxCreateBuyOfferMultiplier
+          local total = math.floor(price * amount * tax)
+          parent = parent:getParent()
+          if parent.total_price_panel then
+            parent.total_price_panel.text:setText(total)
+          end
+        end
+      end
+  UIWidget
+    id: button_minus
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/ui/windows/market/button_amount_minus
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    @onClick: |
+      function(self)
+        local parent = self:getParent()
+        local amount_edit = parent.amount_edit
+        local amount = tonumber(amount_edit:getText())
+        if not amount then
+          amount = 1
+        end
+
+        local min = parent.minimum or 1
+
+        amount = amount - 1
+        if amount < min then
+          amount = min
+        end
+
+        amount_edit:setText(amount)
+        amount_edit:setCursorPos(#amount_edit:getText())
+      end
+  UIWidget
+    id: button_plus
+    anchors.left: amount_edit.right
+    anchors.top: parent.top
+    image-source: /images/ui/windows/market/button_amount_plus
+    margin-left: -4
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    @onClick: |
+      function(self)
+        local parent = self:getParent()
+        local amount_edit = parent.amount_edit
+        local amount = tonumber(amount_edit:getText())
+        if not amount then
+          amount = 1
+        end
+
+        local max = parent.maximum or 1
+        amount = amount + 1
+        if amount > max then
+          amount = max
+        end
+
+        amount_edit:setText(amount)
+        amount_edit:setCursorPos(#amount_edit:getText())
+      end
+
+GameMarketCreateOfferWindowRarityPanel < UIWidget
+  id: rarity_panel
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  size: 190 40
+  margin-top: 10
+  margin-left: 10
+  @onStateChange: |
+    function(self, state)
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(state)
+      end
+    end
+  @onClick: |
+    local state = self:isOn()
+    self:setOn(not state)
+    GameMarket:onCreateBuyOfferRarityListBoxClick(self, not state)
+
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: Select Rarity
+    font: poppins-14
+    margin-left: 10
+    phantom: true
+    text-auto-resize: true
+    text-offset: 0 1
+    text-color: #CED2D9
+    $disabled:
+      text-color: gray
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/market/filter_panel_arrow_down
+    size: 20 20
+    phantom: true
+    margin-right: 10
+    image-color: white
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_active
+    $disabled:
+      image-color: gray
+
+GameMarketCreateOfferWindowAttributesPanel < UIWidget
+  id: attributes_panel
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  size: 190 40
+  margin-top: 10
+  margin-left: 10
+  @onStateChange: |
+    function(self, state)
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(state)
+      end
+    end
+  @onClick: |
+    local state = self:isOn()
+    self:setOn(not state)
+    GameMarket:onCreateBuyOfferAttributesListBoxClick(self, not state)
+  @onEnableChange: |
+    function (self, enabled)
+      for _, child in ipairs(self:getChildren()) do
+        child:setEnabled(enabled)
+      end
+    end
+
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: Select Attributes
+    font: poppins-14
+    margin-left: 10
+    phantom: true
+    text-auto-resize: true
+    text-offset: 0 1
+    text-color: #CED2D9
+    $disabled:
+      text-color: gray
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/market/filter_panel_arrow_down
+    size: 20 20
+    phantom: true
+    margin-right: 10
+    image-color: white
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_active
+    $disabled:
+      image-color: gray
+
+
+GameMarketCreateOfferWindowBuyOfferRightPanel < UIWidget
+  id: right_panel
+  size: 450 369
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-right: 20
+  layout:
+    type: verticalBox
+    spacing: 2
+
+  UIWidget
+    id: title
+    image-source: /images/ui/windows/market/create_offer_right_panel_title_background
+    image-border: 5
+    text: Current buy offers
+    text-color: #FFFFFF
+    font: poppins-13
+    height: 30
+    text-align: center
+    text-offset: 0 2
+  GameMarketCreateOfferWindowPanelListHeader
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_1
+    margin-top: 5
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_2
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_3
+  GameMarketCreateOfferWindowPanelListItemPanel
+    id: offer_4
+  GameMarketCreateOfferWindowNoOffersLabel
+  HorizontalSeparator
+    background-color: #3A3D43
+    margin-top: 2
+  GameMarketCreateOfferWindowPanelPagination
+    margin-top: 7
+
+GameMarketCreateBuyOfferWindowTotalPricePanel < UIWidget
+  id: total_price_panel
+  anchors.left: parent.left
+  anchors.top: price_panel.bottom
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  size: 200 95
+  margin-top: 10
+  UIWidget
+    id: total_price_label
+    anchors.left: parent.left
+    anchors.top: parent.top
+    !text: tr('Total Cost')
+    text-color: #CED2D9
+    text-auto-resize: true
+    font: poppins-14
+    margin-left: 15
+    @onTextChange: |
+      function(self, text)
+        if not tonumber(text) then return end
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+  
+  UIWidget
+    id: icon
+    size: 25 25
+    anchors.left: parent.left
+    anchors.top: total_price_label.bottom
+    image-source: /images/ui/icons/silver_44
+    margin-left: 15
+    margin-top: 10
+    phantom: true
+  
+  UIWidget
+    id: text
+    anchors.left: icon.right
+    anchors.top: total_price_label.bottom
+    anchors.right: parent.right
+    text-align: left
+    font: poppins-16
+    margin-top: 10
+    margin-left: 10
+    text-vertical-auto-resize: true
+    phantom: true
+    text-color: white
+    font: poppins-semibold-16
+    text: 0
+    @onTextChange: |
+      function(self, text)
+        if not tonumber(text) then return end
+        -- format text to cotain commas
+        local length = 0
+        local text = self:getText()
+        local formatted = ''
+        for i = #text, 1, -1 do
+          formatted = text:sub(i, i) .. formatted
+          length = length + 1
+          if length == 3 and i ~= 1 then
+            formatted = ',' .. formatted
+            length = 0
+          end
+        end
+        self:setText(formatted, true)
+      end
+
+GameMarketRarityPopupMenuButton < UIWidget
+  height: 30
+  text-align: left
+    font: poppins-12
+  text-horizontal-auto-resize: true
+  text-align: top-left
+  text-offset: 0 10
+
+  @onHoverChange: |
+    function(self, hovered)
+      if hovered then
+        self:setTextColor('#36F991')
+      else
+        self:setTextColor(self.textColor)
+      end
+    end
+
+GameMarketAttributesPopupMenuButtonExpanded < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  text-offset: 40 1
+  $checked:
+// title
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onClick: |
+    self.checkbox:setChecked(not self.checkbox:isChecked())
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 10
+    @onCheckChange: |
+      function(self, state)
+        modules.game_market.GameMarket:onAttributesListCheckboxChange(self, state)
+      end

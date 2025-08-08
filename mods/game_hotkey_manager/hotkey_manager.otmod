@@ -1,0 +1,7 @@
+Module
+  name: game_hotkey_manager
+  description: Hotkey Manager
+  sandboxed: false
+  scripts: [ hotkey_manager ]
+  @onLoad: GameHotkeyManager:init()
+  @onUnload: GameHotkeyManager:terminate()

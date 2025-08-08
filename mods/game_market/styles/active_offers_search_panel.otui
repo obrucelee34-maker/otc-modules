@@ -1,0 +1,39 @@
+GameMarketActiveOffersPanelSearch < UIWidget
+  id: search
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  height: 40
+  margin-left: 10
+  GameMarketActiveOffersPanelSearchPanel
+    GameMarketActiveOffersPanelSearchPanelInputPanel
+    GameMarketActiveOffersPanelSearchPanelFilterPanel
+
+GameMarketActiveOffersPanelSearchPanel < GameMarketWindowSearchPanel
+  id: search_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+
+GameMarketActiveOffersPanelSearchPanelInputPanel < GameMarketWindowSearchPanelInputPanel
+  id: search_input_panel
+  margin-left: 10
+  @onSetup: |
+    self.input.onTextChange = function(self, text)
+        GameMarket:onActiveOffersSearchInputTextChange(self, text)
+    end
+    self.clear_button.onClick = function()
+        modules.game_market.GameMarket:clearActiveOffersSearchInput()
+    end
+
+GameMarketActiveOffersPanelSearchPanelFilterPanel < GameMarketWindowSearchFilterPanel
+  id: filter_panel
+  anchors.left: search_input_panel.right
+  @onClick: |
+    local state = self:isOn()
+    self:setOn(not state)
+    GameMarket:onActiveOffersFilterPanelClick(self, not state)
+  @onSetup: |
+    self.indicative.onClick = function()
+      modules.game_market.GameMarket:clearAllActiveOffersFilters()
+    end

@@ -1,0 +1,90 @@
+Module
+  name: game_interface
+  description: Create the game interface, where the ingame stuff starts
+  author: OTClient team
+  website: www.otclient.info
+  sandboxed: true
+  scripts: [ widgets/uigamemap, widgets/uiitem, widgets/uiactionkey, gameinterface ]
+  load-later:
+    - client_entergame
+    - game_daily
+    - game_hotkey_manager
+    - game_menu
+    - game_healthinfo
+    - game_minimap
+    - game_rangerscompany
+    - game_adventurers_board
+    - game_questlog
+    - game_interactions
+    - game_prompts
+    - game_lootnotification
+    - game_channeling
+    - game_battle
+    - game_levelup_notification
+    - game_conditions
+    - game_targethud
+    - game_layout
+    - game_abilitybar
+    - game_sounds
+    - game_settings
+    - game_modaldialog
+    - game_walking
+    - game_fishfight
+    - game_damage_numbers
+    - game_shaders
+    - game_icons
+    - updater
+    - game_abilitytooltip
+    - game_mapview
+    - game_gamemaster
+    - game_channeling_minigame
+    - game_bgs
+
+    - game_chat
+    - game_character
+    - game_reputation
+    - game_cards
+    - game_spelltree
+    - game_transport
+    - game_infusion
+    - game_playerdeath
+    - game_channel_selector
+    - game_wagonstorage
+    - game_professions
+    - game_tradepacks
+    - game_worldmap
+    - game_trade
+    - game_achievements
+    - game_waypoints
+    - game_hearthteleport
+
+    - game_house
+    - game_tutorial
+    - game_feedback
+    - game_questmanager
+    - game_thingstats
+    - game_voiceacting
+    - game_npcs
+    - game_inventory
+//    - game_arena
+    - game_social
+    - game_notification
+    - game_highlight_sparkles
+    - game_market
+    - game_screenmessage
+    - game_journal
+    - game_premium_store
+    - game_guild
+    - game_subtitles
+    - game_player_report
+    - game_dialogueviewer
+    - game_duel
+    - game_aether_rift
+    - game_aether_echo
+    - game_warforge
+    - game_ambient_assets
+    - game_redeem_rewards
+    - game_captcha
+
+  @onLoad: init()
+  @onUnload: terminate()
