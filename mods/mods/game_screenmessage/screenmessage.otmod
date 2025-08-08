@@ -1,0 +1,11 @@
+Module
+  name: game_screenmessage
+  author: LPE
+  scripts: [ screenmessage ]
+  sandboxed: false
+
+  @onLoad: |
+    GameScreenMessage:init()
+
+  @onUnload: |
+    GameScreenMessage:terminate()

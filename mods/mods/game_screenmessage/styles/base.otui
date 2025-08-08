@@ -1,0 +1,48 @@
+GameScreenMessageBase < UIWidget
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 500 100
+  &minHeight: 100
+  margin-bottom: 30
+  phantom: true
+
+  UIWidget
+    id: background
+    image-source: /images/ui/windows/notification/background
+    anchors.fill: parent
+    margin-bottom: 5
+    phantom: true
+  
+  UIWidget
+    id: color_edge
+    image-source: /images/ui/windows/notification/edge
+    anchors.fill: parent
+    image-border-top: 30
+    image-border-bottom: 30
+    margin-top: 3
+    margin-bottom: 8
+    phantom: true
+
+  UIWidget
+    id: content
+    anchors.fill: parent
+    margin: 15
+    phantom: true
+    GameScreenMessageText
+
+  MainWindowEdgeTop
+    height: 3
+    phantom: true
+  MainWindowEdgeBottom
+    height: 3
+    margin-bottom: 5
+    phantom: true
+
+GameScreenMessageText < UIWidget
+  id: text
+  anchors.fill: parent
+  font: poppins-semibold-13
+  text: Notification text goes here
+  color: #ffffff
+  text-wrap: true
+  phantom: true
