@@ -1,0 +1,124 @@
+GameInteractionsActionWindow < UIWidget
+  id: action_window
+  size: 400 123
+  draggable: false
+
+  MainWindowContent
+    padding: 15 20 15 20
+    anchors.fill: parent
+    image-source: /images/ui/windows/interactions/window_background
+    image-border: 10
+
+    UIWidget
+      id: keys_panel
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 50
+      layout:
+        type: horizontalBox
+        spacing: 23
+
+      &update: |
+        function(self)
+          local childrenWidth = 0
+          local layout = self:getLayout()
+          local firstVisibleChild = nil
+          for i, child in ipairs(self:getChildren()) do
+            if child:isVisible() then
+              childrenWidth = childrenWidth + child:getWidth() + (firstVisibleChild and layout:getSpacing() or 0)
+              firstVisibleChild = firstVisibleChild or child
+            end
+          end
+          local margin = (self:getWidth() - childrenWidth) / 2
+          if firstVisibleChild then
+            firstVisibleChild:setMarginLeft(margin)
+          end
+        end
+      @onGeometryChange: |
+        self:update()
+
+    UIWidget
+      id: text
+      anchors.top: keys_panel.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      padding-top: 30
+      text-vertical-auto-resize: true
+      font: poppins-16
+      text-align: center
+      text-wrap: true
+      text: Press I or Left-Click to open your Inventory
+
+  GameInteractionsBanditAvatarBox
+    anchors.bottom: content.top
+    margin-bottom: -20
+    anchors.horizontalCenter: parent.horizontalCenter
+
+  GameInteractionsArrowUp
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.top
+
+  GameInteractionsArrowDown
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.bottom
+
+  GameInteractionsArrowLeft
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.left
+
+  GameInteractionsArrowRight
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.right
+
+GameInteractionsKey < UIWidget
+  id: key
+  height: 40
+  margin-top: 10
+  padding-top: 10
+  padding-bottom: 10
+  padding-left: 15
+  padding-right: 15
+  image-source: /images/ui/windows/interactions/key_background
+  image-border: 15
+  id: text
+  text-horizontal-auto-resize: true
+  font: poppins-semibold-18
+  text-align: center
+  text-color: black
+  text-offset: 0 -4
+  text: I
+
+GameInteractionsMouseLeftKey < UIWidget
+  id: mouse_key
+  size: 32 47
+  margin-top: 3
+  image-source: /images/ui/windows/interactions/left_mouse_click
+
+GameInteractionsMouseRightKey < UIWidget
+  id: mouse_key
+  size: 32 47
+  margin-top: 3
+  image-source: /images/ui/windows/interactions/right_mouse_click
+
+GameInteractionsKeySpacer < UIWidget
+  id: key_spacer
+  image-source: /images/ui/windows/interactions/key_spacer
+  size: 5 24
+  margin-top: 26
+
+GameInteractionsKeySpacerPlus < UIWidget
+  id: key_spacer
+  image-source: /images/ui/windows/interactions/key_spacer_plus
+  image-size: 13 13
+  margin-top: 33
+
+GameInteractionsArrowKeys < UIWidget
+  id: key_arrows
+  image-source: /images/ui/windows/interactions/arrow_keys
+  size: 65 50
+
+GameInteractionsWASDKeys < UIWidget
+  id: key_wasd
+  image-source: /images/ui/windows/interactions/wasd_keys
+  size: 65 50

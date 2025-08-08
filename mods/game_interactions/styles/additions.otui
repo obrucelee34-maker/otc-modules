@@ -1,0 +1,74 @@
+GameInteractionsBanditAvatar < UIWidget
+  id: bandit_avatar
+  size: 124 120
+  $on:
+    image-source: /images/ui/windows/interactions/bandit_background
+
+  UIWidget
+    id: border
+    image-source: /images/ui/windows/interactions/bandit_border
+    size: 100 100
+    anchors.centerIn: parent
+    phantom: true
+    visible: false
+    margin-left: 2
+
+  UIWidget
+    id: border_highlight
+    size: 100 100
+    anchors.centerIn: parent
+    phantom: true
+    margin-left: 2
+  
+  UIWidget
+    id: bandit
+    anchors.centerIn: parent
+    size: 79 82
+    image-source: /images/ui/windows/interactions/bandit_avatar
+    phantom: true
+
+  UIWidget
+    id: exclamation
+    margin-bottom: -15
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 34 48
+    image-source: /images/ui/windows/interactions/exclamation
+    phantom: true
+
+  visible: false
+  draggable: true
+  EditModePanel
+    &title: 'Bandit UI'
+    visible: false
+
+GameInteractionsBanditAvatarBox < UIWidget
+  id: bandit_avatar
+  size: 79 82
+  image-source: /images/ui/windows/interactions/bandit_avatar
+  visible: false
+  draggable: true
+
+GameInteractionsArrowUp < UIWidget
+  id: arrow_up
+  size: 33 27
+  image-source: /images/ui/windows/interactions/arrow_up
+  visible: false
+
+GameInteractionsArrowDown < UIWidget
+  id: arrow_down
+  size: 33 27
+  image-source: /images/ui/windows/interactions/arrow_down
+  visible: false
+
+GameInteractionsArrowLeft < UIWidget
+  id: arrow_left
+  size: 27 33
+  image-source: /images/ui/windows/interactions/arrow_left
+  visible: false
+
+GameInteractionsArrowRight < UIWidget
+  id: arrow_right
+  size: 27 33
+  image-source: /images/ui/windows/interactions/arrow_right
+  visible: false

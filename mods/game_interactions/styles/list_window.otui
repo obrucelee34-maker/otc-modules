@@ -1,0 +1,91 @@
+GameInteractionsListWindow < MainWindow
+  id: list_window
+  size: 350 110
+  &minSize: {width = 350, height = 70}
+  &title: 'Bandit\'s Teachings'
+  &iconPath: '/images/ui/windows/interactions/icon'
+  &isGeneralUIWindow: true
+  anchors.centerIn: parent
+  MainWindowContent
+    padding-top: 10
+    layout:
+      type: verticalBox
+      spacing: 5
+
+GameInteractionsListWindowEmpty < UIWidget
+  font: poppins-14
+  text: No interactions available
+  text-color: #FFFFFF
+  text-align: center
+  text-auto-resize: true
+
+GameInteractionsListWindowEntry < UIWidget
+  size: 350 40
+  image-source: /images/ui/windows/interactions/entry_background
+  image-border: 10
+
+  UIWidget
+    id: name
+    font: poppins-14
+    text-vertical-auto-resize: true
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text: Rangers Company
+    text-wrap: true
+    margin-left: 20
+    text-align: left
+    width: 140
+    &update: |
+      function(self)
+        local parent = self:getParent()
+        local height = math.max(40, self:getTextSize().height + 15)
+        parent:setHeight(height)
+      end
+  
+  UIWidget
+    id: active
+    anchors.left: name.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    size: 45 20
+    text: Active
+    font: poppins-12
+    image-source: /images/ui/windows/ravencards/packs/new_background
+    image-border: 10
+    text-color: #FBFB79
+    text-offset: 2 4
+    visible: false
+
+  UIWidget
+    id: start_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    size: 25 25
+    image-source: /images/ui/windows/interactions/button_start
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    $disabled:
+      image-source: /images/ui/windows/interactions/button_start_disabled
+    @onClick: |
+      modules.game_interactions.GameInteractions:startInteraction(self:getParent().name.interactionName)
+  
+  UIWidget
+    id: cancel_button
+    anchors.right: start_button.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 6
+    size: 25 25
+    image-source: /images/ui/windows/interactions/button_cancel
+    opacity: 1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 0.6
+    $disabled:
+      image-source: /images/ui/windows/interactions/button_cancel_disabled
+    @onClick: |
+      modules.game_interactions.GameInteractions:cancelInteraction(self:getParent().name.interactionName)

@@ -1,0 +1,132 @@
+GameInteractionsDescriptionWindow < UIWidget
+  id: description_window
+  size: 300 158
+  draggable: false
+
+  MainWindowContent
+    padding: 15 20 15 20
+    anchors.fill: parent
+    image-source: /images/ui/windows/interactions/window_background
+    image-border: 10
+    UIWidget
+      id: text
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text-wrap: true
+      font: poppins-14
+      text-vertical-auto-resize: true
+
+    HorizontalSeparator
+      id: separator
+      anchors.top: text.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 1
+      background-color: #3A3D43
+      margin-top: 9
+
+    UIWidget
+      id: button_panel
+      anchors.top: separator.bottom
+      margin-top: 10
+      anchors.left: parent.left
+      anchors.right: parent.right
+      height: 25
+      layout:
+        type: horizontalBox
+        spacing: 10
+      &update: |
+        function(self)
+          local childrenWidth = 0
+          local layout = self:getLayout()
+          local firstVisibleChild = nil
+          for _, child in ipairs(self:getChildren()) do
+            if child:isVisible() then
+              child:setMarginLeft(0)
+              childrenWidth = childrenWidth + child:getWidth() + layout:getSpacing()
+              firstVisibleChild = firstVisibleChild or child
+            end
+          end
+          local margin = (self:getWidth() - childrenWidth) / 2
+          if firstVisibleChild then
+            firstVisibleChild:setMarginLeft(margin)
+          end
+        end
+      @onGeometryChange: |
+        self:update()
+
+      UIWidget
+        id: page_text
+        text: 1 of 2
+        font: poppins-14
+        color: #FFFFFF
+        height: 25
+        text-align: center
+        text-horizontal-auto-resize: true
+
+      UIWidget
+        id: prev_button
+        image-source: /images/ui/windows/base_window/close_button_left
+        size: 25 25
+        opacity: 1
+        $hover:
+          image-source: /images/ui/windows/base_window/close_button_left_active
+          opacity: 0.8
+        $on:
+          image-source: /images/ui/windows/base_window/close_button_left_active
+        $pressed:
+          image-source: /images/ui/windows/base_window/close_button_left_active
+          opacity: 0.8
+        @onClick: modules.game_interactions.GameInteractions:changeDescriptionBoxPage('previous', true)
+
+      UIWidget
+        id: next_button
+        image-source: /images/ui/windows/base_window/close_button_right
+        size: 25 25
+        opacity: 1
+        $hover:
+          image-source: /images/ui/windows/base_window/close_button_right_active
+          opacity: 0.8
+        $on:
+          image-source: /images/ui/windows/base_window/close_button_right_active
+        $pressed:
+          image-source: /images/ui/windows/base_window/close_button_right_active
+          opacity: 0.8
+        @onClick: modules.game_interactions.GameInteractions:changeDescriptionBoxPage('next', true)
+
+      UIWidget
+        id: close_button
+        image-source: /images/ui/windows/base_window/close_button
+        size: 25 25
+        opacity: 1
+        $hover:
+          image-source: /images/ui/windows/base_window/close_button_active
+          opacity: 0.8
+        $on:
+          image-source: /images/ui/windows/base_window/close_button_active
+        $pressed:
+          image-source: /images/ui/windows/base_window/close_button_active
+          opacity: 0.8
+        @onClick: modules.game_interactions.GameInteractions:closeDescriptionBox(true)
+  
+  GameInteractionsBanditAvatarBox
+    anchors.bottom: content.top
+    margin-bottom: -20
+    anchors.horizontalCenter: parent.horizontalCenter
+
+  GameInteractionsArrowUp
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.top
+
+  GameInteractionsArrowDown
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.bottom
+
+  GameInteractionsArrowLeft
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.left
+
+  GameInteractionsArrowRight
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.right

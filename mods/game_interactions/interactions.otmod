@@ -1,0 +1,7 @@
+Module
+  name: game_interactions
+  description: Tutorial interactions module
+  sandboxed: true
+  scripts: [ interactions ]
+  @onLoad: GameInteractions:init()
+  @onUnload: GameInteractions:terminate()
