@@ -1,0 +1,68 @@
+ChannelingMinigame < UIWidget
+  id: channelingMinigameWindow
+  image-source: /images/ui/windows/gathering_minigame/background_border_normal
+  image-auto-resize: true
+  anchors.centerIn: parent
+  margin-bottom: 130
+
+  UIWidget
+    id: stars
+    visible: false
+    anchors.bottom: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: -30
+    margin-bottom: -5
+    image-source: /images/ui/windows/gathering_minigame/success_stars
+    image-auto-resize: true
+
+  UIWidget
+    id: background
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-left: 2
+    margin-top: 2
+    image-source: /images/ui/windows/gathering_minigame/background
+    image-auto-resize: true
+
+    UIWidget
+      id: icon
+      size: 19 19
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin-top: 6
+      margin-left: 6
+      image-color: #CED2D9
+
+    UIWidget
+      id: barContainer
+      height: 18
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 7
+      margin-left: 30
+      margin-right: 15
+
+      UIWidget
+        id: rangeIndicator
+        image-source: /images/ui/windows/gathering_minigame/range
+        image-border: 5
+        height: 18
+        anchors.top: parent.top
+        anchors.left: parent.left
+
+      UIWidget
+        id: movingLine
+        size: 9 37
+        image-source: /images/ui/windows/gathering_minigame/line
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        image-offset: -3 0
+
+ChannelingMiningameKey < UIWidget
+  id: channelingMinigameKey
+  image-source: /images/ui/windows/gathering_minigame/key
+  margin-bottom: 20
+  $on:
+    image-source: /images/ui/windows/gathering_minigame/key_pressed
+

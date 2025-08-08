@@ -1,0 +1,6 @@
+Module
+  name: game_channel_selector
+  sandboxed: false
+  scripts: [ switch_channel ]
+  @onLoad: GameSwitchChannel:init()
+  @onUnload: GameSwitchChannel:terminate()

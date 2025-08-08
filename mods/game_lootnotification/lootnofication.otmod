@@ -1,0 +1,6 @@
+Module
+  name: game_lootnotification
+  sandboxed: true
+  scripts: [ lootnotification ]
+  @onLoad: GameLootNotification:init()
+  @onUnload: GameLootNotification:terminate()

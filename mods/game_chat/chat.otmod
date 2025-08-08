@@ -1,0 +1,7 @@
+Module
+  name: game_chat
+  description: Chat for the game
+  sandboxed: false
+  scripts: [ widgets/uimessageinput, chat ]
+  @onLoad: GameChat:init()
+  @onUnload: GameChat:terminate()

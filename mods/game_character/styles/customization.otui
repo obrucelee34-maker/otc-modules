@@ -1,0 +1,420 @@
+GameCharacterCustomizationPanel < UIWidget
+  id: customization_panel
+  anchors.fill: parent
+  visible: false
+  padding-right: 28
+  padding-bottom: 20
+  GameCharacterCustomizationPanelPreview
+  GameCharacterCustomizationPanelColorSelectionTitleBackground
+  GameCharacterCustomizationPanelColorSelectionTitle
+  GameCharacterCustomizationPanelColorSelectionPanel
+  GameCharacterCustomizationPanelColorBoxHolder
+
+GameCharacterCustomizationPanelPreview < UIWidget
+  id: outfit_preview
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  size: 407 210
+  image-source: /images/ui/windows/character/preview_background
+  image-border: 10
+  GameCharacterCustomizationPanelPreviewOutfit
+  PrimaryButton
+    text: Outfits
+    id: button_outfits
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-right: 60
+    margin-bottom: 15
+    height: 40
+    @onClick: GameCharacter:toggleOutfitWindow()
+  PrimaryButton
+    text: Effects
+    id: button_effects
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-left: 60
+    margin-bottom: 15
+    height: 40
+    @onClick: GameCharacter:toggleEffectWindow()
+
+GameCharacterCustomizationPanelPreviewOutfit < UICreature
+  id: outfit
+  anchors.centerIn: parent
+  size: 96 96
+  phantom: true
+  auto-resize: false
+  outfit-scale: 1.8
+  outfit-offset: 20 20
+  margin-bottom: 32
+
+GameCharacterCustomizationPanelOutfits < AttachedWindow
+  title: Outfits
+  side: right
+  margin-top: 47
+  visible: false
+  size: 350 608
+  GameCharacterCustomizationPanelOutfitsTopPanelBackground
+  GameCharacterCustomizationPanelOutfitsTopPanel
+  GameCharacterCustomizationPanelOutfitsList
+  GameCharacterCustomizationPanelOutfitsListScrollBar
+
+GameCharacterCustomizationPanelOutfitsList < ScrollablePanel
+  id: outfit_list
+  anchors.top: top_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin: 20
+  margin-top: 50
+  vertical-scrollbar: outfit_list_scrollbar
+  layout:
+    type: grid
+    num-columns: 2
+    cell-size: 145 175
+    cell-spacing: 20 20
+
+GameCharacterCustomizationPanelOutfitsListScrollBar < VerticalScrollBar
+  id: outfit_list_scrollbar
+  anchors.left: outfit_list.right
+  anchors.top: outfit_list.top
+  anchors.bottom: outfit_list.bottom
+  margin-left: 5
+  step: 48
+  pixels-scroll: true
+
+GameCharacterCustomizationPanelOutfitsListButtonHolder < UIWidget
+  size: 145 175
+  image-source: /images/ui/windows/character/outfit_list_background
+  image-border: 10
+  @onStateChange: self.check:setVisible(self:isOn()) self.overlay_text:setOn(self:isOn())
+  UICreature
+    id: outfit
+    anchors.centerIn: parent
+    size: 96 96
+    auto-resize: false
+    outfit-scale: 1.5
+    outfit-offset: 24 24
+    margin-bottom: 15
+    phantom: true
+  UIWidget
+    id: check
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin: 10
+    image-source: /images/ui/windows/character/check
+    visible: false
+  UIWidget
+    id: overlay
+    anchors.fill: parent
+    margin: 3
+    background-color: #000000
+    opacity: 0.60
+    visible: false
+    UIWidget
+      id: compass
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin: 10
+      image-source: /images/ui/windows/character/compass
+      @onClick: modules.game_character.GameCharacter:onCompassClicked(self:getParent():getParent())
+    UIWidget
+      id: lock
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin: 10
+      image-source: /images/ui/windows/character/lock
+    WhiteButton
+      id: unlock_button
+      visible: false
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-bottom: 7
+      !text: tr('Unlock')
+      height: 42
+      &minWidth: 70
+      &iconPath: '/images/ui/icons/icon_ravencoin'
+      &iconAlign: left
+      &iconOffset: '14 0'
+      &textMarginLeft: 25
+      &iconColor: white
+      &dontChangeIconColor: true
+      @onClick: |
+        modules.game_character.GameCharacter:onUnlockClicked(self:getParent():getParent())
+      @onSetup: |
+        self:setWidth(#self:getText() * 14 + 27)
+
+  UIWidget
+    id: premium
+    anchors.bottom: overlay_text.top
+    anchors.left: parent.left
+    margin: 10
+    image-source: /images/ui/windows/character/premium
+    visible: false
+    phanthom: true
+  UIWidget
+    id: overlay_text
+    height: 30
+    font: poppins-12
+    text-align: center
+    text-offset: 0 4
+    margin: 4
+    background-color: #0d0e10
+    border-width-top: 1
+    border-color: #3a3d43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    phantom: true
+    text: Unknown
+    color: #7E828B
+    visible: false
+    $on:
+      color: #CED2D9
+  $on:
+    image-source: /images/ui/windows/character/outfit_list_background_active
+  @onClick: modules.game_character.GameCharacter:selectOutfit(self)
+
+GameCharacterCustomizationPanelOutfitsTopPanelBackground < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 29
+  background-color: #0D0D0F
+  opacity: 0.5
+  margin-top: 47
+
+GameCharacterCustomizationPanelOutfitsTopPanel < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 47
+  size: 350 29
+  layout:
+    type: horizontalBox
+    spacing: 40
+  GameCharacterCustomizationPanelOutfitsTopPanelButton
+    id: body
+  GameCharacterCustomizationPanelOutfitsTopPanelButton
+    id: head
+  GameCharacterCustomizationPanelOutfitsTopPanelButton
+    id: weapon
+  @onSetup: |
+    -- center the buttons
+    local width = 0
+    for _, child in pairs(self:getChildren()) do
+      width = width + child:getWidth()
+    end
+    local spacing = self:getLayout():getSpacing()
+    local margin = (self:getWidth() - width - spacing * 2) / 2
+    self:setMarginLeft(margin)
+
+GameCharacterCustomizationPanelOutfitsTopPanelButton < UIButton
+  text-auto-resize: true
+  text-color: #5b5b5b
+  opacity: 1.0
+  font: poppins-semibold-13
+  text-offset: 0 3
+  text-align: center
+  $hover:
+    text-color: white
+  $pressed:
+    opacity: 0.8
+  $on:
+    text-color: white
+
+  UIWidget
+    id: highlight
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 2
+    visible: false
+    phantom: true
+    background-color: #36f991
+  @onSetup: |
+    self:setText(self:getId():titleCase())
+  @onStateChange: |
+    if self:isOn() then
+      self:getChildById('highlight'):show()
+    else
+      self:getChildById('highlight'):hide()
+    end
+  @onClick: GameCharacter:selectOutfitCategory(self:getId())
+
+GameCharacterCustomizationPanelColorSelectionTitleBackground < UIWidget
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 30
+  margin-top: 20
+  margin-left: -28
+  margin-right: -28
+  background-color: #131416
+  opacity: 0.5
+
+GameCharacterCustomizationPanelColorSelectionTitle < UIWidget
+  text: Colors
+  font: poppins-semibold-12
+  text-color: #9d9d9d
+  text-auto-resize: true
+  text-offset: 0 3
+  anchors.centerIn: prev
+
+GameCharacterCustomizationPanelColorSelectionPanel < UIWidget
+  id: color_selection_panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 20
+  size: 390 80
+  layout:
+    type: horizontalBox
+    spacing: 26
+
+  GameCharacterCustomizationPanelColorSelectionPanelButton
+    id: 1
+  GameCharacterCustomizationPanelColorSelectionPanelButton
+    id: 2
+  GameCharacterCustomizationPanelColorSelectionPanelButton
+    id: 3
+  GameCharacterCustomizationPanelColorSelectionPanelButton
+    id: 4
+
+  @onSetup: |
+    -- center the buttons
+    local width = 0
+    for _, child in pairs(self:getChildren()) do
+      width = width + child:getWidth()
+    end
+    local spacing = self:getLayout():getSpacing()
+    local margin = (self:getWidth() - width - spacing * 3) / 2
+    self:setMarginLeft(margin)
+
+GameCharacterCustomizationPanelColorSelectionPanelButton < UIWidget
+  size: 54 80
+  RadioButton
+    id: radio
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    phantom: true
+
+  UIWidget
+    id: colorBox
+    size: 54 54
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/character/color_selection_background
+    phantom: true
+    font: poppins-semibold-25
+  UIWidget
+    id: colorBorder
+    size: 48 47
+    anchors.centerIn: colorBox
+    border: 2 white
+    phantom: true
+  @onSetup: |
+    self.colorBox:setText(self:getId())
+
+GameCharacterCustomizationPanelColorBoxHolder < UIWidget
+  id: color_box_holder
+  size: 385 83
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: parent.horizontalCenter
+  image-source: /images/ui/windows/character/color_holder_background
+  image-border: 5
+  padding: 3
+  layout:
+    type: grid
+    cell-spacing: 1 1
+    num-columns: 19
+    num-rows: 7
+    cell-size: 19 10
+
+  &centerInParent: |
+    function(self)
+        -- center the buttons
+        local width = 0
+        for i, child in ipairs(self:getChildren()) do
+            width = width + child:getWidth() + 1
+            if i >= 19 then
+                break
+            end
+        end
+        local margin = (self:getWidth() - width) / 2
+        self:setMarginLeft(margin)
+    end
+
+GameCharacterCustomizationPanelColorBox < UIWidget
+  size: 19 10
+  image-color: alpha
+  image-border: 3
+  image-source: /images/ui/windows/character/color_box_background
+  image-offset: -2 -2
+  image-size: 23 14
+  $on:
+    image-color: white
+  @onStateChange: |
+    self:raise()
+
+UnlockOutfitModal < PopupWindow
+  size: 310 370
+
+  Panel
+    id: panel
+    background-color: #181A1D
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 235
+
+    UIWidget
+      id: preview
+      size: 215 164
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 10
+      image-source: /images/ui/windows/character/preview_background
+      image-border: 10
+
+      UICreature
+        id: outfit
+        anchors.centerIn: parent
+        size: 120 120
+        phantom: true
+        auto-resize: false
+        outfit-scale: 2.3
+        outfit-offset: 20 20
+        margin-right: 10
+        margin-bottom: 10
+    
+    UIWidget
+      id: text
+      font: poppins-14
+      text-wrap: true
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      margin-top: 5
+      margin-left: 5
+      margin-right: 5
+
+  Panel
+    id: buttonsPanel
+    anchors.top: panel.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 10
+    height: 51
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    PopupWindowButton
+      id: confirmButton
+      !text: tr('Confirm')
+
+    PopupWindowButton
+      id: cancelButton
+      !text: tr('Cancel')

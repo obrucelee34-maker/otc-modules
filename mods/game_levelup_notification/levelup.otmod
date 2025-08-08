@@ -1,0 +1,6 @@
+Module
+  name: game_levelup_notification
+  sandboxed: true
+  scripts: [ levelup ]
+  @onLoad: GameLevelUpNotification:init()
+  @onUnload: GameLevelUpNotification:terminate()

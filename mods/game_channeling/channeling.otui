@@ -1,0 +1,98 @@
+ChannelingBar < UIChannelingBar
+  size: 206 26
+  phantom: true
+
+  Panel
+    id: background
+    anchors.centerIn: parent
+    anchors.left: parent.left
+    $on:
+      size: 204 27
+      image-source: /images/ui/windows/channeling/background
+    $!on:
+      size: 208 27
+      image-source: /images/ui/windows/channeling/circle_background
+
+  Panel
+    id: fill
+    image-source: /images/ui/windows/channeling/bar_fill
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 12
+
+  Panel
+    id: glow
+    image-source: /images/ui/windows/channeling/bar_border
+    anchors.right: fill.right
+    anchors.verticalCenter: fill.verticalCenter
+
+  Panel
+    id: frame
+    size: 184 23
+    image-source: /images/ui/windows/channeling/bar_overlay
+    anchors.centerIn: parent
+    margin-top: 1
+
+  Panel
+    id: frame_left
+    image-source: /images/ui/windows/channeling/circle_border_left
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: frame.left
+    $on:
+      size: 19 31
+      image-source: /images/ui/windows/channeling/border_left
+      margin-right: -6
+    $!on:
+      size: 25 25
+      image-source: /images/ui/windows/channeling/circle_border_left
+      margin-right: -8
+
+  Panel
+    id: icon
+    size: 22 22
+    anchors.centerIn: prev
+
+  Panel
+    id: frame_overlay
+    size: 26 26
+    image-source: /images/ui/windows/channeling/circle_overlay
+    anchors.centerIn: prev
+
+  Panel
+    id: frame_right
+    size: 19 31
+    image-source: /images/ui/windows/channeling/border_right
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: frame.right
+    margin-top: 1
+    margin-left: -7
+
+  Panel
+    id: name
+    anchors.centerIn: parent
+    text-auto-resize: true
+    font: poppins-semibold-bordered-12
+    text-offset: 0 1
+    margin-top: 1
+
+ChannelingBarPanel < Panel
+  size: 206 26
+  draggable: true
+  phantom: false
+
+  EditModePanel
+    &title: 'Casting'
+
+  ChannelingBar
+    id: channelingBar
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+
+  Panel
+    id: duration
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 23
+    margin-top: 1
+    text-auto-resize: true
+    font: poppins-semibold-bordered-12

@@ -1,0 +1,136 @@
+GameLevelUpNotificationWindow < UIWidget
+  id: notification_holder
+  width: 216
+  height: 250
+  phantom: true
+  draggable: true
+
+  EditModePanel
+    &title: 'LevelUp UI'
+  UIWidget
+    id: content
+    width: 216
+    height: 250
+    phantom: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    @onGeometryChange: |
+      local parent = self:getParent()
+      local height = self:getHeight()
+      local width = self:getWidth()
+      parent:setSize({width = math.max(width, 216), height = math.max(height, 188)})
+
+    GameLevelupLegacyWindow
+    GameLevelupEffectiveWindow
+  
+GameLevelupLegacyWindow < UIWidget
+  id: legacy_level_notification
+  width: 216
+  height: 188
+  phantom: true
+  visible: false
+  anchors.top: parent.top
+  anchors.left: parent.left
+  margin-top: 12
+
+  UIWidget
+    id: level_wings
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    image-source: /images/ui/windows/levelup_notification/legacy_background
+    size: 176 138
+    image-size: 176 138
+    phantom: true
+
+  UIWidget
+    id: level_text
+    anchors.centerIn: prev
+    font: poppins-22
+    text: 2
+    text-auto-resize: true
+    margin-right: 0
+    phantom: true
+    margin-top: 3
+
+  UIWidget
+    id: label
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    image-source: /images/ui/windows/levelup_notification/legacy_text
+    margin-top: 100
+    margin-right: 0
+    phantom: true
+
+  UIWidget
+    id: entry_quests
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/levelup_notification/label_background
+    image-border-left: 20
+    image-border-right: 20
+    margin-top: 20
+    text: New Story Quests
+    font: poppins-semibold-bordered-16
+    phantom: true
+
+GameLevelupEffectiveWindow < UIWidget
+  id: effective_level_notification
+  width: 216
+  height: 250
+  phantom: true
+  visible: false
+  anchors.top: parent.top
+  anchors.left: parent.left
+
+  UIWidget
+    id: level_wings
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    image-source: /images/ui/windows/levelup_notification/effective_background
+    size: 197 155
+    image-size: 197 155
+    phantom: true
+
+  UIWidget
+    id: level_text
+    anchors.centerIn: prev
+    font: poppins-22
+    text: 2
+    text-auto-resize: true
+    margin-right: 0
+    margin-top: 10
+    phantom: true
+
+  UIWidget
+    id: label
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    image-source: /images/ui/windows/levelup_notification/effective_text
+    margin-top: 114
+    phantom: true
+
+  UIWidget
+    id: entry_attributes
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/levelup_notification/label_background
+    image-border-left: 20
+    image-border-right: 20
+    margin-top: 20
+    text: New Attributes
+    font: poppins-semibold-bordered-16
+    phantom: true
+
+  UIWidget
+    id: entry_skillpoint
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/levelup_notification/label_background
+    image-border-left: 20
+    image-border-right: 20
+    text: New Skill Point
+    font: poppins-semibold-bordered-16
+    phantom: true

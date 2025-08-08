@@ -1,0 +1,57 @@
+GameSwitchChannelWindow < MainWindow
+  id: switch_channel_window
+  size: 255 200
+  &title: 'Switch Channel'
+  &iconName: 'icon_switch_channel'
+  anchors.centerIn: parent
+  visible: false
+
+  MainWindowContent
+    padding: 20
+    layout:
+      type: verticalBox
+      spacing: 5
+
+    GameChangeChannelsButton
+    GamePlunderModeButton
+
+GameChangeChannelsButton < PrimaryButton
+  id: change_channels_button
+  text: Change Channels
+  size: 210 50
+  @onClick: |
+    modules.game_channel_selector.GameSwitchChannel:onChangeChannelsButtonClicked(g_game.getWarmodeType(), true)
+  
+GameWarmodeButton < OrangeButton
+  id: warmode_button
+  text: Go to Warmode
+  size: 210 50
+  $checked:
+    text: Leave Warmode
+  @onSetup: |
+    if g_game.isWarmodeChannel() then
+      self:setChecked(true)
+    end
+  @onClick: |
+    if self:isChecked() then
+      modules.game_channel_selector.GameSwitchChannel:onLeaveWarmodeButtonClicked()
+    else
+      modules.game_channel_selector.GameSwitchChannel:onChangeChannelsButtonClicked(CHANNEL_TYPE.WARMODE)
+    end
+
+GamePlunderModeButton < DangerButton
+  id: plundermode_button
+  text: Go to Plunder Mode
+  size: 210 50
+  $checked:
+    text: Leave Plunder Mode
+  @onSetup: |
+    if g_game.isPlunderModeChannel() then
+      self:setChecked(true)
+    end
+  @onClick: |
+    if self:isChecked() then
+      modules.game_channel_selector.GameSwitchChannel:onLeavePlunderButtonClicked()
+    else
+      modules.game_channel_selector.GameSwitchChannel:onChangeChannelsButtonClicked(CHANNEL_TYPE.PLUNDER)
+    end

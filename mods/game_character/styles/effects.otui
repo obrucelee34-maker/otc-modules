@@ -1,0 +1,192 @@
+GameCharacterCustomizationPanelEffects < AttachedWindow
+  title: Effects
+  side: right
+  margin-top: 47
+  visible: false
+  size: 350 608
+  GameCharacterCustomizationPanelEffectsTopPanelBackground
+  GameCharacterCustomizationPanelEffectsTopPanel
+  GameCharacterCustomizationPanelEffectsList
+  GameCharacterCustomizationPanelEffectsListScrollBar
+
+GameCharacterCustomizationPanelEffectsList < ScrollablePanel
+  id: effect_list
+  anchors.top: top_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin: 20
+  margin-top: 50
+  vertical-scrollbar: effect_list_scrollbar
+  layout:
+    type: grid
+    num-columns: 2
+    cell-size: 145 175
+    cell-spacing: 20 20
+
+GameCharacterCustomizationPanelEffectsListScrollBar < VerticalScrollBar
+  id: effect_list_scrollbar
+  anchors.left: effect_list.right
+  anchors.top: effect_list.top
+  anchors.bottom: effect_list.bottom
+  margin-left: 5
+  step: 48
+  pixels-scroll: true
+
+GameCharacterCustomizationPanelEffectsTopPanelBackground < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 29
+  background-color: #0D0D0F
+  opacity: 0.5
+  margin-top: 47
+
+GameCharacterCustomizationPanelEffectsTopPanel < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 47
+  size: 350 29
+  layout:
+    type: horizontalBox
+    spacing: 40
+  GameCharacterCustomizationPanelEffectsTopPanelButton
+    id: weapon shine
+  GameCharacterCustomizationPanelEffectsTopPanelButton
+    id: teleport
+  @onSetup: |
+    -- center the buttons
+    local width = 0
+    for _, child in pairs(self:getChildren()) do
+      width = width + child:getWidth()
+    end
+    local spacing = self:getLayout():getSpacing()
+    local margin = (self:getWidth() - width - spacing * 2) / 2
+    self:setMarginLeft(margin)
+
+GameCharacterCustomizationPanelEffectsTopPanelButton < UIButton
+  text-auto-resize: true
+  text-color: #5b5b5b
+  opacity: 1.0
+  font: poppins-semibold-13
+  text-offset: 0 3
+  text-align: center
+  $hover:
+    text-color: white
+  $pressed:
+    opacity: 0.8
+  $on:
+    text-color: white
+
+  UIWidget
+    id: highlight
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 2
+    visible: false
+    phantom: true
+    background-color: #36f991
+  @onSetup: |
+    self:setText(self:getId():titleCase())
+  @onStateChange: |
+    if self:isOn() then
+      self:getChildById('highlight'):show()
+    else
+      self:getChildById('highlight'):hide()
+    end
+  @onClick: GameCharacter:selectEffectCategory(self:getId())
+  
+GameCharacterCustomizationPanelEffectsListButtonHolder < UIWidget
+  size: 145 175
+  image-source: /images/ui/windows/character/outfit_list_background
+  image-border: 10
+  @onStateChange: self.check:setVisible(self:isOn()) self.overlay_text:setOn(self:isOn())
+  UICreature
+    id: outfit
+    anchors.centerIn: parent
+    size: 96 96
+    auto-resize: false
+    outfit-scale: 1.5
+    outfit-offset: 24 24
+    margin-bottom: 15
+    phantom: true
+  UIWidget
+    id: check
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin: 10
+    image-source: /images/ui/windows/character/check
+    visible: false
+  UIWidget
+    id: overlay
+    anchors.fill: parent
+    margin: 3
+    background-color: #000000
+    opacity: 0.60
+    visible: false
+    UIWidget
+      id: compass
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin: 10
+      image-source: /images/ui/windows/character/compass
+      @onClick: modules.game_character.GameCharacter:onCompassClicked(self:getParent():getParent())
+    UIWidget
+      id: lock
+      anchors.top: parent.top
+      anchors.left: parent.left
+      margin: 10
+      image-source: /images/ui/windows/character/lock
+    WhiteButton
+      id: unlock_button
+      visible: false
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+      margin-bottom: 7
+      !text: tr('Unlock')
+      height: 42
+      &minWidth: 70
+      &iconPath: '/images/ui/icons/icon_ravencoin'
+      &iconAlign: left
+      &iconOffset: '14 0'
+      &textMarginLeft: 25
+      &iconColor: white
+      &dontChangeIconColor: true
+      @onClick: |
+        modules.game_character.GameCharacter:onUnlockClicked(self:getParent():getParent())
+      @onSetup: |
+        self:setWidth(#self:getText() * 14 + 27)
+
+  UIWidget
+    id: premium
+    anchors.bottom: overlay_text.top
+    anchors.left: parent.left
+    margin: 10
+    image-source: /images/ui/windows/character/premium
+    visible: false
+    phanthom: true
+  UIWidget
+    id: overlay_text
+    height: 30
+    font: poppins-12
+    text-align: center
+    text-offset: 0 4
+    margin: 4
+    background-color: #0d0e10
+    border-width-top: 1
+    border-color: #3a3d43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    phantom: true
+    text: Unknown
+    color: #7E828B
+    visible: false
+    $on:
+      color: #CED2D9
+  $on:
+    image-source: /images/ui/windows/character/outfit_list_background_active
+  @onClick: modules.game_character.GameCharacter:selectEffect(self)

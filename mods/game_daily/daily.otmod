@@ -1,0 +1,6 @@
+Module
+  name: game_daily
+  sandboxed: false
+  scripts: [ daily ]
+  @onLoad: GameDaily:init()
+  @onUnload: GameDaily:terminate()

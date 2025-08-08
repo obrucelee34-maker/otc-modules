@@ -1,0 +1,245 @@
+GameCharacterTopPanel < UIWidget
+  id: panel_top
+  anchors.top: top_panel.bottom
+  anchors.left: parent.left
+  size: 447 185
+  padding: 15 28 15 28
+  GameCharacterTopPanelLevelRect
+  GameCharacterTopPanelName
+  GameCharacterTopPanelTitle
+  ComboBox
+    id: combobox
+    height: 40
+    width: 200
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    margin-top: 6
+  GameCharacterTopPanelArchetypes
+    GameCharacterTopPanelArchetype
+      &archetype: 'holy'
+    GameCharacterTopPanelArchetype
+      &archetype: 'warfare'
+    GameCharacterTopPanelArchetype
+      &archetype: 'spiritual'
+  GameCharacterTopPanelLevelProgress
+  GameCharacterTopPanelSelection
+
+GameCharacterTopPanelName < UIWidget
+  id: name
+  &ignoreTr: true
+  anchors.top: level_rect.top
+  anchors.left: level_rect.right
+  margin-left: 10
+  text-offset: 0 -5
+  text: Pepega
+  font: poppins-semibold-21
+  text-auto-resize: true
+
+GameCharacterTopPanelTitle < UIWidget
+  id: title
+  anchors.top: name.bottom
+  anchors.left: name.left
+  text: Astral Ranger
+  font: poppins-14
+  text-color: #34f18c
+  text-auto-resize: true
+  margin-top: 1
+  text-offset: 1 -5
+  @onTextChange: |
+    self:setTextHidden(self:getText() == 'none')
+  
+GameCharacterTopPanelArchetypes < UIWidget
+  id: archetypes
+  anchors.top: parent.top
+  anchors.right: parent.right
+  size: 150 55
+  margin-top: 12
+  layout:
+    type: horizontalBox
+    spacing: 10
+
+GameCharacterTopPanelArchetype < UIWidget
+  id: archetype_icon
+  size: 45 45
+  image-size: 45 45
+  image-offset: 0 0
+  $on:
+    image-size: 42 42
+    size: 42 42
+    image-offset: 0 2
+    text-hidden: false
+
+  font: poppins-17
+  text-color: #7e828b
+  text-hidden: true
+  $middle:
+    text: 7
+  $last:
+    text: 15
+    
+  &archetype: 'archery'
+  &archetypeColors: |
+    {
+        ['archery'] = '#77D463',
+        ['witchcraft'] = '#5DA4FB',
+        ['spiritual'] = '#FF5151',
+        ['shadow'] = '#D977C4',
+        ['protection'] = '#FFF400',
+        ['holy'] = '#FEFEC6',
+        ['warfare'] = '#FFA851',
+        ['wizardry'] = '#5201A8'
+    }
+  @setupVisuals: |
+    if self.archetype then
+        self:setOn(false)
+        self:setImageSource(string.format('/images/ui/icons/archetypes/45x45/%s', self.archetype))
+        self.progress:setBackgroundColor(self.archetypeColors[self.archetype])
+        self.progress:show()
+        self.progress_bg:show()
+        self.lock:hide()
+    else
+        self:setOn(true)
+        self:setImageSource('/images/ui/windows/character/archetype_locked')
+        self.progress:hide()
+        self.progress_bg:hide()
+        self.lock:show()
+    end
+  @onSetup: self:setupVisuals()
+
+  UIWidget
+    id: progress_bg
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 45 7
+    image-source: /images/ui/windows/character/archetype_progress_background
+    
+  UIProgressBar
+    id: progress
+    anchors.fill: prev
+    size: 45 3
+    margin-top: 2
+    margin-bottom: 2
+    margin-left: 2
+    margin-right: 2
+
+  UIWidget
+    id: lock
+    anchors.centerIn: parent
+    margin-top: 12
+    size: 15 15
+    image-source: /images/ui/windows/character/icon_lock
+    visible: false
+
+GameCharacterTopPanelLevelProgress < UIWidget
+  id: level
+  size: 447 9
+  anchors.top: archetypes.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 26
+  image-border: 3
+  image-source: /images/ui/windows/character/level_progress_background
+
+  UIProgressBar
+    id: level_progress
+    anchors.fill: parent
+    size: 447 3
+    margin-top: 3
+    margin-bottom: 4
+    margin-left: 3
+    margin-right: 3
+    background-color: #36f991
+
+GameCharacterTopPanelLevelRect < UIWidget
+  id: level_rect
+  size: 40 40
+  anchors.left: parent.left
+  anchors.top: parent.top
+  image-border: 5
+  image-source: /images/ui/windows/character/level_rect_background
+  text: 15
+  font: poppins-semibold-24
+  text-offset: 0 2
+  margin-top: -5
+
+GameCharacterTopPanelSelectionButton < UIWidget
+  width: 130
+  font: poppins-semibold-14
+  text-offset: 0 5
+  text-color: #5b5b5b
+  image-source: /images/ui/windows/character/selection_button_background_on
+  image-color: alpha
+  $on:
+    text-color: white
+    image-color: white
+  @onClick: GameCharacter:selectTab(self:getId())
+  @onHoverChange: |
+    self.content:setOn(self:isHovered() or self:isOn())
+
+  UIWidget
+    id: content
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-14
+    text-offset: 0 1
+    text-color: #5b5b5b
+    icon-color: #5b5b5b
+    icon-size: 15 15
+    icon-offset: -20 0
+    icon-align: left
+    opacity: 1
+    $on:
+      text-color: white
+      icon-color: white
+    $hover:
+      text-color: white
+      icon-color: white
+    $pressed:
+      opacity: 0.7
+    @onClick: GameCharacter:selectTab(self:getParent():getId())
+
+  @onSetup: | 
+    self.content:setText(self:getId():titleCase())
+    self.content:setIcon('/images/ui/windows/character/' .. self:getId() .. '_icon')
+  @onStateChange: self.content:setOn(self:isOn())
+
+GameCharacterTopPanelSelection < UIWidget
+  id: selection_panel
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 10
+  size: 447 47
+  image-source: /images/ui/windows/character/selection_panel_background
+  layout:
+    type: horizontalBox
+    spacing: 0
+
+  GameCharacterTopPanelSelectionButton
+    id: equipment
+    padding-left: 20
+  GameCharacterTopPanelSelectionButton
+    id: stats
+    padding-left: 10
+  GameCharacterTopPanelSelectionButton
+    id: customization
+    padding-left: 5
+
+GameCharacterWindow < MainWindow
+  id: gameCharacterWindow
+  size: 447 704
+  anchors.centerIn: parent
+  &title: 'Character'
+  &hotkeyId: HOTKEYS_IDS.CHARACTER
+  &iconName: 'icon_character'
+  &isGeneralUIWindow: true
+
+  GameCharacterTopPanel
+  MainWindowContent
+    anchors.top: panel_top.bottom
+    padding-bottom: 0
+    padding-right: 0
+    padding-top: 0
+    GameCharacterEquipmentPanel
+    GameCharacterStatsPanel
+    GameCharacterCustomizationPanel

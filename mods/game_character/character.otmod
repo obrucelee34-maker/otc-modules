@@ -1,0 +1,7 @@
+Module
+  name: game_character
+  description: Character management interface for the game
+  sandboxed: true
+  scripts: [ character ]
+  @onLoad: GameCharacter:init()
+  @onUnload: GameCharacter:terminate()

@@ -1,0 +1,10 @@
+Module
+  name: game_channeling
+  description: Channeling
+  author: Archlight Team
+  website: www.archlightonline.com
+  sandboxed: true
+  autoload: false
+  scripts: [ uichannelingbar, channeling ]
+  @onLoad: init()
+  @onUnload: terminate()

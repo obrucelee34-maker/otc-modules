@@ -1,0 +1,112 @@
+GameLootNotificationWindow < UIWidget
+  id: gameLootNotificationWindow
+  size: 332 300
+  draggable: true
+
+  EditModePanel
+    &title: 'Loot UI'
+  UIWidget
+    id: content
+    anchors.fill: parent
+    margin: 25 0 0 0
+    phantom: true
+    layout:
+      type: verticalBox
+      spacing: 2
+  
+GameLootNotificationWindowEntry < UIWidget
+  size: 305 40
+  image-source: /images/ui/windows/loot_notification/#000000
+  phantom: true
+  image-offset: 30 0
+  image-border-left: 50
+
+  UIWidget
+    id: source_icon
+    size: 30 30
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    image-source: /images/ui/windows/loot_notification/dynamic_event_icon
+    visible: false
+
+  UIItem
+    id: item
+    size: 30 30
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: source_icon.right
+    margin: 5
+    phantom: true
+    @onSetup: |
+      self:setItemId(37470)
+
+  UIWidget
+    id: border
+    size: 40 40
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: source_icon.right
+    phantom: true
+    image-source: /images/ui/windows/loot_notification/border
+
+  UIWidget
+    id: icon
+    size: 30 30
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: source_icon.right
+    margin: 5
+    phantom: true
+
+  UICreature
+    id: outfit
+    size: 30 30
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: source_icon.right
+    margin: 5
+    phantom: true
+
+  UIWidget
+    id: label
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: item.right
+    width: 180
+    margin-left: 10
+    text-vertical-auto-resize: true
+    font: poppins-semibold-shadow-14
+    text: Example Item
+    text-align: left
+    text-offset: 0 22
+    phantom: true
+    @onTextChange: |
+      while self:getTextSize().width > self:getWidth() do
+        self:setText(string.format('%s...', self:getText():sub(1, -5)))
+      end
+      addEvent(function()
+        local parent = self:getParent()
+        parent.amount:setMarginLeft(self:getTextSize().width + 15)
+      end)
+
+  UIWidget
+    id: amount
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: item.right
+    text-auto-resize: true
+    font: poppins-semibold-shadow-14
+    text: x 999
+    text-align: left
+    text-offset: 0 22
+    phantom: true
+
+  UIWidget
+    id: progress_panel
+    height: 5
+    margin-top: 5
+    anchors.left: source_icon.right
+    width: 40
+    anchors.bottom: parent.bottom
+    image-border: 5
+    image-source: /images/ui/windows/professions/menu_progress_background
+    UIProgressBar
+      id: progress
+      anchors.fill: parent
+      size: 447 3
+      margin: 1
+      background-color: #A556FF

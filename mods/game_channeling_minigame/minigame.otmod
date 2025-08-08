@@ -1,0 +1,7 @@
+Module
+  name: game_channeling_minigame
+  author: LPE
+  sandboxed: true
+  scripts: [ minigame ]
+  @onLoad: init()
+  @onUnload: terminate()

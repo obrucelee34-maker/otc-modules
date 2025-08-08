@@ -1,0 +1,520 @@
+GameCharacterStatsPanel < UIWidget
+  id: stats_panel
+  anchors.fill: parent
+  visible: false
+  GameCharacterStatsPanelPrimary
+  GameCharacterStatsPanelAttributePoints
+  GameCharacterStatsPanelSecondary
+  GameCharacterStatsPanelSaveButtonPanel
+
+
+GameCharacterStatsPanelPrimary < UIWidget
+  id: primary_stats
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 200
+  image-source: /images/ui/windows/character/stats_preview_background
+  margin-left: -28
+  padding-right: 28
+  padding-left: 28
+  GameCharacterStatsPanelPrimaryPowerPanel
+  GameCharacterStatsPanelPrimaryAttributePanel
+
+GameCharacterStatsPanelPrimaryPowerPanel < UIWidget
+  id: power_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 112 150
+  margin-top: 5
+  &statNames: |
+    {
+        [StatsAttack] = 'attack_power',
+        [StatsDefense] = 'defense_power',
+    }
+  layout:
+    type: verticalBox
+    spacing: 10
+  GameCharacterStatsPanelPrimaryPower
+    id: attack_power
+  GameCharacterStatsPanelSeparator
+  GameCharacterStatsPanelPrimaryPower
+    id: defense_power
+
+GameCharacterStatsPanelSeparator < UIWidget
+  size: 112 1
+  background-color: #b1b1b1
+  opacity: 0.5
+  visible: true
+
+GameCharacterStatsPanelPrimaryPower < UIWidget
+  size: 112 75
+  @onSetup: |
+    self.name:setText(self:getId())
+    self.icon:setImageSource(string.format("/images/ui/windows/character/icon_%s", self:getId()))
+  UIWidget
+    id: icon
+    size: 25 25
+    anchors.top: parent.top
+    anchors.left: parent.left
+    margin-top: 17
+  UIWidget
+    id: value
+    anchors.left: icon.right
+    anchors.verticalCenter: icon.verticalCenter
+    height: 75
+    text: 0
+    font: poppins-28
+    text-auto-resize: true
+    margin-left: 10
+    text-offset: 0 6
+    @onTextChange: |
+      addEvent(function()
+        local parent = self:getParent()
+        local icon = parent.icon
+        icon:setMarginLeft((parent:getWidth() - icon:getWidth() - self:getTextSize().width - self:getMarginLeft()) / 2)
+      end)
+  UIWidget
+    id: name
+    anchors.top: icon.bottom
+    anchors.bottom: parent.bottom
+    text-align: center
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-auto-resize: true
+    font: poppins-13
+    text-color: #b1b1b1
+    @onTextChange: |
+      self:setText(self:getText():gsub("_", " "):titleCase(), true)
+
+
+GameCharacterStatsPanelPrimaryAttributePanel < UIWidget
+  id: primary_attribute_panel
+  anchors.top: parent.top
+  anchors.right: parent.right
+  size: 234 200
+  &statNames: |
+    {
+        [StatsVitality] = 'vitality',
+        [StatsMight] = 'might',
+        [StatsIntelligence] = 'intelligence',
+        [StatsDexterity] = 'dexterity',
+        [StatsWisdom] = 'wisdom',
+    }
+  layout:
+    type: verticalBox
+    spacing: 7
+    align: top
+  GameCharacterStatsPanelPrimaryAttribute
+    id: vitality
+    &statTooltip: tr("- Maximum Health\n- Health Regeneration\n- Spell Defense\n- Weapon Defense")
+  GameCharacterStatsPanelPrimaryAttribute
+    id: might
+    &statTooltip: tr("- Weapon Power\n- Weapon Defense\n- Health Regeneration")
+  GameCharacterStatsPanelPrimaryAttribute
+    id: intelligence
+    &statTooltip:  tr("- Spell Power\n- Spell Defense\n- Mana Regeneration\n- Healing Power")
+  GameCharacterStatsPanelPrimaryAttribute
+    id: dexterity
+    &statTooltip:  tr("- Haste\n- Spell Defense\n- Weapon Defense")
+  GameCharacterStatsPanelPrimaryAttribute
+    id: wisdom
+    &statTooltip:  tr("- Spell Defense\n- Mana Regeneration\n- Maximum Mana\n- Healing Power")
+
+GameCharacterStatsPanelPrimaryAttribute < UIWidget
+  size: 234 30
+  phantom: false
+  @onSetup: |
+    self.name:setText(self:getId():titleCase())
+    self.icon:setImageSource("/images/ui/windows/character/icon_" .. self:getId())
+    self.name:setTooltip(self.statTooltip)
+  $first:
+    margin-top: 10
+  UIWidget
+    id: icon
+    image-source: /images/ui/windows/character/icon_might
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 30 30
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: Might
+    font: poppins-15
+    margin-left: 15
+    text-auto-resize: true
+    text-offset: 0 5
+    text-color: #b8b8b8
+    phantom: false
+  UIWidget
+    id: plus
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/character/icon_plus
+    size: 20 20
+    opacity: 1
+    text-offset: -5 -30
+    font: poppins-semibold-10
+    text-color: #77D463
+    image-color: white
+    visible: false
+    $disabled:
+      image-color: #b1b1b1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 1.0
+    @onClick: GameCharacter:addAttribute(self:getParent(), self:getParent():getId())
+  UIWidget
+    id: value
+    anchors.right: plus.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-19
+    size: 40 30
+    margin-top: 2
+    phantom: false
+  UIWidget
+    id: minus
+    anchors.right: value.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/character/icon_minus
+    size: 20 20
+    opacity: 1
+    text-offset: 0 -30
+    font: poppins-12
+    text-color: #FF5151
+    image-color: white
+    visible: false
+    $disabled:
+      image-color: #b1b1b1
+    $hover:
+      opacity: 0.8
+    $pressed:
+      opacity: 1.0
+    @onClick: GameCharacter:removeAttribute(self:getParent(), self:getParent():getId())
+
+GameCharacterStatsPanelSecondary < UIWidget
+  id: secondary_stats
+  padding-right: 0
+  padding-left: 0
+  margin-right: 0
+  margin-top: 10
+  anchors.top: attribute_points.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: save_button_panel.top
+  text: Attributes
+  font: poppins-15
+  text-offset: 4 8
+  text-align: top-left
+  background-color: #13141650
+  background-offset: -28 0
+  background-size: 447 30
+
+  UIWidget
+    id: base
+    anchors.right: next.left
+    anchors.top: parent.top
+    size: 12 16
+    margin-top: 7
+    margin-right: 48
+    image-source: /images/ui/windows/character/icon_base
+    &tooltip: tr("Base value")
+  UIWidget
+    id: item
+    anchors.right: next.left
+    anchors.top: parent.top
+    size: 16 16
+    margin-top: 7
+    margin-right: 44
+    image-source: /images/ui/windows/character/icon_item
+    &tooltip: tr("Bonus value")
+  UIWidget
+    id: total
+    anchors.right: parent.right
+    anchors.top: parent.top
+    size: 20 16
+    margin-top: 7
+    margin-right: 53
+    image-source: /images/ui/windows/character/icon_total
+    &tooltip: tr("Total value")
+
+  GameCharacterStatsPanelSecondaryContent
+  GameCharacterStatsPanelSecondaryContentScrollBar
+
+GameCharacterStatsPanelSecondaryContent < ScrollablePanel
+  id: content
+  anchors.fill: parent
+  padding-top: 30
+  vertical-scrollbar: secondary_stats_scrollbar
+  margin-right: 28
+  layout:
+    type: verticalBox
+    cell-size: 380 35
+    spacing: 0
+
+  &statNames: |
+    {
+      [StatsPhysicalAttackBase] = { widgetId = "weapon_power", base = true},
+      [StatsPhysicalAttackBonus] = { widgetId = "weapon_power", bonus = true},
+      [StatsPhysicalAttackEffective] = { widgetId = "weapon_power", total = true},
+
+      [StatsMagicAttackBase] = { widgetId = "spell_power", base = true},
+      [StatsMagicAttackBonus] = { widgetId = "spell_power", bonus = true},
+      [StatsMagicAttackEffective] = { widgetId = "spell_power", total = true},
+
+      [StatsPhysicalDefenseBase] = { widgetId = "weapon_defense", base = true},
+      [StatsPhysicalDefenseBonus] = { widgetId = "weapon_defense", bonus = true},
+      [StatsPhysicalDefenseEffective] = { widgetId = "weapon_defense", total = true},
+
+      [StatsMagicDefenseBase] = { widgetId = "spell_defense", base = true},
+      [StatsMagicDefenseBonus] = { widgetId = "spell_defense", bonus = true},
+      [StatsMagicDefenseEffective] = { widgetId = "spell_defense", total = true},
+
+      [StatsHealingBase] = { widgetId = "healing_power", base = true},
+      [StatsHealingBonus] = { widgetId = "healing_power", bonus = true},
+      [StatsHealingEffective] = { widgetId = "healing_power", total = true},
+
+      [StatsMaxHealthBase] = { widgetId = "maximum_health", base = true},
+      [StatsMaxHealthBonus] = { widgetId = "maximum_health", bonus = true},
+      [StatsMaxHealthEffective] = { widgetId = "maximum_health", total = true},
+
+      [StatsMaxManaBase] = { widgetId = "maximum_mana", base = true},
+      [StatsMaxManaBonus] = { widgetId = "maximum_mana", bonus = true},
+      [StatsMaxManaEffective] = { widgetId = "maximum_mana", total = true},
+
+      [StatsHealthRegenerationBase] = { widgetId = "health_regeneration", base = true},
+      [StatsHealthRegenerationBonus] = { widgetId = "health_regeneration", bonus = true},
+      [StatsHealthRegenerationEffective] = { widgetId = "health_regeneration", total = true},
+
+      [StatsManaRegenerationBase] = { widgetId = "mana_regeneration", base = true},
+      [StatsManaRegenerationBonus] = { widgetId = "mana_regeneration", bonus = true},
+      [StatsManaRegenerationEffective] = { widgetId = "mana_regeneration", total = true},
+
+      [StatsHasteBase] = { widgetId = "haste", base = true},
+      [StatsHasteBonus] = { widgetId = "haste", bonus = true},
+      [StatsHasteEffective] = { widgetId = "haste", total = true},
+
+      [StatsPrecisionBase] = { widgetId = "precision", base = true},
+      [StatsPrecisionBonus] = { widgetId = "precision", bonus = true},
+      [StatsPrecisionEffective] = { widgetId = "precision", total = true},
+
+      [StatsImpactBase] = { widgetId = "impact", base = true},
+      [StatsImpactBonus] = { widgetId = "impact", bonus = true},
+      [StatsImpactEffective] = { widgetId = "impact", total = true},
+    }
+
+  GameCharacterStatsPanelSecondaryListItem
+    id: spell_power
+  GameCharacterStatsPanelSecondaryListItem
+    id: weapon_power
+  GameCharacterStatsPanelSecondaryListItem
+    id: spell_defense
+  GameCharacterStatsPanelSecondaryListItem
+    id: weapon_defense
+  GameCharacterStatsPanelSecondaryListItem
+    id: healing_power
+  GameCharacterStatsPanelSecondaryListItem
+    id: maximum_health
+  GameCharacterStatsPanelSecondaryListItem
+    id: maximum_mana
+  GameCharacterStatsPanelSecondaryListItem
+    id: mana_regeneration
+  GameCharacterStatsPanelSecondaryListItem
+    id: health_regeneration
+  GameCharacterStatsPanelSecondaryListItem
+    id: precision
+  GameCharacterStatsPanelSecondaryListItem
+    id: critical_chance_percent
+    &nameTitle: tr("Critical Chance (%%)")
+    &subCategory: true
+  GameCharacterStatsPanelSecondaryListItem
+    id: impact
+    &nameTitle: tr("Impact")
+  GameCharacterStatsPanelSecondaryListItem
+    id: critical_damage_percent
+    &nameTitle: tr("Critical Damage (%%)")
+    &subCategory: true
+  GameCharacterStatsPanelSecondaryListItem
+    id: haste
+  GameCharacterStatsPanelSecondaryListItem
+    id: attack_speed
+    &nameTitle: tr("Attack Speed (s)")
+    &subCategory: true
+  GameCharacterStatsPanelSecondaryListItem
+    id: global_cooldown
+    &nameTitle: tr("Global Cooldown (s)")
+    &subCategory: true
+  GameCharacterStatsPanelSecondaryListItem
+    id: casting_time
+    &nameTitle: tr("Casting Time (%%)")
+    &subCategory: true
+    &last: true
+
+GameCharacterStatsPanelSecondaryContentScrollBar < VerticalScrollBar
+  id: secondary_stats_scrollbar
+  anchors.top: prev.top
+  anchors.right: parent.right
+  anchors.bottom: prev.bottom
+  step: 48
+  pixels-scroll: true
+  margin-top: 35
+  margin-bottom: 5
+  margin-right: 5
+
+GameCharacterStatsPanelSecondaryListItem < UIWidget
+  size: 380 35
+  phantom: false
+  @onSetup: |
+    self.name:setText(self.nameTitle or self:getId():gsub("_", " "):titleCase())
+    self.icon:setImageSource("/images/ui/windows/character/icon_" .. (self.subCategory and "sub_category" or self:getId()))
+    if self.last then
+      self.separator:hide()
+    end
+  UIWidget
+    id: icon
+    image-source: /images/ui/windows/character/icon_might
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 20
+  UIWidget
+    id: name
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    font: poppins-15
+    margin-left: 15
+    text-auto-resize: true
+    text-offset: 0 5
+    text-color: #b8b8b8
+  UIWidget
+    id: base
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-17
+    size: 40 30
+    margin-top: 2
+    margin-right: 10
+  UIWidget
+    id: bonus
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-17
+    size: 60 30
+    margin-top: 2
+    margin-right: 10
+    text-color: white
+    @onTextChange: |
+        -- add plus sign if value is positive
+        local value = tonumber(self:getText())
+        if value and value > 0 then
+          self:setText("+" .. value, true)
+          self:setOn(true)
+        else
+          self:setOn(false)
+        end
+  UIWidget
+    id: total
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: 0
+    text-offset: 0 5
+    font: poppins-17
+    size: 40 30
+    margin-top: 2
+    margin-right: 20
+    text-color: white
+    phantom: false
+    $on:
+      text-color: #ffa851
+    $checked:
+      text-color: #df4a4a
+
+  UIWidget
+    id: separator
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    size: 380 2
+    background-color: #b1b1b1
+    opacity: 0.1
+
+GameCharacterStatsPanelSaveButtonPanel < UIWidget
+  id: save_button_panel
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  padding-right: 28
+  $on:
+    height: 80
+    visible: true
+  $!on:
+    height: 0
+    visible: false
+
+  UIWidget
+    id: separator
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 2
+    background-color: #1f2124
+    margin-left: -28
+    margin-right: -28
+
+  GameCharacterStatsPanelSaveButton
+
+GameCharacterStatsPanelSaveButton < SuccessButton
+  id: save_button
+  anchors.centerIn: parent
+  text: Save
+  size: 115 50
+  @onClick: GameCharacter:saveAttributes()
+
+GameCharacterStatsPanelAttributePoints < UIWidget
+  image-source: /images/ui/windows/character/stats_preview_background
+  id: attribute_points
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  height: 40
+  margin-left: -28
+  padding-left: 28
+
+  WarningButton
+    size: 112 37 
+    text: Reset
+    anchors.left: parent.left
+    anchors.verticalCenter: next.verticalCenter
+    @onClick: |
+      GameCharacter:requestResetStats()
+
+  UIWidget
+    id: points
+    size: 234 40
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 28
+    font: poppins-semibold-14
+    text-offset: 0 1
+    padding: 10 10 10 10
+    text-color: #77d463
+    image-color: #77d463
+    image-border-left: 1
+    image-border-right: 1
+    image-source: /images/ui/windows/character/points_background
+  
+  UIWidget
+    id: info
+    anchors.left: points.right
+    anchors.verticalCenter: points.verticalCenter
+    margin-left: -10
+    image-source: /images/ui/windows/character/info
+    &tooltipEnabled: true
+    &attributesPointsTooltip: { header = {text = "Attribute Points"}}

@@ -1,0 +1,1347 @@
+ChatPopupMenuButton < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-semibold-14
+  text-horizontal-auto-resize: true
+
+ChatPopupMenuShortcutLabel < UIWidget
+  text-align: right
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  text-auto-resize: true
+  font: poppins-semibold-14
+  text-color: #fbfb79
+  phantom: true
+
+ChatPopupMenuSeparator < UIWidget
+  background-color: #5b5b5b
+  height: 1
+  phantom: true
+
+ChatPopupMenu < UIPopupMenu
+  image-source: /images/ui/windows/popup_menu/background
+  image-border-top: 3
+  image-border-bottom: 3
+  padding: 10 20 10 20
+  width: 200
+
+ChatMainPanel < UIWidget
+  id: main
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  padding: 1
+  width: 500
+  phantom: true
+  visible: false
+  &expandWidth: 500
+  @onVisibilityChange: |
+    local parent = self:getParent()
+    if parent.bottomResizeBorder then
+      parent.bottomResizeBorder:setVisible(self:isVisible())
+    end
+    if parent.rightResizeBorder then
+      parent.rightResizeBorder:setVisible(self:isVisible())
+    end
+    if parent.topResizeBorder then
+      parent.topResizeBorder:setVisible(self:isVisible())
+    end
+    if parent.leftResizeBorder then
+      parent.leftResizeBorder:setVisible(self:isVisible())
+    end
+
+  UIWidget
+    height: 7
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/chat/horizontal_border
+    phantom: true
+    &configurableOpacity: true
+
+  UIWidget
+    id: background
+    anchors.fill: bodyPanel
+    background-color: #000000
+    opacity: 0.8
+    phantom: true
+  
+  ChatTopPanel
+  ChatBodyPanel
+  ChatBottomPanel
+  ChatSettingsPanel
+
+  UIWidget
+    height: 7
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/chat/horizontal_border
+    phantom: true
+    &configurableOpacity: true
+
+ChatMinimizedPanel < UIWidget
+  id: minimized
+  anchors.left: parent.left
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  margin-top: 1
+  margin-bottom: 1
+  size: 504 395
+  visible: true
+  phantom: true
+  &configurableOpacity: true
+
+  UIWidget
+    id: sidePanel
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    width: 50
+    phantom: true
+    background-color: #000000CC
+
+    UIWidget
+      height: 7
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      image-source: /images/ui/windows/chat/horizontal_border
+      phantom: true
+
+    UIWidget
+      id: topPanel
+      height: 40
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      border: 1 #25272C
+
+      UIWidget
+        id: currentChat
+        anchors.centerIn: parent
+        image-source: /images/ui/windows/chat/collapsed_chat_border
+        padding: 3
+        text-align: center
+        text-offset: 0 2
+        font: poppins-semibold-16
+        @onClick: GameChat:enable(true)
+
+        UIWidget
+          id: icon
+          anchors.centerIn: parent
+          image-source: /images/ui/windows/chat/icon_general
+          @onClick: GameChat:enable(true)
+
+      UIWidget
+        id: ping
+        anchors.top: parent.top
+        anchors.right: parent.right
+        margin-right: 5
+        margin-top: 1
+        image-source: /images/ui/windows/chat/message_ping
+        visible: false
+        &count: 0
+
+    UIWidget
+      id: togglePopupButton
+      anchors.bottom: bottomPanel.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 11
+      image-source: /images/ui/windows/chat/messages_showing
+      &tooltip: tr('Hide Popup Chat')
+      &enabled: true
+      $on:
+        image-source: /images/ui/windows/chat/messages_hidden
+      &getTooltipMessage: |
+        function(self)
+          return self:isOn() and tr('Show Popup Chat') or tr('Hide Popup Chat')
+        end
+      @onClick: |
+        if not self.enabled then
+          GameChat:enable()
+          addEvent(function()
+            GameChat:toggleSettings("hidePopoutMessageDelay")
+          end)
+          return
+        end
+        self:setOn(not self:isOn())
+        self:setTooltip(self:getTooltipMessage())
+        GameChat:togglePopupChat(not self:isOn())
+
+    UIWidget
+      id: bottomPanel
+      height: 47
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-bottom: 7
+      border: 1 #25272C
+
+      UIWidget
+        id: expandButton
+        anchors.centerIn: parent
+        image-source: /images/ui/windows/chat/arrow_right
+        $on:
+          opacity: 0.6
+        $!on:
+          opacity: 1
+        @onClick: GameChat:enable(true)
+
+    UIWidget
+      height: 7
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      image-source: /images/ui/windows/chat/horizontal_border
+      phantom: true
+
+  ChatHiddenMessagePanel
+    id: hiddenMessagePanel
+    anchors.left: sidePanel.right
+    visible: true
+    vertical-scrollbar: hiddenMessageScrollbar
+
+  ChatMessagePanelScrollBar
+    id: hiddenMessageScrollbar
+    opacity: 0
+    phantom: true
+
+MessageInput < UIMessageInput
+  size: 250 45
+  padding-top: 7
+  padding-left: 10
+  padding-right: 10
+  text-align: left
+  text-offset: 0 12
+  opacity: 1
+  selection-color: #272727
+  selection-background-color: #cccccc
+  font: myriad-pro-24
+  $disabled:
+    color: #27272788
+    opacity: 0.5
+  $!disabled:
+    color: white
+    opacity: 1
+
+ChatPrivateCloseButton < UIWidget
+  id: closeButton
+  image-source: /images/ui/windows/chat/private_tab_close
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  margin-right: -4
+  size: 20 20
+  opacity: 0.8
+  phantom: false
+  text: 
+  $hover:
+    opacity: 1.0
+  $pressed:
+    opacity: 0.8
+
+ChatPrivateNotificationButton < UIWidget
+  id: closeButton
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  text: 0
+  font: poppins-13
+  size: 20 20
+  text-offset: 0 3
+  phantom: true
+  image-source: /images/ui/windows/chat/private_tab_notification_button_off
+  text-color: #7E828B
+  $on:
+    image-source: /images/ui/windows/chat/private_tab_notification_button_on
+    text-color: #A556FF
+
+ChatTabButton < MoveableTabBarButton
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  width: 20
+  image-size: 25 25
+  image-offset: 7 7
+  image-color: white
+  text-offset: 25 7
+  font: poppins-16
+  border: 1 #25272C
+  on: false
+
+  $checked:
+    background-color: #000000CC
+  $!checked:
+    background-color: #181A1D
+  $on:
+    image-color: #F6B97C
+  $!on:
+    image-color: white
+
+  UIWidget
+    id: notification
+    size: 14 14
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 19
+    margin-left: 0
+    image-source: /images/ui/windows/chat/notification
+    image-border: 3
+    text-auto-resize: true
+    padding-left: 3
+    padding-right: 3
+    padding-top: 1
+    text-offset: 0 2
+    phantom: true
+    visible: false
+    text: 10
+    font: poppins-semibold-10
+
+ChatPrivateTabButton < ChatTabButton
+  text-auto-resize: true
+  text-align: left
+  text-offset: 15 6
+  image-offset: 7 8
+  font: poppins-16
+  margin-bottom: 1
+  @onTextChange: |
+    local width = self:getTextSize().width
+    self:setWidth(width + 36)
+    self:setImageWidth(self:getWidth() + 6)
+  &private: true
+
+  $checked !on:
+    background-color: #000000CC
+    text-color: white
+  $!checked !on:
+    background-color: #181A1D
+    text-color: white
+  $checked on:
+    background-color: #000000CC
+    text-color: white
+  $!checked on:
+    background-color: #181A1D
+    text-color: #FFA851
+
+ChatTabBar < MoveableTabBar
+  id: chatTabBar
+  height: 40
+  padding: 0
+  anchors.left: parent.left
+  &tabsMoveable: true
+  &maxMargin: 0
+  &scrollable: true
+  &scrollStep: 30
+  &scrollInverted: false
+  &hideTabsOnResize: false
+  @onTabSizeChange: |
+    function(self, widget, oldRect, newRect)
+      if GameChat.enabled and (not self.settings or self.settings.tabScrollButtons) then
+        local parent = self:getParent():getParent()
+        if self:isOverflowing() then
+          parent.scrollLeft:setWidth(25)
+          parent.scrollLeft:show()
+          parent.scrollRight:setWidth(25)
+          parent.scrollRight:show()
+        else
+          parent.scrollLeft:setWidth(0)
+          parent.scrollLeft:hide()
+          parent.scrollRight:setWidth(0)
+          parent.scrollRight:hide()
+        end
+      end
+    end
+  
+ChatTopPanel < UIWidget
+  id: topPanel
+  height: 40
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 6
+  background-color: #181A1D
+  phantom: true
+  &configurableOpacity: true
+  @onGeometryChange: |
+    function(self, oldRect, newRect)
+      if GameChat.enabled and (not self.settings or self.settings.tabScrollButtons) then
+        if self.content.chatTabBar:isOverflowing() then
+          self.scrollLeft:setWidth(25)
+          self.scrollLeft:show()
+          self.scrollRight:setWidth(25)
+          self.scrollRight:show()
+        else
+          self.scrollLeft:setWidth(0)
+          self.scrollLeft:hide()
+          self.scrollRight:setWidth(0)
+          self.scrollRight:hide()
+        end
+      end
+    end
+
+  UIWidget
+    id: scrollLeft
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/windows/chat/scroll_left
+    @onMousePress: |
+      self:getParent().content.chatTabBar:scrollDecrement()
+      self:monitorMousePress(function()
+        self:getParent().content.chatTabBar:scrollDecrement()
+      end, 100)
+    $on:
+      opacity: 0.6
+    $!on:
+      opacity: 1
+
+  UIWidget
+    id: scrollRight
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    image-source: /images/ui/windows/chat/scroll_right
+    opacity: 1
+    @onMousePress: |
+      self:getParent().content.chatTabBar:scrollIncrement()
+      self:monitorMousePress(function()
+        self:getParent().content.chatTabBar:scrollIncrement()
+      end, 100)
+    $on:
+      opacity: 0.6
+
+  ScrollablePanel
+    id: content
+    clipping: true
+    anchors.fill: parent
+    anchors.left: scrollLeft.right
+    anchors.right: scrollRight.left
+
+    ChatTabBar
+      anchors.fill: parent
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+
+ChatMessage < UIWidget
+  width: 450
+  padding: 5
+  on: false
+  image-source: /images/ui/windows/chat/background_message
+  image-color: alpha
+  focusable: true
+  $!first:
+    margin-top: 5
+  $!first on:
+    margin-top: 0
+  $!on:
+    padding: 0
+  $on:
+    image-color: white
+    image-border: 15
+    padding: 10
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 3
+  @onFocusChange: |
+    function(self, focused)
+      if not focused then
+        self.text:setSelection(0, 0)
+        self.title:setSelection(0, 0)
+      end
+    end
+
+  UITextEdit
+    id: title
+    color: #b8b8b8
+    height: 26
+    margin-top: 5
+    padding-right: 60
+    padding-top: 0
+    text-align: left
+    text-wrap: true
+    text-auto-resize: true
+    text-offset: 0 -3
+    editable: false
+    change-cursor-image: false
+    cursor-visible: false
+    selection-color: #272727
+    selection-background-color: #cccccc
+    selectable: true
+    focusable: true
+
+    UIWidget
+      id: title_icon
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      image-offset: 0 0
+      margin-left: -22
+      size: 22 20
+      &type: 'premium'
+      visible: false
+      @onVisibilityChange: |
+        function(self, visible)
+          local parent = self:getParent()
+          if visible then
+            if self.type then
+              self:setImageSource(string.format('/images/ui/windows/chat/icon_%s', self.type))
+            end
+            parent:setPaddingLeft(24)
+          else
+            parent:setPaddingLeft(0)
+          end
+        end
+
+    UIWidget
+      id: time
+      text-auto-resize: true
+      anchors.right: parent.right
+      margin-right: -60
+      anchors.verticalCenter: parent.verticalCenter
+      text-color: #b8b8b8
+      font: poppins-16
+
+  UITextEdit
+    id: text
+    height: 22
+    margin-top: 5
+    margin-left: 5
+    &ignoreTr: true
+    text-align: left
+    text-wrap: true
+    text-auto-resize: true
+    text-offset: 0 0
+    editable: false
+    change-cursor-image: false
+    cursor-visible: false
+    font: poppins-16
+    selection-color: #272727
+    selection-background-color: #cccccc
+    selectable: true
+    focusable: true
+
+ChatHiddenMessagePanel < ScrollablePanel
+  size: 420 410
+  margin-top: 30
+  margin-bottom: 30
+  margin-left: 20
+  margin-right: 5
+  anchors.fill: parent
+  phantom: true
+  always-scroll-maximum: true
+
+  layout:
+    type: verticalBox
+    spacing: 4
+
+ChatMessagePanel < ScrollablePanel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin-left: 20
+  margin-right: 20
+  margin-bottom: 10
+  inverted-scroll: true
+  visible: false
+  focusable: false
+  @onClick: |
+    GameChat.window.main.bottomPanel.messageInput:recursiveFocus(ActiveFocusReason)
+
+  layout:
+    type: verticalBox
+    align-bottom: true
+
+ChatMessagePanelScrollBar < VerticalScrollBar
+  anchors.top: prev.top
+  anchors.left: prev.right
+  anchors.bottom: prev.bottom
+  margin-left: 6
+  margin-bottom: 5
+  margin-top: 5
+  step: 48
+  pixels-scroll: true
+
+ChatTabPanel < UIWidget
+  anchors.fill: parent
+  visible: false
+  @onClick: |
+    GameChat.window.main.bottomPanel.messageInput:recursiveFocus(ActiveFocusReason)
+
+ChatGeneralTabPanel < ChatTabPanel
+  id: generalTabPanel
+  &buttonStyle: 'ChatGeneralTabPanelButton'
+
+  ChatMessagePanel
+    id: generalMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatGeneralTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_general
+  &activeText: 'General'
+
+ChatGlobalTabPanel < ChatTabPanel
+  id: globalTabPanel
+  &buttonStyle: 'ChatGlobalTabPanelButton'
+
+  ChatMessagePanel
+    id: global_en
+    vertical-scrollbar: scrollbar_en
+    visible: false
+
+  ChatMessagePanelScrollBar
+    id: scrollbar_en
+
+  ChatMessagePanel
+    id: global_br
+    vertical-scrollbar: scrollbar_br
+    visible: false
+
+  ChatMessagePanelScrollBar
+    id: scrollbar_br
+
+  ChatMessagePanel
+    id: global_pl
+    vertical-scrollbar: scrollbar_pl
+    visible: false
+
+  ChatMessagePanelScrollBar
+    id: scrollbar_pl
+
+  ChatMessagePanel
+    id: global_es
+    vertical-scrollbar: scrollbar_es
+    visible: false
+
+  ChatMessagePanelScrollBar
+    id: scrollbar_es
+
+ChatGlobalTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_global
+  &activeText: 'Global'
+  $on:
+    image-color: white
+
+ChatSystemTabPanel < ChatTabPanel
+  id: systemTabPanel
+  &buttonStyle: 'ChatSystemTabPanelButton'
+
+  ChatMessagePanel
+    id: systemMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatSystemTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_system
+  &activeText: 'System Log'
+
+ChatBattleTabPanel < ChatTabPanel
+  id: battleTabPanel
+  &buttonStyle: 'ChatBattleTabPanelButton'
+
+  ChatMessagePanel
+    id: battleMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatBattleTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_battle
+  &activeText: 'Battle Log'
+
+ChatPartyTabPanel < ChatTabPanel
+  id: partyTabPanel
+  &buttonStyle: 'ChatPartyTabPanelButton'
+
+  ChatMessagePanel
+    id: partyMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatPartyTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_party
+  &activeText: 'Party'
+
+ChatGuildTabPanel < ChatTabPanel
+  id: guildTabPanel
+  &buttonStyle: 'ChatGuildTabPanelButton'
+
+  ChatMessagePanel
+    id: guildMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatGuildTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_guild
+  &activeText: 'Guild'
+
+ChatLfgTabPanel < ChatTabPanel
+  id: lfgTabPanel
+  &buttonStyle: 'ChatLfgTabPanelButton'
+
+  ChatMessagePanel
+    id: lfgMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatLfgTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_lfg
+  &activeText: 'Looking for Group'
+
+ChatTradeTabPanel < ChatTabPanel
+  id: tradeTabPanel
+  &buttonStyle: 'ChatTradeTabPanelButton'
+
+  ChatMessagePanel
+    id: tradeMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatTradeTabPanelButton < ChatTabButton
+  image-source: /images/ui/windows/chat/icon_trade
+  &activeText: 'Trade'
+
+ChatPrivateTabPanel < ChatTabPanel
+  id: privateTabPanel
+  &buttonStyle: 'ChatPrivateTabPanelButton'
+
+  ChatMessagePanel
+    id: privateMessagePanel
+    vertical-scrollbar: scrollbar
+
+  ChatMessagePanelScrollBar
+    id: scrollbar
+
+ChatPrivateTabPanelButton < ChatPrivateTabButton
+
+ChatSettingsTrueFalseOption < GameSettingsTrueFalseOption
+  @onSetup: |
+    if self.descriptionText then
+      self.description:setText(tr(self.descriptionText))
+    end
+    if self.descriptionTooltip then
+      self.description:setTooltip(tr(self.descriptionTooltip))
+      self.description:setPhantom(false)
+    end
+    self.description:setTextColor('#CED2D9')
+    self.description:setWidth(230)
+
+    if self.hideDescription then
+      self.description:hide()
+    end
+
+ChatSettingsComboBox < ComboBox
+  icon-align: left
+  icon-offset: 10 0
+  text-offset: 40 3
+  &disableScroll: true
+ChatSettingsComboBoxPopupMenu < ComboBoxPopupMenu
+ChatSettingsComboBoxPopupMenuButton < ComboBoxPopupMenuButton
+  icon-align: left
+  icon-offset: 10 0
+  text-offset: 40 3
+  height: 30
+
+ChatSettingsComboBoxOption < UIWidget
+  height: 40
+  Label
+    id: description
+    text: description
+    font: poppins-14
+    text-color: #CED2D9
+    width: 230
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  ChatSettingsComboBox
+    id: comboBox
+    anchors.left: prev.right
+    font: poppins-14
+    width: 170
+  
+  @onSetup: |
+    if self.descriptionText then
+      self.description:setText(tr(self.descriptionText))
+    end
+    if self.hideDescription then
+      self.description:hide()
+    end
+
+ChatSettingsSliderOption < SettingsSliderOption
+  &disableScroll: true
+  @onSetup: |
+    self.slider:setWidth(150)
+    if self.symbol then
+      self.slider:setSymbol(self.symbol)
+    end
+    if self.maximum then
+      self.slider:setMaximum(self.maximum)
+    end
+    if self.minimum then
+      self.slider:setMinimum(self.minimum)
+    end
+    if self.step then
+      self.slider:setStep(self.step)
+    end
+    if self.defaultValue then
+      self.slider:setValue(self.defaultValue)
+    end
+    if self.displayFormat then
+      self.slider.displayFormat = self.displayFormat
+    end
+    if self.disableScroll then
+      self.slider.disableScroll = self.disableScroll
+    end
+    if self.descriptionText then
+      self.description:setText(tr(self.descriptionText))
+    end
+    self.description:setTextColor('#CED2D9')
+    self.description:setWidth(230)
+    if self.hideDescription then
+      self.description:hide()
+    end
+    if self.onSliderRelease then
+      self.slider.onSliderRelease = self.onSliderRelease
+    end
+    if self.onValueChange then
+      connect(self.slider, { onValueChange = self.onValueChange })
+    end
+
+ChatSettingsCheckBoxOption < UIWidget
+  height: 40
+  Label
+    id: description
+    text: description
+    font: poppins-14
+    text-color: #CED2D9
+    width: 230
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  CheckBox
+    id: checkBox
+    anchors.top: prev.top
+    anchors.left: prev.right
+    margin-top: 4
+    size: 20 20
+  Label
+    id: text
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    text-auto-resize: true
+    text-align: left
+    text-offset: 0 2
+    font: poppins-14
+    margin-left: 5
+  @onSetup: |
+    if self.descriptionText then
+      self.description:setText(tr(self.descriptionText))
+    end
+    if self.hideDescription then
+      self.description:hide()
+    end
+    if self.displayText then
+      self.text:setText(tr(self.displayText))
+    end
+
+ChatSettingsButtonOption < UIWidget
+  height: 40
+  Label
+    id: description
+    text: description
+    font: poppins-14
+    text-color: #CED2D9
+    width: 230
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  Button
+    id: button
+    text: description
+    font: poppins-14
+    text-color: #CED2D9
+    width: 230
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  @onSetup: |
+    if self.descriptionText then
+      self.description:setText(tr(self.descriptionText))
+    end
+    if self.hideDescription then
+      self.description:hide()
+    end
+
+    if self.buttonColor then
+      self.button.color = self.buttonColor
+    end
+    if self.buttonWidth then
+      self.button:setWidth(self.buttonWidth)
+    end
+    if self.onClick then
+      connect(self.button, { onClick = self.onClick })
+    end
+    addEvent(function()
+      local textWidget = self.button:getChildById('text')
+      if textWidget then
+        if self.buttonFont then
+          textWidget:setFont(self.buttonFont)
+        end
+        if self.buttonText then
+          textWidget:setText(tr(self.buttonText))
+        end
+      end
+    end)
+
+ChatSettingsCategory < UIWidget
+  height: 40
+  width: 230
+  font: poppins-14
+  text-color: #CED2D9
+  text-align: topLeft
+  text-offset: 5 3
+  margin-top: 10
+  layout:
+    type: verticalBox
+    spacing: -4
+    fit-children: true
+
+ChatSettingsPanel < UIWidget
+  id: settingsPanel
+  anchors.top: parent.top
+  anchors.bottom: bottomPanel.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  background-color: #000000EE
+  visible: false
+
+  VerticalScrollBar
+    id: settingsScrollBar
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    width: 10
+    margin-top: 25
+    margin-bottom: 5
+    margin-right: 5
+    step: 48
+    pixels-scroll: true
+
+  ScrollablePanel
+    id: settings
+    margin-top: 25
+    margin-left: 20
+    padding-left: 10
+    padding-right: 10
+    padding-bottom: 0
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: settingsScrollBar.left
+    vertical-scrollbar: settingsScrollBar
+    layout:
+      type: verticalBox
+      spacing: 7
+    @onVisibilityChange: |
+      self.button = self.button or GameChat.window.main.bottomPanel:recursiveGetChildById("settingsButton")
+      self.button:setOn(self:isVisible())
+
+    ChatSettingsSliderOption
+      id: fontSize
+      &descriptionText: 'Font Size'
+      &symbol: 'px'
+      &minimum: 0
+      &maximum: 3
+      &step: 1
+      &defaultValue: 1
+      &displayFormat: |
+        function(value, self)
+          return self:getParent():getOptions()[value + 1]
+        end
+      &getOptions: |
+        function(self)
+          self.options = self.options or {12,14,16,18}
+          return self.options
+        end
+      &onValueChange: |
+        function(self, value, delta)
+          local newValue = self:getParent():getOptions()[value + 1]
+          GameChat:setFontSize(newValue)
+        end
+
+    ChatSettingsSliderOption
+      id: opacity
+      &descriptionText: 'Chat Opacity'
+      &symbol: '%'
+      &minimum: 30
+      &maximum: 100
+      &step: 1
+      &defaultValue: 100
+      &onValueChange: |
+        function(self, value, delta)
+          GameChat:setOpacity(value / 100)
+        end
+
+    ChatSettingsSliderOption
+      id: backgroundOpacity
+      &descriptionText: 'Background Opacity'
+      &symbol: '%'
+      &minimum: 20
+      &maximum: 100
+      &step: 1
+      &defaultValue: 80
+      &onValueChange: |
+        function(self, value, delta)
+          GameChat:setBackgroundOpacity(value / 100)
+        end
+
+    ChatSettingsSliderOption
+      id: hidePopoutMessageDelay
+      opacity: 1
+      &descriptionText: 'Hide Popout Message'
+      &minimum: 0
+      &maximum: 15500
+      &step: 500
+      &defaultValue: 15500
+      &displayFormat: |
+        function(value, self)
+          return value == 15500 and tr('Never') or (value == 0 and tr('Always') or (value/1000) .. 's')
+        end
+      &onValueChange: |
+        function(self, value, delta)
+          GameChat:setPopoutMessageHideDelay(value)
+        end
+      $on:
+        opacity: 0
+    
+    ChatSettingsComboBoxOption
+      id: globalChatLanguage
+      &descriptionText: 'Global Chat Language'
+
+    ChatSettingsTrueFalseOption
+      id: autoClearPopupMessages
+      &descriptionText: 'Auto Clear Popup Messages'
+      &descriptionTooltip: 'Automatically clear popup messages when they are hidden.'
+
+    ChatSettingsTrueFalseOption
+      id: keepChatOpen
+      &descriptionText: 'Keep Chat Open'
+
+    ChatSettingsTrueFalseOption
+      id: hideChatOnSend
+      &descriptionText: 'Hide Chat on Sending'
+
+    ChatSettingsTrueFalseOption
+      id: hideNpcInGeneral
+      &descriptionText: 'Hide NPC in General Chat'
+
+    ChatSettingsTrueFalseOption
+      id: autoOpenPrivateMessages
+      &descriptionText: 'Auto Open Private Messages'
+      &descriptionTooltip: 'Automatically open private chats when receiving a whisper.'
+
+    ChatSettingsTrueFalseOption
+      id: guildLoginNotifications
+      &descriptionText: 'Guild Logout Notifications'
+
+    ChatSettingsTrueFalseOption
+      id: alwaysShowTabNames
+      &descriptionText: 'Always Show Tab Names'
+
+    ChatSettingsTrueFalseOption
+      id: tabScrollButtons
+      &descriptionText: 'Tab Scroll Buttons'
+
+    ChatSettingsCategory
+      id: inGeneralChat
+      !text: tr('General Chat:')
+
+      ChatSettingsCheckBoxOption
+        id: general
+        &hideDescription: true
+        &displayText: 'Local'
+
+      ChatSettingsCheckBoxOption
+        id: global
+        &hideDescription: true
+        &displayText: 'Global'
+
+      ChatSettingsCheckBoxOption
+        id: system
+        &hideDescription: true
+        &displayText: 'System Log'
+      
+      ChatSettingsCheckBoxOption
+        id: battle
+        &hideDescription: true
+        &displayText: 'Battle Log'
+      
+      ChatSettingsCheckBoxOption
+        id: party
+        &hideDescription: true
+        &displayText: 'Party'
+
+      ChatSettingsCheckBoxOption
+        id: guild
+        &hideDescription: true
+        &displayText: 'Guild'
+
+      ChatSettingsCheckBoxOption
+        id: lfg
+        &hideDescription: true
+        &displayText: 'Looking for Group'
+
+      ChatSettingsCheckBoxOption
+        id: trade
+        &hideDescription: true
+        &displayText: 'Trade'
+
+    ChatSettingsCategory
+      id: openChats
+      !text: tr('Open Tabs:')
+
+      ChatSettingsCheckBoxOption
+        id: general
+        &hideDescription: true
+        &displayText: 'General'
+
+      ChatSettingsCheckBoxOption
+        id: global
+        &hideDescription: true
+        &displayText: 'Global'
+
+      ChatSettingsCheckBoxOption
+        id: system
+        &hideDescription: true
+        &displayText: 'System Log'
+      
+      ChatSettingsCheckBoxOption
+        id: battle
+        &hideDescription: true
+        &displayText: 'Battle Log'
+      
+      ChatSettingsCheckBoxOption
+        id: party
+        &hideDescription: true
+        &displayText: 'Party'
+
+      ChatSettingsCheckBoxOption
+        id: guild
+        &hideDescription: true
+        &displayText: 'Guild'
+
+      ChatSettingsCheckBoxOption
+        id: lfg
+        &hideDescription: true
+        &displayText: 'Looking for Group'
+
+      ChatSettingsCheckBoxOption
+        id: trade
+        &hideDescription: true
+        &displayText: 'Trade'
+
+    ChatSettingsButtonOption
+      id: resetButton
+      height: 50
+      margin-bottom: 20
+      &buttonText: 'Reset Settings'
+      &buttonWidth: 220
+      &buttonColor: '#A6AAB2'
+      &buttonFont: 'poppins-semibold-14'
+      &hideDescription: true
+      &onClick: |
+        function(self)
+          GameChat:resetSettings()
+        end
+        
+ChatBodyPanel < UIWidget
+  id: bodyPanel
+  anchors.top: topPanel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: bottomPanel.top
+  phantom: true
+
+ChatMessageInput < MessageInput
+  id: messageInput
+  size: 400 35
+  anchors.left: prev.right
+  anchors.right: rightSection.left
+  anchors.verticalCenter: parent.verticalCenter
+  max-length: 255
+  phantom: false
+  on: true
+  focusable: true
+  font: poppins-16
+  padding-top: 7
+  cursor-padding-top: 0
+  !preview: tr('Type your message.')
+  $!on:
+    phantom: true
+    focusable: false
+  @onTextChange: GameChat:onTextInputChange(self, self:getText())
+  @onStateChange: self:getParent():setOn(self:isOn()) self:setText(nil)
+
+ChatMessageInputPrefix < UIWidget
+  id: messageInputPrefix
+  anchors.left: messageInput.left
+  anchors.verticalCenter: parent.verticalCenter
+  text-auto-resize: true
+  text-color: #5da4f8
+  font: poppins-16
+  text-offset: 0 3
+  on: false
+  $on:
+    text-offset: 10 3
+
+ChatMessageInputType < UIWidget
+  id: inputType
+  anchors.left: prev.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.verticalCenter: parent.verticalCenter
+  text-horizontal-auto-resize: true
+  height: 35
+  text-offset: 10 7
+  text-align: left
+  font: poppins-16
+  text: Local
+  border: 1 #25272C
+  visible: true
+  @onTextChange: self:setWidth(self:getTextSize().width + 50)
+  @onVisibilityChange: self:getParent():getChildById("messageInput"):updateAnchors()
+  @onClick: GameChat:changeInputType(self)
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/chat/select_arrow
+    margin-left: 15
+    phantom: true
+
+ChatBottomPanel < UIWidget
+  id: bottomPanel
+  height: 50
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-bottom: 7
+  border: 1 #25272C
+  background-color: #000000E6
+  &configurableOpacity: true
+
+  UIWidget
+    id: leftSection
+    width: 50
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    border: 1 #25272C
+    phantom: true
+
+    UIWidget
+      id: settingsButton
+      anchors.centerIn: parent
+      image-source: /images/ui/windows/chat/settings
+      @onClick: GameChat:toggleSettings()
+      $on:
+        image-source: /images/ui/windows/chat/settings_active
+
+  ChatMessageInputType
+  ChatMessageInput
+  ChatMessageInputPrefix
+  
+  UIWidget
+    id: rightSection
+    width: 50
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    border: 1 #25272C
+
+    UIWidget
+      id: minimize
+      anchors.centerIn: parent
+      image-source: /images/ui/windows/chat/arrow_left
+      $on:
+        opacity: 0.6
+      $!on:
+        opacity: 1
+      @onClick: GameChat:disableOrHideSettings()
+
+ChatWindow < UIWindow
+  id: chatWindow
+  size: 500 400
+  draggable: true
+
+  EditModePanel
+    &title: 'Chat'
+
+  ChatMinimizedPanel
+  ChatMainPanel
+
+  ResizeBorder
+    id: topResizeBorder
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    hoverable: true
+    enabled: true
+    &minimum: 200
+    &maximum: 1000
+    @onSetup: self:setVisible(self:getParent().main:isVisible())
+
+  ResizeBorder
+    id: rightResizeBorder
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    hoverable: true
+    enabled: true
+    &minimum: 500
+    &maximum: 1500
+    @onSetup: self:setVisible(self:getParent().main:isVisible())
+
+  ResizeBorder
+    id: bottomResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    hoverable: true
+    enabled: true
+    &minimum: 200
+    &maximum: 1000
+    @onSetup: self:setVisible(self:getParent().main:isVisible())
+
+  ResizeBorder
+    id: leftResizeBorder
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    hoverable: true
+    enabled: true
+    &minimum: 500
+    &maximum: 1500
+    @onSetup: self:setVisible(self:getParent().main:isVisible())
