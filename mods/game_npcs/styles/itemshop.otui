@@ -1,0 +1,369 @@
+ShopItem < Panel
+  height: 62
+  image-border: 5
+  phantom: false
+  disabled: false
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  @onEnableChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setEnabled(self:isEnabled())
+    end
+
+  Item
+    id: item
+    size: 46 46
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: false
+
+  GameItemShopPoppins14px
+    id: name
+    text-color: white
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-top: 2
+    margin-left: 10
+    margin-right: 10
+    phantom: false
+    text-wrap: false
+    text-auto-resize: true
+    @onTextChange: self:setTooltip(self:getText())
+    @onClick: self:getParent():onClick()
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+  Panel
+    id: icon
+    size: 12 12
+    image-source: /images/ui/icons/silver_24
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 2
+    margin-left: 0
+
+  GameItemShopPoppins12px
+    id: price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    phantom: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+ShopItemInfo < ShopItem
+  width: 270
+
+  UIWidget
+    id: plus
+    image-source: /images/ui/windows/npcs/main/btnPlus
+    anchors.left: next.right
+    anchors.verticalCenter: price.verticalCenter
+    margin-left: 8
+    @onClick: |
+      local label = self:getParent().count
+      local n = tonumber(label:getText()) or 0
+      label:setText(math.min(n+1, (self:getParent().realCount or 100)))
+
+  UITextEdit
+    id: count
+    size: 50 20
+    text-align: center
+    text-offset: 0 2
+    padding-left: 7
+    padding-right: 7
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.right: parent.right
+    anchors.verticalCenter: price.verticalCenter
+    margin-right: 35
+    text-auto-resize: false
+    focusable: true
+    font: poppins-semibold-14
+    @onTextChange: ItemShop.onItemCountChange(self, self:getText())
+
+  UIWidget
+    id: minus
+    image-source: /images/ui/windows/npcs/main/btnMinus
+    anchors.right: prev.left
+    anchors.verticalCenter: price.verticalCenter
+    margin-right: 8
+    @onClick: |
+      local label = self:getParent().count
+      local n = tonumber(label:getText()) or 0
+      label:setText(math.max(n-1, 0))
+
+ShopItemInfoLabel < Panel
+  size: 140 18
+
+  &align: |
+    function(self)
+      if not self.defaultWidth then
+        self.defaultWidth = self:getWidth()
+      end
+      local otherChild = nil
+      local parent = self:getParent()
+      local children = parent:getChildren()
+      for _, child in ipairs(children) do
+        if child ~= self and child:getStyleName() == 'ShopItemInfoLabel' then
+          if not self.defaultWidth then return end
+          local childTextWidth = child.text:getWidth()
+          local selfTextWidth = self.text:getWidth()
+          if childTextWidth > selfTextWidth then
+            self.text:setMarginLeft(childTextWidth - selfTextWidth)
+          end
+          otherChild = child
+          break
+        end
+      end
+
+      if otherChild and
+        (otherChild:getWidth() + otherChild:getMarginLeft()) > self:getWidth() + self:getMarginLeft() then
+
+        return
+      end
+
+      local iconValueWidth = self.icon:getWidth() + self.icon:getMarginRight() + self.value:getWidth()
+      local textWidth = (self.text:getWidth() + self.text:getMarginLeft())
+      local allWidth = (iconValueWidth + textWidth)
+
+      if allWidth > self.defaultWidth then
+        self:setWidth(allWidth)
+        for _, child in ipairs(children) do
+          if child ~= self and child:getStyleName() == 'ShopItemInfoLabel' then
+            child:setWidth(allWidth)
+            break
+          end
+        end
+      else
+        local oldWidth = self:getWidth()
+        local newValue = self.defaultWidth
+        for _, child in ipairs(children) do
+          if child ~= self and child:getStyleName() == 'ShopItemInfoLabel' then
+            if child:getWidth() == oldWidth then
+              local childAllWidth = child.icon:getWidth()
+                + child.icon:getMarginRight() + child.value:getWidth()
+                + child.text:getWidth() + child.text:getMarginLeft()
+
+              newValue = math.max(newValue, childAllWidth)
+              child:setWidth(newValue)
+            end
+            break
+          end
+        end
+        self:setWidth(newValue)
+      end
+    end
+
+  GameItemShopPoppinsBold14px
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-offset: 0 -1
+
+  Panel
+    id: icon
+    size: 18 18
+    image-source: /images/ui/icons/silver_24
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: next.left
+    margin-right: 4
+
+  GameItemShopPoppinsBold12px
+    id: value
+    text: 0
+    text-auto-resize: true
+    //text-align: center
+    text-offset: 0 2
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    phantom: true
+    @onTextChange: |
+      function(self)
+        local number = tonumber(self:getText())
+        if number then
+          self._internal_value = number
+          self:setText(FormatCommaNumber(number), true)
+          self:getParent():align()
+        end
+      end
+
+GameItemShopPanel < Panel
+  id: gameItemShopPanel
+  anchors.fill: parent
+
+  Panel
+    id: filterPanel
+    height: 40
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: 10
+    margin-right: 10
+
+    UITextEdit
+      id: textEdit
+      height: 40
+      image-source: /images/ui/windows/npcs/main/search_background
+      image-border: 4
+      font: poppins-12
+      padding: 10
+      text-align: left
+      text-offset: 0 5
+      selection-color: #272727
+      selection-background-color: #cccccc
+      color: #5B5B5B
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 8
+
+      @onTextChange: |
+        ItemShop:onSearchFilter(self)
+
+      UIWidget
+        id: placeholder
+        font: poppins-12
+        !text: tr('Search item...')
+        text-align: left
+        text-offset: 0 5
+        color: #5B5B5B
+        opacity: 0.6
+        anchors.fill: parent
+        phantom: true
+
+  ScrollablePanel
+    id: itemsPanel
+    vertical-scrollbar: itemsPanelScrollbar
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    anchors.bottom: bottomPanel.top
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: grid
+      cell-size: 196 61
+      cell-spacing: 6 6
+      flow: true
+
+  GameNpcDialogueScrollBar
+    id: itemsPanelScrollbar
+    anchors.right: prev.right
+    margin-right: 0
+    step: 75
+    margin-top: 10
+    margin-bottom: 10
+
+  Panel
+    id: bottomPanel
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+
+    $on checked:
+      height: 310
+    $on !checked:
+      height: 260
+    $!on:
+      height: 0
+
+    ShopItemInfo
+      id: shopItemInfo
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 15
+
+    UIWidget
+      id: itemQuality
+      height: 50
+      anchors.top: prev.bottom
+      anchors.left: prev.left
+      anchors.right: prev.right
+      margin-top: 15
+
+      $on:
+        height: 50
+      $!on:
+        height: 0
+
+      GameItemShopPoppinsBold14px
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text-offset: 0 -1
+        text: Quality
+
+      ComboBox
+        id: comboBox
+        font: poppins-14
+        width: 165
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+
+    GameNpcHorizontalSeparator
+      margin-top: 15
+
+    ShopItemInfoLabel
+      id: silver
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 15
+
+      @onSetup: |
+        self:getChildById('text'):setText('Your Coins')
+        self:align()
+
+    ShopItemInfoLabel
+      id: cost
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 5
+
+      @onSetup: |
+        self:getChildById('text'):setText('Total')
+        self:align()
+
+    Button
+      id: buyButton
+      width: 110
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Buy
+      @onClick: ItemShop:buyItem()
+
+    Button
+      id: sellButton
+      width: 110
+      anchors.top: cost.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Sell
+      @onClick: ItemShop:sellItem()
+      visible: false

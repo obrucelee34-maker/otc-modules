@@ -1,0 +1,42 @@
+GameSettingsVerticalSeparator < UIWidget
+  size: 3 704
+  phantom: true
+  focusable: false
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  margin-top: -20
+  margin-bottom: -20
+  margin-left: 20
+  margin-right: 20
+  image-source: /images/ui/windows/settings/edgeVertical
+
+GameSettingsResetButton < Button
+  id: resetButton
+  !text: tr('Reset Settings')
+  width: 160
+  &color: '#A6AAB2'
+  anchors.bottom: parent.bottom
+  anchors.horizontalCenter: next.horizontalCenter
+  @onSetup: |
+    addEvent(function()
+      local textWidget = self:getChildById('text')
+      if textWidget then
+        textWidget:setFont("poppins-semibold-14")
+      end
+    end)
+
+GameSettingsWindow < MainWindow
+  id: gameSettingsWindow
+  size: 880 704
+  anchors.centerIn: parent
+  &title: 'Settings'
+  &hotkeyId: HOTKEYS_IDS.SETTINGS
+  &iconName: 'icon_settings'
+  &isGeneralUIWindow: true
+    
+  MainWindowContent
+    GameSettingsResetButton
+    GameSettingsLeftPanel
+      margin-bottom: 50
+    GameSettingsVerticalSeparator
+      anchors.left: prev.right

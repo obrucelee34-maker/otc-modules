@@ -1,0 +1,175 @@
+GameNpcLabel < Label
+  color: #ffffff
+  text-auto-resize: true
+  //text-align: bottom
+
+GameNpcVollkorn24px < GameNpcLabel
+  font: vollkorn-24
+
+GameNpcVollkorn20px < GameNpcLabel
+  font: vollkorn-20
+
+GameNpcVollkorn18px < GameNpcLabel
+  font: vollkorn-18
+
+GameItemShopPoppinsBold14px < GameNpcLabel
+  font: poppins-semibold-14
+
+GameItemShopPoppinsBold12px < GameNpcLabel
+  font: poppins-semibold-12
+
+GameItemShopPoppins14px < GameNpcLabel
+  font: poppins-14
+
+GameItemShopPoppins12px < GameNpcLabel
+  font: poppins-12
+
+GameNpcDialogueBox < ScrollablePanel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  //padding: 4
+
+GameNpcDialogueScrollBar < VerticalScrollBar
+  anchors.top: prev.top
+  anchors.bottom: prev.bottom
+  margin-top: 2
+  margin-bottom: 2
+  pixels-scroll: true
+  step: 15
+
+GameNpcStorageSelectionPanel < SideSelect
+  id: storage_selection_panel
+  size: 200 40
+  visible: false
+  &left_text: 'Bank'
+  &right_text: 'House'
+  @onClick: function() GameBank:onChangeStorageSelection() end
+
+GameNpcHorizontalSeparator < Panel
+  id: separator
+  height: 1
+  background-color: #3a3d43
+  anchors.top: prev.bottom
+  anchors.right: parent.right
+  anchors.left: parent.left
+  margin-left: 30
+  margin-right: 30
+  opacity: 0.5
+
+GameNpcWindow < Panel
+  id: gameNpcWindow
+  image-source: /images/ui/windows/npcs/main/BgMainSeparator
+  anchors.top: parent.top
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  image-border-left: 6
+  padding-left: 6
+  draggable: false
+  focusable: true
+  phantom: false
+
+  Panel
+    id: topPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+    @onStateChange: |
+      local isOn = self:isOn()
+      self.npcPreview:setOn(isOn)
+      self.npcName:setOn(isOn)
+      self:getParent().separator:setOn(isOn)
+
+    $!on:
+      image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    $on:
+      image-source:
+
+    UIButton
+      id: bagButton
+      visible: false
+      anchors.left: parent.left
+      anchors.top: parent.top
+      size: 42 42
+      image-source: /images/ui/windows/npcs/tradepost/button_bag
+      margin-left: 10
+      margin-top: 10
+      opacity: 0.7
+
+      @onClick: |
+        GameTradepacks:toggleLeftPanel()
+
+      $on:
+        image-source: /images/ui/windows/npcs/tradepost/button_bag_active
+      $hover:
+        opacity: 1.0
+
+    UIButton
+      id: closeButton
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: 10
+      margin-right: 10
+      image-source: /images/ui/windows/base_window/close_button
+      size: 28 28
+      
+      @onClick: |
+        GameNpc:onClose()
+
+      $hover:
+        image-source: /images/ui/windows/base_window/close_button_active
+      $pressed:
+        image-source: /images/ui/windows/base_window/close_button
+
+    UICreature
+      id: npcPreview
+      anchors.verticalCenter:parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 10
+
+      $!on:
+        visible: false
+      $on:
+        visible: true
+
+    GameNpcVollkorn24px
+      id: npcName
+
+      @onStateChange: |
+        local isOn = self:isOn()
+        self:breakAnchors()
+        self:addAnchor(isOn and AnchorTop or AnchorVerticalCenter, isOn and 'prev' or 'parent', isOn and AnchorBottom or AnchorVerticalCenter)
+        self:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+
+      $!on:
+        margin-top: 5
+        margin-left: 0
+      $on:
+        margin-top: 20
+        margin-left: 5
+
+  GameNpcStorageSelectionPanel
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    $!hidden:
+      height: 40
+      margin-top: 20
+    $hidden:
+      height: 0
+      margin-top: 0
+
+  GameNpcHorizontalSeparator
+    id: separator
+
+    $!on:
+      height: 0
+      margin-top: 0
+    $on:
+      height: 1
+      margin-top: 15
+
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    margin-top: 15

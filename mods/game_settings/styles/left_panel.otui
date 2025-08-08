@@ -1,0 +1,43 @@
+SelectButton < UISelectButton
+  height: 40
+  text-hidden: true
+  &minWidth: 50
+  image-source: /images/ui/buttons/select/bgItemSelect
+  $on:
+    image-source: /images/ui/buttons/select/bgItemSelectActive
+
+  UIWidget
+    id: text
+    phantom: true
+    opacity: 1.0
+    anchors.fill: parent
+    text-align: left
+    text-auto-resize: true
+    text-offset: 20 3
+    font: poppins-14
+    $on:
+      text-color: white
+    $!on:
+      text-color: #A6AAB2
+
+  UIWidget
+    id: icon
+    phantom: true
+    opacity: 1.0
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 14
+    image-source: /images/ui/buttons/select/btnArrow
+    $on:
+      image-source: /images/ui/buttons/select/btnArrowActive
+
+GameSettingsLeftPanel < UIWidget
+  id: leftPanel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  width: 290
+  margin-left: -5
+  layout:
+    type: verticalBox
+    spacing: 10

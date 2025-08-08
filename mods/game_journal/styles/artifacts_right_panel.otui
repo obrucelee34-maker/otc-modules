@@ -1,0 +1,128 @@
+GameJournalArtifactsPanelRightPanel < ScrollablePanel
+  id: right_panel
+  anchors.right: parent.right
+  width: 400
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  margin-right: 20
+  margin-top: 7
+  margin-bottom: 7
+
+  layout:
+    type: verticalBox
+    spacing: 3
+
+  GameJournalArtifactsPanelRightPanelHeader
+
+GameJournalArtifactsPanelRightPanelHeader < UIWidget
+  id: right_panel_header
+  height: 42
+  image-source: /images/ui/windows/journal/artifacts/item_background_on
+  image-border: 5
+  UIWidget
+    id: text
+    anchors.centerIn: parent
+    text: How to acquire
+    font: poppins-18
+    text-color: #ffffff
+    text-align: center
+    text-offset: -17 5
+    text-auto-resize: true
+  UIWidget
+    id: icon
+    anchors.left: text.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/journal/artifacts/icon_placeholder
+    margin-left: 5
+
+GameJournalArtifactsPanelRightPanelScrollBar < VerticalScrollBar
+  id: right_panel_vertical_scrollbar
+  anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  step: 48
+  pixels-scroll: true
+  margin-top: 5
+  margin-bottom: 5
+  margin-right: 5
+
+GameJournalArtifactsPanelRightPanelEntry < UIWidget
+  id: acquire_row
+  image-source: /images/ui/windows/journal/artifacts/reward_row_background
+  image-border: 10
+  height: 44
+  $first:
+    margin-top: 5
+
+  UIWidget
+    id: icon
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-left: 15
+    margin-top: 10
+    size: 20 22
+    image-source: /images/ui/windows/journal/artifacts/icon_incomplete
+    $on:
+      image-source: /images/ui/windows/journal/artifacts/icon_complete
+
+  UIWidget
+    id: index
+    anchors.left: icon.right
+    margin-left: 10
+    margin-top: 12
+    text-color: #ffffff
+    text-auto-resize: true
+    anchors.top: parent.top
+    text: 1.
+    font: poppins-14
+
+  UIWidget
+    id: description
+    anchors.left: index.right
+    anchors.top: parent.top
+    anchors.right: next.left
+    margin-left: 10
+    text-wrap: true
+    margin-top: 12
+    font: poppins-14
+    margin-right: 10
+    text-color: #ffffff
+    text-align: top-left
+    text-vertical-auto-resize: true
+    padding: 10
+    @onTextChange: |
+      self:updateSize()
+    &updateSize: |
+      function(self)
+        addEvent(function()
+          local parent = self:getParent()
+          local textSize = self:getTextSize().height + 22 
+          local parentSize = parent:getSize().height
+          local additionTextSize = parent.progress:getTextSize().height
+          parent:setSize({width = parent:getSize().width, height = textSize + (parent.progress:getText() ~= '' and additionTextSize or 0)})
+        end)
+      end
+
+  UIWidget
+    id: locate_button
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-right: 15
+    margin-top: 10
+    size: 25 25
+    image-source: /images/ui/windows/journal/artifacts/locate_button
+    opacity: 1
+    $pressed:
+      opacity: 0.8
+    $hover:
+      opacity: 0.9
+
+  UIWidget
+    id: progress
+    anchors.right: description.right
+    anchors.top: description.bottom
+    anchors.bottom: parent.bottom
+    anchors.left: description.left
+    text-align: top-left
+    font: poppins-14
+    margin-top: -16

@@ -1,0 +1,7 @@
+Module
+  name: game_settings
+  description: Settings management interface for the game
+  sandboxed: true
+  scripts: [ settings ]
+  @onLoad: GameSettings:init()
+  @onUnload: GameSettings:terminate()

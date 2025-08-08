@@ -1,0 +1,9 @@
+Module
+  name: game_layout
+  description: Layout Handler
+  author: Archlight Team
+  website: www.archlightonline.com
+  sandboxed: false
+  scripts: [ layout ]
+  @onLoad: g_layout.init()
+  @onUnload: g_layout.terminate()

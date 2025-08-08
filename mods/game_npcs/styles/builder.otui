@@ -1,0 +1,646 @@
+BuilderShopLeftPanel < UIWidget
+  id: left_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  margin-top: 48
+  width: 250
+  UIWidget
+    id: content
+    anchors.fill: parent
+    BuilderShopLeftPanelList
+    BuilderShopLeftPanelListScrollBar
+
+BuilderShopLeftPanelList < ScrollablePanel
+  id: list
+  anchors.fill: parent
+  vertical-scrollbar: list_scrollbar
+  layout:
+    type: verticalBox
+    spacing: 3
+
+BuilderShopLeftPanelListCategory < UIWidget
+  &shrinkedHeight: 40
+  &expanded: true
+  layout:
+    type: verticalBox
+  &update: |
+    function(self)
+      local height = 0
+      local count = 0
+      for idx, child in ipairs(self:getChildren()) do
+        if not child.hidden then
+          if idx > 1 then
+            count = count + 1
+            child:setMarginTop(count == 1 and 10 or 1)
+          end
+          height = height + child:getHeight() + child:getMarginBottom() + child:getMarginTop()
+        end
+      end
+      self:setHeight(height + 10)
+      self.expandedHeight = height + 10
+      self.expanded = true
+      self.button_holder.right_icon:setOn(true)
+    end
+  @onSetup: |
+    self:update()
+  @onClick: |
+    self.button_holder.expand_button:onClick()
+  UIWidget
+    id: button_holder
+    width: 250
+    height: 40
+    UIButton
+      anchors.fill: parent
+      id: expand_button
+      text-align: top-left
+      font: poppins-14
+      text-color: #CED2D9
+      text-offset: 30 11
+      background-color: #00000080
+      height: 40
+      @onClick: |
+        local parent = self:getParent():getParent()
+        parent:setHeight(parent.expanded and parent.shrinkedHeight or parent.expandedHeight)
+        parent.expanded = not parent.expanded
+        self:getParent().right_icon:setOn(parent.expanded)
+    UIWidget
+      id: right_icon
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 20
+      image-auto-resize: true
+      image-source: /images/ui/windows/base_window/close_button_up
+      $on:
+        image-source: /images/ui/windows/base_window/close_button_down
+      $hover on:
+        image-source: /images/ui/windows/base_window/close_button_down_active
+      $hover !on:
+        image-source: /images/ui/windows/base_window/close_button_up_active
+      @onClick: |
+        local parent = self:getParent()
+        parent:getChildBefore(self):onClick(mousePos)
+
+BuilderShopLeftPanelListEntry < UIItem
+  margin-left: 29
+  margin-right: 29
+  margin-top: 1
+  
+  UICreature
+    id: icon
+    size: 25 25
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    image-source: /images/ui/windows/npcs/builder/item_background
+    image-border: 12
+    phantom: true
+    focusable: false
+
+  UIItem
+    id: item
+    size: 25 25
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    visible: false
+    phantom: true
+    focusable: false
+    image-source: /images/ui/windows/npcs/builder/item_background
+    image-border: 12
+
+  height: 50
+  text-align: left
+  font: poppins-16
+  text-color: #a6aab2
+  text-offset: 63 6
+  background-color: #00000040
+  $hover:
+    background-color: #00000080
+  $on:
+    text-color: #36F991
+    background-color: #00000080
+
+BuilderShopLeftPanelListScrollBar < VerticalScrollBar
+  id: list_scrollbar
+  anchors.right: parent.right
+  anchors.top: list.top
+  anchors.bottom: list.bottom
+  margin-top: 5
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true
+
+BuilderShipRightPanelTop < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  width: 212
+  anchors.bottom: craftButtonPanel.top
+  UICreature
+    id: icon
+    size: 100 100
+    padding: 5
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 56
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/npcs/builder/item_background_big
+    fixed-ratio: true
+    &tooltipEnabled: true
+    phantom: false
+  UIItem
+    id: item
+    size: 100 100
+    padding: 5
+    anchors.left: parent.left
+    anchors.top: parent.top
+    margin-top: 56
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/npcs/builder/item_background_big
+    fixed-ratio: true
+    phantom: true
+  Label
+    id: name
+    font: poppins-16
+    anchors.horizontalCenter: prev.horizontalCenter
+    anchors.top: prev.bottom
+    text-auto-resize: true
+    margin-top: 15
+  UIWidget
+    id: taxBox
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: name.horizontalCenter
+    height: 24
+    margin-top: 6
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 5
+    Label
+      font: poppins-14
+      !text: tr('Tax')..': '
+      text-auto-resize: true
+      margin-top: 4
+    UIItem
+      id: silver_icon
+      size: 24 24
+      image-source: /images/ui/icons/silver_24
+    Label
+      id: value
+      font: poppins-14
+      margin-top: 4
+      text-auto-resize: true
+      @onTextChange: |
+        local number = tonumber(self:getText())
+        if number then
+          self._internal_value = number
+          self:setText(FormatCommaNumber(number), true)
+        end
+
+BuilderShopMaterialsLabel < UIWidget
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  text: Materials
+  text-align: center
+  height: 40
+  font: poppins-semibold-16
+  background-color: #101010
+
+BuilderShopCraftButtonPanel < UIWidget
+  id: craftButtonPanel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  height: 70
+  background-color: #101010
+  border-color-top: #3A3D43
+  border-width-top: 1
+  Button
+    id: craft_button
+    text: Craft
+    &color: '#36F991'
+    width: 90
+    anchors.centerIn: parent
+
+
+BuilderShopMaterialsListPanel < ScrollablePanel
+  id: materials_list
+  //anchors.top: prev.bottom
+  anchors.top: parent.top
+  anchors.left: prev.right
+  anchors.right: parent.right
+  anchors.bottom: craftButtonPanel.top
+  margin-top: 20
+  margin-bottom: 20
+  vertical-scrollbar: materials_list_scrollbar
+  layout:
+    type: verticalBox
+
+BuilderShopMaterialsListScrollBar < VerticalScrollBar
+  id: materials_list_scrollbar
+  anchors.right: parent.right
+  anchors.top: materials_list.top
+  anchors.bottom: materials_list.bottom
+  margin-top: 5
+  margin-bottom: 5
+  margin-right: 5
+  step: 48
+  pixels-scroll: true
+
+BuilderShopMaterialsListItem < UIWidget
+  height: 70
+  padding: 0 20 0 20
+
+  UIWidget
+    id: background
+    anchors.fill: parent
+    margin-bottom: 20
+    image-source: /images/ui/windows/npcs/builder/item_background
+    image-border: 5
+
+  UIWidget
+    id: amount
+    padding: 10
+    image-source: /images/ui/windows/npcs/builder/points_background
+    image-border: 5
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: parent.left
+    text: 22/5
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text-color: #a6aab2
+    margin-left: 15
+    size: 70 30
+    $on:
+      image-source: /images/ui/windows/npcs/builder/points_background_active
+
+  UIItem
+    id: item
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: amount.right
+    margin-left: 15
+    size: 32 32
+    virtual: true
+    phantom: true
+
+  UIWidget
+    id: name
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: item.right
+    anchors.right: check_ok.left
+    margin-right: 5
+    text-align: left
+    margin-left: 12
+    font: poppins-12
+    text-wrap: true
+    text-offset: 0 2
+    text-auto-resize: true
+    text-color: #a6aab2
+
+  UIWidget
+    id: check_ok
+    image-source: /images/ui/windows/npcs/builder/check_ok
+    size: 20 20
+    anchors.verticalCenter: background.verticalCenter
+    anchors.right: background.right
+    margin-right: 15
+  
+  @onSetup: |
+    addEvent(function()
+      if self:isLast() then
+        self:setMarginBottom(30)
+      end
+    end)
+
+
+BuilderShopMaterialsListOutfit < UIWidget
+  height: 70
+  padding: 0 20 0 20
+
+  UIWidget
+    id: background
+    anchors.fill: parent
+    margin-bottom: 20
+    image-source: /images/ui/windows/npcs/builder/item_background
+    image-border: 5
+
+  UIWidget
+    id: amount
+    padding: 10
+    image-source: /images/ui/windows/npcs/builder/points_background
+    image-border: 5
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: parent.left
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text-color: #a6aab2
+    margin-left: 15
+    size: 70 30
+    $on:
+      image-source: /images/ui/windows/npcs/builder/points_background_active
+
+  UICreature
+    id: outfit
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: amount.right
+    margin-left: 15
+    size: 32 32
+    virtual: true
+    phantom: true
+
+  UIWidget
+    id: name
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: outfit.right
+    anchors.right: check_ok.left
+    margin-right: 5
+    text-align: left
+    margin-left: 12
+    font: poppins-12
+    text-wrap: true
+    text-offset: 0 2
+    text-auto-resize: true
+    text-color: #a6aab2
+
+  UIWidget
+    id: check_ok
+    image-source: /images/ui/windows/npcs/builder/check_ok
+    size: 20 20
+    anchors.verticalCenter: background.verticalCenter
+    anchors.right: background.right
+    margin-right: 15
+  
+  @onSetup: |
+    addEvent(function()
+      if self:isLast() then
+        self:setMarginBottom(30)
+      end
+    end)
+
+BuilderShopRightPanel < UIWidget
+  id: right_panel
+  height: 390
+  anchors.right: parent.right
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  background-color: #181A1D
+  border-color-top: #3A3D43
+  border-width-top: 1
+  UIWidget
+    id: content
+    anchors.fill: parent
+    BuilderShipRightPanelTop
+    BuilderShopMaterialsListPanel
+    BuilderShopCraftButtonPanel
+    BuilderShopMaterialsListScrollBar
+
+BuilderShopFilterCheckBox < UIWidget
+  size: 140 35
+  anchors.verticalCenter: parent.verticalCenter
+  font: poppins-14
+  text: Only Unlocked
+  text-offset: 25 2
+  text-color: #CED2D9
+  @onClick: |
+      local checked = not self.checkbox:isChecked()
+      self.checkbox:setChecked(checked)
+  CheckBoxSmall
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    phantom: true
+    checked: false
+
+BuilderShopFilterButton < UIWidget
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  opacity: 1.0
+  padding: 0 10 0 10
+  height: 40
+  &sortDirection: 'asc'
+  $hover:
+    opacity: 0.9
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text: Demand
+    phantom: true
+    text-color: #595c64
+    $checked:
+      text-color: #a6aab2
+    @onSetup: |
+      self:setText(self:getParent():getId():titleCase())
+  UIWidget
+    id: icon
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 11 7
+    margin-top: 1
+    phantom: true
+    image-source: /images/ui/windows/tradepacks/arrow_down
+    image-color: #595c64
+    $checked:
+      image-color: #a6aab2
+    $on:
+      image-source: /images/ui/windows/tradepacks/arrow_up
+  @onStateChange: |
+    self.icon:setOn(self:isOn())
+    self.text:setOn(self:isOn())
+  @onCheckChange: |
+    self.text:setChecked(self:isChecked())
+    self.icon:setChecked(self:isChecked())
+  @onClick: |
+    BuilderShop:sortItemsByName(self)
+
+BuilderShopFiltersSection < UIWidget
+  id: filtersSection
+  height: 40
+  padding-left: 28
+  padding-right: 28
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  layout:
+    type: horizontalBox
+    fit-children: true
+
+  TextEdit
+    id: searchInput
+    width: 220
+    !preview: tr('Search...')
+    font: poppins-15
+    text-offset: 25 0
+    image-source: /images/ui/windows/market/search_panel_background
+    image-border: 5
+    height: 40
+    padding-left: 35
+    @onTextChange: |
+      BuilderShop:onSearchEditChange(self:getText())
+    UIWidget
+      id: icon_search
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      size: 20 20
+      image-source: /images/ui/windows/tradepacks/icon_search
+      margin-left: -25
+      margin-top: -3
+  BuilderShopFilterButton
+    id: name
+    width: 110
+    margin-left: 10
+
+BuilderShopListsSection < ScrollablePanel
+  id: listSection
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: prev.bottom
+  anchors.bottom: right_panel.top
+  margin-top: 15
+  margin-bottom: 4
+  vertical-scrollbar: listSectionScrollbar
+  layout:
+    type: verticalBox
+
+BuilderShopListsPanelScrollBar < VerticalScrollBar
+  id: listSectionScrollbar
+  anchors.right: parent.right
+  anchors.top: listSection.top
+  anchors.bottom: listSection.bottom
+  margin-right: 5
+  margin-top: 5
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true
+
+BuilderShopWindow < UIWindow
+  image-source: /images/ui/windows/npcs/main/BgMainSeparator
+  anchors.top: parent.top
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  image-border-left: 6
+  padding-left: 6
+  draggable: false
+  focusable: true
+  phantom: false
+  @onEscape: BuilderShop:hide()
+
+  Panel
+    id: topPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+    @onStateChange: |
+      local isOn = self:isOn()
+      self.npcPreview:setOn(isOn)
+      self.npcName:setOn(isOn)
+      self:getParent().separator:setOn(isOn)
+
+    $!on:
+      image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    $on:
+      image-source:
+
+    UIButton
+      id: bagButton
+      visible: false
+      anchors.left: parent.left
+      anchors.top: parent.top
+      size: 42 42
+      image-source: /images/ui/windows/npcs/tradepost/button_bag
+      margin-left: 10
+      margin-top: 10
+      opacity: 0.7
+
+      @onClick: |
+        GameTradepacks:toggleLeftPanel()
+
+      $on:
+        image-source: /images/ui/windows/npcs/tradepost/button_bag_active
+      $hover:
+        opacity: 1.0
+
+    UIButton
+      id: closeButton
+      anchors.top: parent.top
+      anchors.right: parent.right
+      margin-top: 10
+      margin-right: 10
+      image-source: /images/ui/windows/base_window/close_button
+      size: 28 28
+      
+      @onClick: |
+        GameNpc:onClose()
+
+      $hover:
+        image-source: /images/ui/windows/base_window/close_button_active
+      $pressed:
+        image-source: /images/ui/windows/base_window/close_button
+
+    UICreature
+      id: npcPreview
+      anchors.verticalCenter:parent.verticalCenter
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 10
+
+      $!on:
+        visible: false
+      $on:
+        visible: true
+
+    Label
+      id: npcName
+      color: #ffffff
+      text-auto-resize: true
+      font: poppins-24
+      margin-bottom: 40
+
+      @onStateChange: |
+        local isOn = self:isOn()
+        self:breakAnchors()
+        self:addAnchor(isOn and AnchorTop or AnchorVerticalCenter, isOn and 'prev' or 'parent', isOn and AnchorBottom or AnchorVerticalCenter)
+        self:addAnchor(AnchorHorizontalCenter, 'parent', AnchorHorizontalCenter)
+
+      $!on:
+        margin-top: 5
+        margin-left: 0
+      $on:
+        margin-top: 20
+        margin-left: 5
+
+  GameNpcStorageSelectionPanel
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    $!hidden:
+      height: 40
+      margin-top: 20
+    $hidden:
+      height: 0
+      margin-top: 0
+
+  GameNpcHorizontalSeparator
+    id: separator
+
+    $!on:
+      height: 0
+      margin-top: 0
+    $on:
+      height: 1
+      margin-top: 15
+
+  Panel
+    id: contentPanel
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    margin-top: 20
+
+    BuilderShopFiltersSection
+    BuilderShopListsSection
+    BuilderShopListsPanelScrollBar
+    BuilderShopRightPanel

@@ -1,0 +1,173 @@
+GameSettingsTrueFalseOption < UIWidget
+  height: 40
+  Label
+    id: description
+    text: description
+    font: poppins-14
+    text-color: #A6AAB2
+    width: 200
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  TrueFalseSelect
+    id: trueFalseSelect
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    @onClick: |
+      self.cursor:setOn(not self.cursor:isOn())
+      self:setOn(self.cursor:isOn())
+      local value = self:isOn()
+      local stateLabel = self:getParent().stateLabel
+      if value then
+        stateLabel:setTextColor('#36F991')
+        stateLabel:setText('On')
+      else
+        stateLabel:setTextColor('#7E828B')
+        stateLabel:setText('Off')
+      end
+  Label
+    id: stateLabel
+    text: Off
+    font: poppins-14
+    text-color: #A6AAB2
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: prev.right
+    margin-left: 10
+    text-align: left
+    text-offset: 0 5
+
+GameSettingsComboBoxOption < UIWidget
+  height: 40
+  Label
+    id: description
+    text: description
+    font: poppins-14
+    text-color: #A6AAB2
+    width: 200
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    text-align: left
+    text-offset: 5 3
+  ComboBox
+    id: comboBox
+    anchors.left: prev.right
+    font: poppins-14
+    width: 200
+
+GameSettingsButtonOption < UIWidget
+  height: 40
+  margin-top: 11
+  Button
+    id: button
+    height: 39
+    width: 160
+    anchors.left: parent.left
+    anchors.bottom: parent.bottom
+    &color: '#FFA851'
+    @onSetup: |
+      addEvent(function()
+        local textWidget = self:getChildById('text')
+        if textWidget then
+          textWidget:setFont("poppins-semibold-14")
+        end
+      end)
+
+GameSettingsRestorePromptsButton < GameSettingsButtonOption
+  @onSetup: |
+    self.button:setText(tr('Restore Prompts'))
+    self.button:setTooltip(tr('Restore all hidden prompts.'))
+    self.button.onClick = function(widget)
+      local yesCallback = function()
+        if widget.confirmWindow then
+          widget.confirmWindow:destroy()
+          widget.confirmWindow = nil
+        end
+        modules.game_prompts.GamePrompts:restorePrompts()
+      end
+
+      local noCallback = function()
+        if widget.confirmWindow then
+          widget.confirmWindow:destroy()
+          widget.confirmWindow = nil
+        end
+      end
+
+      noCallback()
+
+      widget.confirmWindow = displayGeneralBox(tr('Restore Prompts'), tr('Are you sure you want to restore all hidden prompts?'), {
+        { text = tr('Yes'), callback = yesCallback },
+        { text = tr('No'), callback = noCallback }
+      }, yesCallback, noCallback, nil, modules.game_interface.getRootPanel())
+    end
+
+GameSettingsRightPanel < ScrollablePanel
+  id: rightPanel
+  margin-left: 20
+  layout:
+    type: verticalBox
+    spacing: 10
+    
+GameSettingsRightPanelScrollBar < VerticalScrollBar
+  id: rightPanelScrollBar
+  anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  margin-top: 68
+  margin-bottom: 20
+  margin-right: 7
+  step: 48
+  pixels-scroll: true
+
+GameSettingsEditInterfaceOption < GameSettingsTrueFalseOption
+  Button
+    id: restoreButton
+    height: 30
+    width: 130
+    margin-left: 20
+    !text: tr('Restore layout')
+    &tooltip: tr('Restore the layout to the last loaded backup.')
+    &color: '#FFA851'
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.left: stateLabel.right
+    &setRestore: |
+      function(self, restore)
+        self.__restore = restore
+        if restore then
+          self:setText(tr('Revert restore'))
+          self:setTooltip(tr('Revert the last restore.'))
+        else
+          self:setText(tr('Restore layout'))
+          self:setTooltip(tr('Restore the layout to the last loaded backup.'))
+        end
+      end
+    @onSetup: |
+      addEvent(function()
+        local textWidget = self:getChildById('text')
+        if textWidget then
+          textWidget:setFont("poppins-semibold-14")
+        end
+
+        local trueFalseSelect = self:getParent().trueFalseSelect
+        connect(trueFalseSelect, {
+          onStateChange = function(widget, state)
+            if state then
+              self:setRestore(false)
+            end
+          end
+        })
+      end)
+    @onClick: |
+      if self.__restore then
+        g_layout.restoreLastSaved(function()
+          self:setRestore(false)
+        end)
+      else
+        g_layout.loadBackup(function()
+          self:setRestore(true)
+        end)
+      end

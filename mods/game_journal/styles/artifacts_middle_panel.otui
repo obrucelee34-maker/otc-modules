@@ -1,0 +1,342 @@
+GameJournalArtifactsPanelMiddlePanel < UIWidget
+  id: middle_panel
+  anchors.left: parent.left
+  anchors.right: next.left
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  margin-left: 20
+  margin-top: 8
+  margin-bottom: 8
+
+  ScrollablePanel
+    id: dummy_background_panel
+    vertical-scrollbar: middle_panel_dummy_vertical_scrollbar
+    anchors.fill: parent
+    margin-right: 20
+    always-hide-scrollbar: true
+    layout:
+      type: verticalBox
+      spacing: 10
+
+  GameJournalArtifactsPanelMiddlePanelProgression
+    vertical-scrollbar: progression_scrollbar
+    phantom: true
+    margin-right: 20
+    anchors.fill: parent
+    always-hide-scrollbar: true
+    layout:
+      type: verticalBox
+      spacing: 10
+      align-top: true
+
+  GameJournalArtifactsPanelMiddlePanelProgressionScrollBar
+    phantom: true
+
+  ScrollablePanel
+    id: content_panel
+    vertical-scrollbar: middle_panel_vertical_scrollbar
+    anchors.fill: parent
+    margin-right: 20
+    layout:
+      type: verticalBox
+      spacing: 10
+
+  GameJournalArtifactsPanelMiddlePanelScrollBar
+  GameJournalArtifactsPanelMiddlePanelDummyScrollBar
+
+GameJournalArtifactsPanelMiddlePanelScrollBar < VerticalScrollBar
+  id: middle_panel_vertical_scrollbar
+  anchors.right: parent.right
+  anchors.top: content_panel.top
+  anchors.bottom: content_panel.bottom
+  step: 48
+  pixels-scroll: true
+  margin-right: 7
+  @onValueChange: |
+    function(self, value, delta)
+      local parent = self:getParent()
+      local dummy = parent:getChildById('middle_panel_dummy_vertical_scrollbar')
+      local progression = parent:getChildById('progression_scrollbar')
+      if delta > 0 then
+        dummy:increment(delta)
+        progression:increment(delta)
+      else
+        dummy:decrement(-delta)
+        progression:decrement(-delta)
+      end
+    end
+
+GameJournalArtifactsPanelMiddlePanelDummyScrollBar < VerticalScrollBar
+  id: middle_panel_dummy_vertical_scrollbar
+  anchors.right: parent.right
+  anchors.top: content_panel.top
+  anchors.bottom: content_panel.bottom
+  step: 48
+  pixels-scroll: true
+  margin-right: 7
+  mouse-scroll: false
+
+GameJournalArtifactsPanelMiddlePanelCumulativeEntry < UIWidget
+  id: cumulative_row
+  image-source: /images/ui/windows/journal/artifacts/reward_row_background
+  image-border: 10
+
+  UIWidget
+    id: icon_holder
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 19
+    size: 40 40
+    image-source: /images/ui/windows/journal/artifacts/icon_background_off
+    $on:
+      image-source: /images/ui/windows/journal/artifacts/icon_background_on
+
+    UIWidget
+      id: icon
+      anchors.centerIn: parent
+      size: 20 20
+      image-source: /images/ui/windows/journal/artifacts/icon_placeholder
+
+  UIWidget
+    id: requirement
+    anchors.left: icon_holder.right
+    text-color: #A6AAB2
+    text-vertical-auto-resize: true
+    width: 85
+    anchors.verticalCenter: parent.verticalCenter
+    text: "[1/10]"
+    font: poppins-14
+    $on:
+      text-color: white
+
+  UIWidget
+    id: description
+    anchors.left: requirement.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.right: parent.right
+    margin-right: 75
+    text-wrap: true
+    font: poppins-14
+    text-color: #A6AAB2
+    $on:
+      text-color: white
+    text-align: left
+    @onTextChange: |
+      addEvent(function()
+        local parent = self:getParent()
+        local textSize = self:getTextSize().height + 30
+        local parentSize = parent:getSize().height + 30
+        if textSize > parentSize then
+          parent:setSize({width = parent:getSize().width, height = textSize})
+        end
+      end)
+  
+  UIWidget
+    id: locate_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    size: 25 25
+    image-source: /images/ui/windows/journal/artifacts/locate_button
+    opacity: 1
+    $pressed:
+      opacity: 0.8
+    $hover:
+      opacity: 0.9
+
+  UIWidget
+    id: fairy_button
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 5
+    size: 25 25
+    image-source: /images/ui/windows/journal/artifacts/fairy_button
+    opacity: 1
+    $pressed:
+      opacity: 0.8
+    $hover:
+      opacity: 0.9
+    $disabled:
+      image-source: /images/ui/windows/journal/artifacts/fairy_button_off
+
+GameJournalArtifactsPanelMiddlePanelProgression < ScrollablePanel
+  id: progression_panel
+  width: 6
+  margin-left: 17
+
+  UIWidget
+    id: progress_holder
+    margin-left: 38
+    margin-top: 7
+    margin-bottom: 7
+    size: 6 30
+    UIWidget
+      id: background
+      image-source: /images/ui/windows/journal/artifacts/progress_background
+      image-border-top: 10
+      image-border-bottom: 10
+      image-border-left: 3
+      image-border-right: 3
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+  
+    UIWidget
+      id: fill
+      image-source: /images/ui/windows/journal/artifacts/progress_bar
+      image-border-left: 3
+      image-border-right: 3
+      image-border-top: 10
+      image-border-bottom: 10
+      anchors.top: parent.top
+      anchors.left: parent.left
+
+GameJournalArtifactsPanelMiddlePanelProgressionScrollBar < VerticalScrollBar
+  id: progression_scrollbar
+  anchors.right: content_panel.right
+  anchors.top: content_panel.top
+  anchors.bottom: content_panel.bottom
+  step: 48
+  pixels-scroll: true
+  margin-top: 5
+  margin-bottom: 5
+  margin-right: 5
+  visible: false
+  mouse-scroll: false
+
+GameJournalArtifactsPanelMiddlePanelNonCumulativeEntry < UIWidget
+  id: non_cumulative_row
+  image-source: /images/ui/windows/journal/artifacts/reward_row_background
+  image-border: 10
+
+  UIWidget
+    id: progress_holder
+    size: 6 59
+    anchors.horizontalCenter: icon_holder.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    UIWidget
+      id: background
+      image-source: /images/ui/windows/journal/artifacts/progress_background
+      image-border-top: 5
+      image-border-bottom: 5
+      image-border-left: 3
+      image-border-right: 3
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+  
+    UIWidget
+      id: fill
+      image-source: /images/ui/windows/journal/artifacts/progress_bar
+      image-border-left: 3
+      image-border-right: 3
+      image-border-top: 5
+      image-border-bottom: 5
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.bottom: parent.bottom
+      visible: false
+
+  UIWidget
+    id: icon_holder
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 19
+    size: 40 40
+    image-source: /images/ui/windows/journal/artifacts/icon_background_off
+    $on:
+      image-source: /images/ui/windows/journal/artifacts/icon_background_on
+    @onStateChange: |
+      function(self, state)
+        local parent = self:getParent()
+        local progress_holder = parent:getChildById('progress_holder')
+        progress_holder.fill:setVisible(state)
+      end
+
+    UIWidget
+      id: icon
+      anchors.centerIn: parent
+      size: 20 20
+      image-source: /images/ui/windows/journal/artifacts/icon_placeholder
+
+  UIWidget
+    id: requirement
+    anchors.left: icon_holder.right
+    margin-left: 15
+    text-color: #ffffff
+    text-auto-resize: true
+    anchors.verticalCenter: parent.verticalCenter
+    text: "[1/10]"
+    font: poppins-14
+
+  UIWidget
+    id: text_holder
+    anchors.left: requirement.right
+    anchors.right: parent.right
+    anchors.verticalCenter: requirement.verticalCenter
+    layout:
+      type: verticalBox
+      spacing: 3
+
+    UIWidget
+      id: description
+      text-wrap: true
+      font: poppins-14
+      text-color: #ffffff
+      text-align: left
+      text-vertical-auto-resize: true
+      padding-right: 50
+      @onTextChange: |
+        addEvent(function()
+          local parent = self:getParent()
+          local textSize = self:getTextSize().height
+          local parentSize = parent:getSize().height
+          local bonusTextSize = parent.subdescription:getTextSize().height
+          if textSize > parentSize then
+            parent:setSize({width = parent:getSize().width, height = textSize + bonusTextSize})
+            parent:getParent():setSize({width = parent:getSize().width, height = textSize + bonusTextSize + 30})
+          end
+
+          if #parent:getParent().requirement:getText() > 0 then
+            self:setTextOffset({x = 10, y = 0})
+            parent.subdescription:setTextOffset({x = 10, y = 0})
+          end
+        end)
+
+    UIWidget
+      id: subdescription
+      text-wrap: true
+      font: poppins-14
+      text-color: #CED2D9
+      text-align: left
+      text-vertical-auto-resize: true
+      padding-right: 50
+  
+  UIWidget
+    id: locate_button
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    size: 25 25
+    image-source: /images/ui/windows/journal/artifacts/locate_button
+    opacity: 1
+    $pressed:
+      opacity: 0.8
+    $hover:
+      opacity: 0.9
+
+  UIWidget
+    id: fairy_button
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 5
+    size: 25 25
+    image-source: /images/ui/windows/journal/artifacts/fairy_button
+    opacity: 1
+    $pressed:
+      opacity: 0.8
+    $hover:
+      opacity: 0.9
+    $disabled:
+      image-source: /images/ui/windows/journal/artifacts/fairy_button_off

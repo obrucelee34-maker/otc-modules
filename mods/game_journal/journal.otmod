@@ -1,0 +1,6 @@
+Module
+  name: game_journal
+  sandboxed: true
+  scripts: [ journal ]
+  @onLoad: GameJournal:init()
+  @onUnload: GameJournal:terminate()

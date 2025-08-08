@@ -1,0 +1,336 @@
+GameJournalArtifactsPanel < UIWidget
+  id: artifacts_panel
+  anchors.top: top_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  GameJournalArtifactsPanelLeftPanel
+  GameJournalArtifactsPanelLeftPanelVerticalScrollBar
+  GameJournalArtifactsPanelOverviewPanel
+
+GameJournalArtifactsPanelLeftPanel < ScrollablePanel
+  id: left_panel
+  width: 340
+  anchors.left: parent.left
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  vertical-scrollbar: left_panel_scrollbar
+  margin-top: 3
+
+  layout:
+    type: verticalBox
+    spacing: 2
+  
+  GameJournalArtifactsPanelLeftPanelItem
+    id: overview
+    @onClick: |
+      GameJournal:selectArtifactTab("overview")
+
+GameJournalArtifactsPanelLeftPanelVerticalScrollBar < VerticalScrollBar
+  id: left_panel_scrollbar
+  anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  step: 48
+  pixels-scroll: true
+  margin-top: 5
+  margin-bottom: 5
+  margin-right: 5
+
+GameJournalArtifactsPanelLeftPanelItem < UIWidget
+  id: item
+  size: 340 72
+  background-color: #00000025
+  $on:
+    background-color: #00000050
+  $hover:
+    background-color: #00000050
+  $pressed:
+    background-color: #00000050
+
+  UIWidget
+    id: icon_holder
+    size: 72 72
+    anchors.left: parent.left
+    anchors.top: parent.top
+    phantom: true
+    margin-left: 20
+    UIWidget
+      id: icon_background
+      anchors.centerIn: parent
+      image-source: /images/ui/windows/journal/artifacts/small_icons/overview
+      &update: |
+        function(self)
+          local textureWidth = self:getImageTextureWidth()
+          local textureHeight = self:getImageTextureHeight()
+          self:setSize({width = textureWidth, height = textureHeight})
+        end
+    UIWidget
+      id: icon
+      anchors.centerIn: parent
+      image-source: /images/ui/windows/journal/artifacts/small_icons/overview
+      &update: |
+        function(self)
+          local textureWidth = self:getImageTextureWidth()
+          local textureHeight = self:getImageTextureHeight()
+          self:setSize({width = textureWidth, height = textureHeight})
+        end
+
+  UIWidget
+    id: name
+    size: 158 72
+    anchors.left: icon_holder.right
+    anchors.verticalCenter: icon_holder.verticalCenter
+    font: poppins-16
+    text-color: #CED2D9
+    text-align: left
+    margin-left: 10
+    phantom: true
+    text-offset: 0 4
+    text: Overview
+
+  UIWidget
+    id: progress
+    size: 60 33
+    anchors.right: parent.right
+    anchors.verticalCenter: icon_holder.verticalCenter
+    margin-right: 30
+    image-source: /images/ui/windows/journal/artifacts/left_panel_progress_background
+    image-border: 5
+    font: poppins-14
+    text-color: #CED2D9
+    phantom: true
+    text-align: center
+    text: 0%
+    @onSetup: |
+      local parent = self:getParent()
+      if parent:isFirst() then
+        self:hide()
+      end
+
+GameJournalArtifactsPanelOverviewPanel < UIWidget
+  id: overview_panel
+  anchors.top: top_panel.bottom
+  anchors.left: left_panel.right
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  size: 1010 720
+  margin-top: 3
+  visible: false
+
+  UIWidget
+    id: top_panel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 107
+
+    UIWidget
+      id: title
+      size: 329 107
+      anchors.centerIn: parent
+      UIWidget
+        id: icon
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        image-source: /images/ui/windows/journal/artifacts/medium_icons/overview
+      UIWidget
+        id: text
+        anchors.left: icon.right
+        anchors.verticalCenter: parent.verticalCenter
+        font: poppins-24
+        text: Artifacts Overview
+        text-offset: 0 5
+
+    UIWidget
+      id: separator
+      background-color: #3A3D43
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: 20
+      margin-right: 20
+      anchors.bottom: parent.bottom
+      height: 1
+
+  ScrollablePanel
+    id: content_panel
+    anchors.top: top_panel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin-left: 80
+    margin-top: 15
+    margin-bottom: 15
+    vertical-scrollbar: content_panel_scrollbar
+    layout:
+      type: grid
+      num-columns: 3
+      cell-size: 250 250
+      cell-spacing: 50 17
+  
+  VerticalScrollBar
+    id: content_panel_scrollbar
+    anchors.right: parent.right
+    anchors.top: top_panel.bottom
+    anchors.bottom: parent.bottom
+    step: 48
+    pixels-scroll: true
+    margin-top: 5
+    margin-bottom: 5
+    margin-right: 5
+
+GameJournalArtifactsPanelOverviewPanelItem < UIWidget
+  size: 250 250
+  background-color: #00000080
+  
+  UIWidget
+    id: top_border
+    phantom: true
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 5
+    image-source: /images/ui/windows/journal/artifacts/overview_item_top_border
+  
+  UIWidget
+    id: bottom_border
+    phantom: true
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 5
+    image-source: /images/ui/windows/journal/artifacts/overview_item_bottom_border
+
+  UIWidget
+    id: icon_holder
+    size: 150 150
+    anchors.centerIn: parent
+    margin-top: -20
+    phantom: true
+    UIWidget
+      id: icon_background
+      anchors.centerIn: parent
+      phantom: true
+      &update: |
+        function(self)
+          local textureWidth = self:getImageTextureWidth()
+          local textureHeight = self:getImageTextureHeight()
+          self:setSize({width = textureWidth, height = textureHeight})
+        end
+    UIWidget
+      id: icon
+      anchors.centerIn: parent
+      phantom: true
+      &update: |
+        function(self)
+          local textureWidth = self:getImageTextureWidth()
+          local textureHeight = self:getImageTextureHeight()
+          self:setSize({width = textureWidth, height = textureHeight})
+        end
+  
+  UIWidget
+    id: name
+    font: poppins-24
+    text-color: white
+    text: Deadlands
+    anchors.top: icon_holder.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    phantom: true
+  UIWidget
+    id: progress_text
+    font: poppins-14
+    anchors.top: name.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-color: #CED2D9
+    text-auto-resize: true
+    phantom: true
+
+GameJournalArtifactsPanelContentPanel < UIWidget
+  id: content_panel
+  anchors.top: top_panel.bottom
+  anchors.left: left_panel.right
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  size: 1010 720
+  margin-top: 3
+  visible: false
+
+  UIWidget
+    id: top_panel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 107
+    margin-left: 53
+
+    UIWidget
+      id: title
+      size: 329 107
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      UIWidget
+        id: icon_holder
+        size: 107 107
+        anchors.left: parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        UIWidget
+          id: icon
+          anchors.centerIn: parent
+          image-source: /images/ui/windows/journal/artifacts/big_icons/glaceforde_off
+          &update: |
+            function(self)
+              local textureWidth = self:getImageTextureWidth()
+              local textureHeight = self:getImageTextureHeight()
+              self:setSize({width = textureWidth, height = textureHeight})
+            end
+        UIWidget
+          id: icon_background
+          anchors.centerIn: parent
+          image-source: /images/ui/windows/journal/artifacts/big_icons/glaceforde_on
+          &update: |
+            function(self)
+              local textureWidth = self:getImageTextureWidth()
+              local textureHeight = self:getImageTextureHeight()
+              self:setSize({width = textureWidth, height = textureHeight})
+            end
+      UIWidget
+        id: text_holder
+        anchors.left: icon_holder.right
+        anchors.verticalCenter: parent.verticalCenter
+        size: 250 107
+        layout:
+          type: verticalBox
+          fit-children: true
+        UIWidget
+          id: text
+          font: poppins-24
+          text: Artifacts Overview
+          text-auto-resize: true
+          text-align: left
+        UIWidget
+          id: progress_text
+          font: poppins-14
+          text-auto-resize: true
+          text: (25% completed)
+          text-align: left
+
+    UIWidget
+      id: separator
+      background-color: #3A3D43
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-left: -33
+      margin-right: 20
+      anchors.bottom: parent.bottom
+      height: 1
+
+  UIWidget
+    id: content_panel
+    anchors.top: top_panel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom

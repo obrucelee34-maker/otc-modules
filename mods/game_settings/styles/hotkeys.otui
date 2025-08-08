@@ -1,0 +1,182 @@
+GameSettingsHotkeysCategory < UIWidget
+  id: category
+  height: 40
+
+  GameSettingsHotkeysCategoryHeader
+  GameSettingsHotkeysCategoryContent
+
+  @onStateChange: |
+    local height = 40
+    if self:isOn() then
+      self.content:setVisible(true)
+      height = height + self.content:getHeight()
+    else
+      self.content:setVisible(false)
+    end
+
+    self.header.expand:setOn(self:isOn())
+
+    self:setHeight(height)
+
+GameSettingsHotkeysCategoryHeader < UIWidget
+  id: header
+  height: 40
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+
+  GameSettingsHotkeysCategoryLabelLeft
+    id: name
+    text: 'Movement'
+    anchors.left: parent.left
+    anchors.right: primary.left
+    margin-right: 2
+  GameSettingsHotkeysCategoryLabelCenter
+    id: primary
+    text: Primary
+    width: 150
+    anchors.right: secondary.left
+    margin-right: 2
+  GameSettingsHotkeysCategoryLabelCenter
+    id: secondary
+    text: Secondary
+    width: 150
+    anchors.right: expand.left
+    margin-right: 2
+  GameSettingsHotkeysCategoryExpand
+    anchors.right: parent.right
+
+GameSettingsHotkeysCategoryLabelCenter < UIWidget
+  height: 40
+  color: #CED2D9
+  font: poppins-14
+  text-align: center
+  image-source: /images/ui/windows/settings/hotkeys/category_column_bg
+  image-border: 3
+
+GameSettingsHotkeysCategoryLabelLeft < GameSettingsHotkeysCategoryLabelCenter
+  text-align: left
+  text-offset: 15 0
+
+GameSettingsHotkeysCategoryExpand < UIWidget
+  id: expand
+  size: 40 40
+  image-source: /images/ui/windows/settings/hotkeys/category_column_bg
+  image-border: 3
+
+  UIWidget
+    id: expand
+    size: 24 24
+    anchors.centerIn: parent
+    phantom: true
+    image-source: /images/ui/windows/settings/hotkeys/expand_plus
+    $on:
+      image-source: /images/ui/windows/settings/hotkeys/expand_minus
+
+  @onStateChange: |
+    self.expand:setOn(self:isOn())
+    
+  @onClick: |
+    self:getParent():getParent():setOn(not self:isOn())
+
+GameSettingsHotkeysCategoryContent < UIWidget
+  id: content
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 40
+  visible: false
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 2
+
+
+GameSettingsHotkeysCategoryItem < UIWidget
+  id: hotkey_item
+  height: 50
+  image-source: /images/ui/windows/settings/hotkeys/category_item_bg
+  image-border: 3
+
+  UIWidget
+    id: name
+    height: 40
+    anchors.left: parent.left
+    anchors.right: key1.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 2
+    color: #CED2D9
+    font: poppins-14
+    text-align: left
+    text-offset: 15 0
+    text-wrap: true
+  GameSettingsHotkeysCategoryItemKey
+    id: key1
+    anchors.right: key2.left
+    margin-right: 3
+  GameSettingsHotkeysCategoryItemKey
+    id: key2
+    anchors.right: parent.right
+    margin-right: 40
+
+GameSettingsHotkeysCategoryItemKey < UIWidget
+  size: 150 40
+  anchors.verticalCenter: parent.verticalCenter
+  padding: 5
+  font: poppins-14
+  text-color: #CED2D9
+  image-source: /images/ui/windows/settings/hotkeys/category_item_key_bg
+
+  $on !checked:
+    image-source: /images/ui/windows/settings/hotkeys/category_item_key_bg_on
+  $hover !on !checked:
+    image-source: /images/ui/windows/settings/hotkeys/category_item_key_bg_hover
+  $checked:
+    image-source: /images/ui/windows/settings/hotkeys/category_item_key_bg_error
+    text-color: #FF5151
+
+  @onClick: modules.game_settings.GameSettings:editHotkey(self)
+
+GameSettingsHotkeysBottomContent < UIWidget
+  height: 84
+  margin-bottom: -20
+  margin-left: -20
+  margin-right: -27
+  image-source: /images/ui/windows/settings/rightBottomPanelBg
+  UIWidget
+    id: content
+    size: 470 51
+    anchors.centerIn: parent
+    UnderscoreButton
+      id: reset_button
+      !text: tr('Restore Defaults')
+      enabled: false
+      anchors.left: parent.left
+      anchors.verticalCenter: parent.verticalCenter
+      @onClick: modules.game_settings.GameSettings:resetHotkeys()
+    UIWidget
+      id: info
+      size: 314 51
+      margin-left: 40
+      anchors.left: prev.right
+      anchors.right: parent.right
+      image-source: /images/ui/windows/settings/hotkeys/info_bg
+      UIWidget
+        id: icon
+        size: 24 24
+        margin-left: 12
+        image-source: /images/ui/windows/settings/hotkeys/info_icon
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+      UIWidget
+        id: text
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: icon.right
+        anchors.right: parent.right
+        margin-left: 12
+        margin-right: 12
+        text-color: #CED2D9
+        font: poppins-14
+        text: Press Backspace or Delete when a box is selected to unassign the hotkey.
+        text-auto-resize: true
+        text-wrap: true

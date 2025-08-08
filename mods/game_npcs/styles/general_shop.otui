@@ -1,0 +1,334 @@
+GeneralShopSelectionPanel < SideSelect
+  id: general_shop_selection_panel
+  size: 200 40
+  &left_text: 'Buy'
+  &right_text: 'Sell'
+  @onClick: |
+    GeneralShop:onChangeTypeSelection()
+
+GeneralShopItem < UIWidget
+  id: item
+  height: 65
+  image-border: 5
+  phantom: false
+  disabled: false
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  @onEnableChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setEnabled(self:isEnabled())
+    end
+
+  Item
+    id: item
+    size: 46 46
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: false
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+  GameItemShopPoppins14px
+    id: name
+    text-color: white
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    height: 20
+    margin-top: 2
+    margin-left: 10
+    margin-right: 10
+    phantom: false
+    text-wrap: false
+    text-auto-resize: true
+    @onTextChange: |
+      self:setTooltip(self:getText())
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+  Panel
+    id: silver_icon
+    size: 12 12
+    image-source: /images/ui/icons/silver_24
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 2
+    margin-left: 0
+
+  GameItemShopPoppins12px
+    id: silver_price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    phantom: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GeneralShopItemInfoLabel < Panel
+  height: 18
+
+  Panel
+    id: icon
+    size: 18 18
+    image-source: /images/ui/icons/silver_24
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 24
+  
+  GameItemShopPoppinsBold14px
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: icon.left
+    margin-right: 34
+    text-offset: 0 2
+    text-align: right
+    text-auto-resize: true
+
+  GameItemShopPoppinsBold12px
+    id: silver
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: icon.right
+    margin-left: 8
+    phantom: true
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GeneralShopItemInfo < GeneralShopItem
+  width: 270
+
+  UIWidget
+    id: count_panel
+    anchors.verticalCenter: silver_price.verticalCenter
+    anchors.right: parent.right
+    size: 120 20
+
+    UIWidget
+      id: plus
+      image-source: /images/ui/windows/npcs/main/btnPlus
+      anchors.left: next.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-left: 8
+      @onClick: |
+        local label = self:getParent().count
+        local n = tonumber(label:getText()) or 0
+        label:setText(math.min(n+1, (self:getParent():getParent().real_count or 100)))
+
+    UITextEdit
+      id: count
+      size: 50 20
+      text-align: center
+      text-offset: 0 2
+      padding-left: 7
+      padding-right: 7
+      image-source: /images/ui/windows/npcs/main/BgIcon
+      anchors.right: parent.right
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 35
+      text-auto-resize: false
+      focusable: true
+      font: poppins-semibold-14
+      @onTextChange: GeneralShop.onItemCountChange(self, self:getText())
+
+    UIWidget
+      id: minus
+      image-source: /images/ui/windows/npcs/main/btnMinus
+      anchors.right: prev.left
+      anchors.verticalCenter: parent.verticalCenter
+      margin-right: 8
+      @onClick: |
+        local label = self:getParent().count
+        local n = tonumber(label:getText()) or 0
+        label:setText(math.max(n-1, 0))
+
+
+GameGeneralShopPanel < Panel
+  id: gameGeneralShopPanel
+  anchors.fill: parent
+
+  GeneralShopSelectionPanel
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+
+  Panel
+    id: filterPanel
+    height: 40
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-left: 10
+    margin-right: 10
+    margin-top: 10
+
+    UITextEdit
+      id: textEdit
+      height: 40
+      image-source: /images/ui/windows/npcs/main/search_background
+      image-border: 4
+      font: poppins-12
+      padding: 10
+      text-align: left
+      text-offset: 0 5
+      selection-color: #272727
+      selection-background-color: #cccccc
+      color: #5B5B5B
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 8
+
+      @onTextChange: |
+        GeneralShop:onSearchFilter(self)
+
+      UIWidget
+        id: placeholder
+        font: poppins-12
+        !text: tr('Search item...')
+        text-align: left
+        text-offset: 0 5
+        color: #5B5B5B
+        opacity: 0.6
+        anchors.fill: parent
+        phantom: true
+
+  Panel
+    id: bottomPanel
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+    layout:
+      type: verticalBox
+      fit-children: true
+      spacing: 5
+
+    UIWidget
+      id: shopItemInfoHolder
+      height: 65
+      margin-top: 10
+      GeneralShopItemInfo
+        id: shopItemInfo
+        anchors.centerIn: parent
+
+    UIWidget
+      id: itemQualityHolder
+      height: 50
+      margin-top: 10
+      UIWidget
+        id: itemQuality
+        size: 270 50
+        anchors.centerIn: parent
+
+        GameItemShopPoppinsBold14px
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          text-offset: 0 2
+          text: Quality
+
+        ComboBox
+          id: comboBox
+          font: poppins-14
+          width: 165
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+
+    GeneralShopHorizontalSeparator
+      margin-top: 15
+
+    GeneralShopItemInfoLabel
+      id: silver_balance
+      margin-top: 10
+
+      @onSetup: |
+        self:getChildById('text'):setText('Your Coins')
+
+    GeneralShopItemInfoLabel
+      id: total_cost
+      margin-top: 5
+
+      @onSetup: |
+        self:getChildById('text'):setText('Total')
+
+    UIWidget
+      id: buttonHolder
+      height: 70
+      margin-top: 10
+      Button
+        id: buyButton
+        width: 110
+        anchors.centerIn: parent
+        &color: '#77d463'
+        text: Buy
+
+      Button
+        id: sellButton
+        width: 110
+        anchors.centerIn: parent
+        &color: '#77d463'
+        text: Sell
+        visible: false
+
+GeneralShopItemsPanel < Panel
+  anchors.fill: parent
+  anchors.top: filterPanel.bottom
+  anchors.bottom: bottomPanel.top
+  visible: false
+  ScrollablePanel
+    id: itemsPanel
+    vertical-scrollbar: itemsPanelScrollbar
+    anchors.fill: parent
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: grid
+      cell-size: 246 61
+      cell-spacing: 6 6
+      flow: true
+
+  GameNpcDialogueScrollBar
+    id: itemsPanelScrollbar
+    anchors.right: prev.right
+    margin-right: 0
+    step: 75
+    margin-top: 10
+    margin-bottom: 10
+
+GeneralShopHorizontalSeparator < Panel
+  id: separator
+  height: 1
+  background-color: #3a3d43
+  margin-left: 30
+  margin-right: 30
+  opacity: 0.5

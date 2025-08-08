@@ -1,0 +1,366 @@
+GearBreakdownShopItem < UIWidget
+  id: item
+  height: 65
+  image-border: 5
+  phantom: false
+  disabled: false
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  @onEnableChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setEnabled(self:isEnabled())
+    end
+
+  Item
+    id: item
+    size: 46 46
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: false
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+  GameItemShopPoppins14px
+    id: name
+    text-color: white
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    height: 20
+    margin-top: 2
+    margin-left: 10
+    margin-right: 10
+    phantom: false
+    text-wrap: false
+    text-auto-resize: true
+    @onTextChange: |
+      self:setTooltip(self:getText())
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+  Panel
+    id: dawn_essence_icon
+    size: 12 12
+    image-source: /images/ui/windows/premium_store/icon_purchase_dawn_essence
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 2
+    margin-left: 0
+
+  GameItemShopPoppins12px
+    id: dawn_essence_price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    phantom: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GearBreakdownShopRankPanel < UIWidget
+  id: rank_panel
+  height: 40
+  &shrinkedHeight: 40
+  &expandedHeight: 40
+  &expanded: false
+
+  @onClick: |
+    if self.expanded then
+      self.expanded = false
+      self:setHeight(self.shrinkedHeight)
+      self.list:setVisible(false)
+      self.toggle_button:setOn(false)
+    else
+      self.expanded = true
+      self:setHeight(self.expandedHeight)
+      self.list:setVisible(true)
+      self.toggle_button:setOn(true)
+    end
+
+  UIWidget
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 40
+    background-color: #1a1a1a80
+    phantom: true
+
+  UIWidget
+    id: name
+    anchors.left: parent.left
+    anchors.top: parent.top
+    text-auto-resize: true
+    margin-left: 20
+    margin-top: 12
+    font: poppins-semibold-14
+    text-color: #a6aab2
+    phantom: true
+    $on:
+      text-color: #77d463
+    text-align: left
+    text: Rank 1 - Recruit
+
+  UIWidget
+    id: lock_icon
+    anchors.left: name.right
+    phantom: true
+    anchors.verticalCenter: name.verticalCenter
+    margin-left: 20
+    size: 16 16
+    visible: false
+    image-source: /images/ui/windows/spelltree/lock
+
+  UIWidget
+    id: toggle_button
+    anchors.right: parent.right
+    anchors.verticalCenter: name.verticalCenter
+    margin-right: 20
+    size: 25 25
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+  
+  UIWidget
+    id: list
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: toggle_button.bottom
+    anchors.bottom: parent.bottom
+    margin-top: 20
+    layout:
+      type: grid
+      num-columns: 2
+      cell-spacing: 15 15
+      cell-size: 235 65
+
+    &update: |
+      function(self)
+        local parent = self:getParent()
+        local itemsHeight = 40
+        local visibleCount = 0
+        for index, item in pairs(self:getChildren()) do
+          if not item.hidden then
+            visibleCount = visibleCount + 1
+            if visibleCount % 2 == 1 then
+              itemsHeight = itemsHeight + item:getHeight() + 15
+              item:setMarginLeft(20)
+            else
+              item:setMarginLeft(0)
+            end
+          end
+        end
+        parent.expandedHeight = itemsHeight
+      end
+
+    @onSetup: |
+      self:update()
+
+GearBreakdownShopItemInfoLabel < Panel
+  size: 250 18
+
+  GameItemShopPoppinsBold14px
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-offset: 0 -1
+
+  Panel
+    id: icon
+    size: 18 18
+    image-source: /images/ui/windows/premium_store/icon_purchase_dawn_essence
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 25
+
+  GameItemShopPoppinsBold12px
+    id: dawn_essence_price
+    text: 0
+    text-auto-resize: true
+    //text-align: center
+    text-offset: 0 2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 8
+    phantom: true
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GameGearBreakdownShopPanel < Panel
+  id: gameGearBreakdownShopPanel
+  anchors.fill: parent
+
+  Panel
+    id: filterPanel
+    height: 40
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: 10
+    margin-right: 10
+
+    UITextEdit
+      id: textEdit
+      height: 40
+      image-source: /images/ui/windows/npcs/main/search_background
+      image-border: 4
+      font: poppins-12
+      padding: 10
+      text-align: left
+      text-offset: 0 5
+      selection-color: #272727
+      selection-background-color: #cccccc
+      color: #5B5B5B
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 8
+
+      @onTextChange: |
+        GearBreakdownShop:onSearchFilter(self)
+
+      UIWidget
+        id: placeholder
+        font: poppins-12
+        !text: tr('Search item...')
+        text-align: left
+        text-offset: 0 5
+        color: #5B5B5B
+        opacity: 0.6
+        anchors.fill: parent
+        phantom: true
+
+  ScrollablePanel
+    id: itemsPanel
+    vertical-scrollbar: itemsPanelScrollbar
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    anchors.bottom: bottomPanel.top
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: verticalBox
+      spacing: 8
+
+  GameNpcDialogueScrollBar
+    id: itemsPanelScrollbar
+    anchors.right: prev.right
+    margin-right: 0
+    step: 75
+    margin-top: 10
+    margin-bottom: 10
+
+  Panel
+    id: bottomPanel
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+
+    $on checked:
+      height: 310
+    $on !checked:
+      height: 260
+    $!on:
+      height: 0
+
+    GearBreakdownShopItem
+      id: shopItemInfo
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 15
+
+    UIWidget
+      id: itemQuality
+      height: 50
+      anchors.top: prev.bottom
+      anchors.left: prev.left
+      anchors.right: prev.right
+      margin-top: 15
+
+      $on:
+        height: 50
+      $!on:
+        height: 0
+
+      GameItemShopPoppinsBold14px
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text-offset: 0 -1
+        text: Quality
+
+      ComboBox
+        id: comboBox
+        font: poppins-14
+        width: 165
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+
+    GameNpcHorizontalSeparator
+      margin-top: 15
+
+    GearBreakdownShopItemInfoLabel
+      id: dawn_essence
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 15
+
+      @onSetup: |
+        self:getChildById('text'):setText('Your Dawn Essence')
+
+    GearBreakdownShopItemInfoLabel
+      id: cost
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 5
+      margin-left: 39
+
+      @onSetup: |
+        self:getChildById('text'):setText('Total')
+
+    Button
+      id: breakButton
+      width: 110
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Break
+      @onClick: ItemShop:sellItem()

@@ -1,0 +1,148 @@
+GameDialogueButtonText < GameNpcVollkorn18px
+  id: text
+  height: 20
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-left: 18
+  margin-right: 10
+  text-align: left
+  text-offset: 0 -1
+  on: false
+
+GameDialogueButtonIcon < UIWidget
+  id: icon
+  image-offset: 0 -2
+  image-color: #bbbbbbaa
+  anchors.left: parent.left
+  anchors.verticalCenter: parent.verticalCenter
+  margin-left: 75
+  phantom: true
+
+  $!disabled:
+    size: 30 35
+  $disabled:
+    size: 0 0
+
+GameDialogueButton < UIButton
+  height: 35
+  anchors.left: parent.left
+  margin-top: 5
+  padding: 5
+  padding-left: 40
+  padding-top: 3
+  on: false
+
+  @onClick: |
+    GameNpc:buttonClicked(self, self:getId(), self.text:getText())
+  @onHoverChange: |
+    local isHover = self:isHovered() self.text:setOn(isHover) self.icon:setOn(isHover)
+
+  $hover:
+    image-source: /images/ui/windows/npcs/main/activeSentence
+  $!hover:
+    image-source:
+
+  GameDialogueButtonText
+    anchors.left: next.right
+    on: false
+
+    $on:
+      color: #f6f1e8
+    $!on:
+      color: #948a7d
+
+  GameDialogueButtonIcon
+    margin-left: 2
+    phantom: true
+    on: false
+
+    $on !disabled:
+      image-color: #ffffff
+    $!on !disabled:
+      image-color: #bbbbbbaa
+
+GameDialogueLogButton < UIButton
+  height: 35
+  anchors.left: parent.left
+  margin-top: 5
+  padding: 5
+  padding-left: 0
+  padding-top: 3
+  phantom: true
+
+  GameDialogueButtonText
+    anchors.left: parent.left
+    opacity: 0.6
+
+  GameDialogueButtonIcon
+    image-color: #bbbbbbaa
+    margin-left: 75
+    phantom: true
+
+GameDialoguePanel < ScrollablePanel
+  id: gameNpcDialoguePanel
+  anchors.fill: parent
+
+  GameNpcDialogueBox
+    anchors.fill: parent
+    vertical-scrollbar: dialogueScrollBar
+
+    Panel
+      height: 0
+      image-source: /images/ui/windows/npcs/main/BgSelectQuest
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: parent.top
+      padding: 20
+      padding-left: 25
+
+      GameNpcVollkorn24px
+        id: questionName
+        color: #ffa851
+        anchors.top: parent.top
+        anchors.left: parent.left
+        margin-top: 15
+
+      GameNpcVollkorn18px
+        id: questionLabel
+        color: #d6c0a2
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: prev.bottom
+        margin-top: 15
+        padding-right: 10
+        text-auto-resize: true
+        text-wrap: true
+      
+        @onGeometryChange: |
+          local height = self:getParent():getPaddingTop() + self:getParent():getPaddingBottom()
+          for _, child in ipairs(self:getParent():getChildren()) do
+            height = height + child:getHeight() + child:getMarginTop() + child:getMarginBottom()
+          end
+          self:getParent():setHeight(height)
+
+    Panel
+      id: dialogueAnswerPanel
+      height: 0
+      image-source: /images/ui/windows/npcs/main/BgSelectQuest
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      padding-bottom: 15
+
+    Panel
+      id: dialogueLogPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.top: prev.bottom
+      padding-top: 10
+      padding-bottom: 15
+
+      Panel
+        id: dummy
+        anchors.top: parent.top
+
+  GameNpcDialogueScrollBar
+    id: dialogueScrollBar
+    anchors.right: parent.right
+    margin-right: 5

@@ -1,0 +1,38 @@
+Module
+  name: game_npcs
+  author: LPE
+  scripts: [ npc, itemshop, warehouse, tradepost, fishpost, builder, bank, rangers_company_shop, rangers_company_specialshop, gear_breakdown_shop, culled_eyes_shop, accessory_shop, moa_exchange_shop, harvest_shop, general_shop ]
+
+  @onLoad: |
+    GameNpc:init()
+    ItemShop:init()
+    PortWarehouse:init()
+    Tradepost:init()
+    Fishpost:init()
+    BuilderShop:init()
+    GameBank:init()
+    RangersCompanyShop:init()
+    GearBreakdownShop:init()
+    CulledEyesShop:init()
+    AccessoryShop:init()
+    MoaExchange:init()
+    HarvestShop:init()
+    GeneralShop:init()
+    RangersCompanySpecialShop:init()
+
+  @onUnload: |
+    GameNpc:terminate()
+    ItemShop:terminate()
+    PortWarehouse:terminate()
+    Tradepost:terminate()
+    Fishpost:terminate()
+    BuilderShop:terminate()
+    GameBank:terminate()
+    RangersCompanyShop:terminate()
+    GearBreakdownShop:terminate()
+    CulledEyesShop:terminate()
+    AccessoryShop:terminate()
+    MoaExchange:terminate()
+    HarvestShop:terminate()
+    GeneralShop:terminate()
+    RangersCompanySpecialShop:terminate()

@@ -1,0 +1,225 @@
+GameMoaExchangePagination < Panel
+  id: pagination_panel
+  height: 50
+  image-source: /images/ui/windows/transport/pagination_background
+  image-border: 5
+
+  UIWidget
+    id: count
+    font: poppins-14
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 20
+    text-auto-resize: true
+    text-offset: 0 3
+    color: #CED2D9
+    text: 1-6 of 10
+
+  UIWidget
+    id: current
+    font: poppins-14
+    image-source: /images/ui/windows/transport/square_background
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 10
+    text-offset: 0 3
+    color: #CED2D9
+
+  UIWidget
+    id: total
+    font: poppins-14
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 10
+    text-auto-resize: true
+    text-offset: 0 3
+    color: #CED2D9
+
+  UIWidget
+    id: back
+    image-source: /images/ui/windows/transport/left_arrow
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: next.left
+    margin-right: 10
+    opacity: 0.7
+    $hover:
+      opacity: 1.0
+    $disabled:
+      opacity: 0.4
+    @onClick: |
+      function(self)
+        if MoaExchange.currentPagination > 1 then
+            MoaExchange:requestPaginationMountList(MoaExchange.currentPagination - 1)
+        end
+      end
+  
+  UIWidget
+    id: next
+    image-source: /images/ui/windows/transport/right_arrow
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 20
+    opacity: 0.8
+    $hover:
+      opacity: 1.0
+    $disabled:
+      opacity: 0.4
+    @onClick: |
+      function(self)
+        if MoaExchange.currentPagination < tonumber(self:getParent().total:getText()) then
+          MoaExchange:requestPaginationMountList(MoaExchange.currentPagination + 1)
+        end
+      end
+
+GameMoaExchangeTooltip < Panel
+  id: tooltip_panel
+  height: 50
+  image-source: /images/ui/windows/npcs/main/tooltip_background
+  image-border: 10
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 10
+  text: Select two Moas of the same tier to receive a random Moa of lower, same or higher tier. The received Moa can't be bred.
+  text-align: center
+  text-wrap: true
+  color: #CED2D9
+  font: poppins-14
+
+GameMoaExchangeReward < Panel
+  id: reward_panel
+  size: 310 65
+  image-source: /images/ui/windows/npcs/moaexchange/mount_panel
+  image-border: 10
+
+  Panel
+    id: outfit
+    image-source: /images/ui/windows/npcs/moaexchange/mount_background
+    image-border: 5
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 10
+    padding: 3
+
+    UIWidget
+      id: placeholder
+      anchors.fill: parent
+      image-source: /images/ui/windows/npcs/moaexchange/mount_preview
+
+  UIWidget
+    font: poppins-16
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 20
+    text-offset: 0 5
+    text-auto-resize: true
+    text-align: left
+    color: white
+    text: Random Moa
+
+  UIWidget
+    id: count
+    size: 32 26
+    font: poppins-16
+    image-source: /images/ui/windows/transport/square_background
+    image-border: 5
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    text-offset: 0 5
+    text-align: center
+    color: white
+    text: 0
+
+GameMoaExchangeShopPanel < Panel
+  id: gameMoaExchangeShopPanel
+  anchors.fill: parent
+
+  GameMoaExchangeTooltip
+
+  ScrollablePanel
+    id: list
+    anchors.top: prev.bottom
+    anchors.bottom: pagination_panel.top
+    anchors.left: prev.left
+    anchors.right: prev.right
+    vertical-scrollbar: scrollbar
+    margin-top: 15
+    //border: 1 green
+    layout:
+      type: grid
+      num-columns: 3
+      cell-size: 145 175
+      cell-spacing: 29 10
+
+  VerticalScrollBar
+    id: scrollbar
+    anchors.top: list.top
+    anchors.bottom: next.top
+    anchors.left: list.right
+    pixels-scroll: true
+    margin-bottom: 10
+    step: 32
+
+  GameMoaExchangePagination
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+
+  UIWidget
+    id: spacer
+    anchors.bottom: next.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    background-color: #2d3132
+    height: 1
+
+  Panel
+    id: bottomPanel
+    height: 230
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+
+    UIWidget
+      font: poppins-16
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 10
+      text-auto-resize: true
+      text-align: center
+      color: #36F991
+      text: Exchange
+
+    GameMoaExchangeReward
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 10
+
+    UIWidget
+      id: spacer
+      anchors.top: prev.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 20
+      background-color: #2d3132
+      height: 1
+
+    SuccessButton
+      id: exchangeButton
+      size: 60 40
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-bottom: 10
+      text: 0
+      &resizeText: true
+      &minWidth: 60
+      &iconPath: '/images/ui/icons/silver_24'
+      &iconAlign: left
+      &iconOffset: '20 0'
+      &textMarginLeft: 25
+      &iconColor: white
+      @onSetup: self.icon:setChecked(true)
+      @onClick: |
+        MoaExchange:requestMoaExchange()

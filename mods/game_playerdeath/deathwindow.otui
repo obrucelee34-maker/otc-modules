@@ -1,0 +1,278 @@
+SpawnOptionButton < Button
+  width: 145
+  &color: '#e7b131'
+  &resizeText: true
+
+DeathWindowTitle < UILabel
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 25
+  text-auto-resize: true
+  font: poppins-semibold-30
+  color: #e7b131
+
+UIDeathWindow < Panel
+  image-source: /images/ui/windows/player_death/death_background
+  anchors.centerIn: parent
+  draggable: false
+  padding: 10
+  padding-top: 28
+
+  UIWidget
+    id: title
+    font: poppins-20
+    image-source: /images/ui/windows/player_death/title_background
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.top
+    text-algin: center
+    text-offset: 0 4
+
+DeathFadeBackground < Panel
+  id: deathFadeBackground
+  image-source: /images/ui/windows/player_death/blur_background
+  anchors.fill: parent
+  visible: true
+  phantom: false
+
+DeathWindow < UIDeathWindow
+  id: deathWindow
+  size: 650 422
+  image-source: /images/ui/windows/player_death/death_background
+  &baseWidth: 650
+  &baseHeight: 422
+  visible: true
+  @onSetup: |
+    self.title:setText('You Died')
+  
+  Panel
+    height: 242
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 45
+    Label
+      id: subtitle
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      font: poppins-14
+      height: 30
+      text-wrap: true
+      text-align: center
+
+    Label
+      id: closestSpawnPoint
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      font: poppins-semibold-16
+      margin-top: 20
+
+    Panel
+      id: mapPanel
+      size: 650 140
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+
+      UIWidget
+        id: minimap
+        anchors.centerIn: parent
+        visible: false
+
+      UIWidget
+        image-source: /images/ui/windows/player_death/map_border_top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.top
+
+      UIWidget
+        image-source: /images/ui/windows/player_death/map_border_bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.bottom
+
+  Label
+    !text: tr('Choose which shrine your spirit shall be guided to:')
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-16
+
+  Panel
+    height: 1
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin-bottom: 10
+    border: 1 #3A3D43
+
+  UIWidget
+    id: buttonsPanel
+    height: 49
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 10
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 10
+
+DeathPenaltyTextPanel < Panel
+  width: 300
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+
+  Label
+    id: price
+    height: 30
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-24
+    margin-top: 20
+    text-align: left
+    text-offset: 35 -2
+    text-auto-resize: true
+    icon-size: 30 30
+    icon-align: left
+
+  Label
+    id: desc
+    height: 20
+    font: poppins-14
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: prev.horizontalCenter
+    text-auto-resize: true
+    text-align: center
+    margin-top: 5
+
+  Label
+    id: total
+    height: 20
+    font: poppins-12
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: prev.horizontalCenter
+    text-auto-resize: true
+    text-align: left
+    icon-size: 20 20
+    icon-align: topleft
+    margin-top: 15
+
+DeathPenaltyWindow < UIDeathWindow
+  id: deathPenaltyWindow
+  size: 650 379
+  image-source: /images/ui/windows/player_death/penalty_background
+  &baseWidth: 650
+  &baseHeight: 379
+  visible: true
+  @onSetup: |
+    self.title:setText('Restore Your Soul')
+    local locale = g_settings.get('locale') or 'en-GB'
+    if locale == 'en-GB' then
+      self.closestSpawnPoint:setFont('poppins-semibold-16')
+    end
+
+  Label
+    id: subtitle
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    font: poppins-14
+    margin-top: 30
+    padding: 10
+    text-align: center
+    text-auto-resize: true
+    text-wrap: true
+
+  Label
+    id: closestSpawnPoint
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    font: poppins-semibold-14
+    text-align: center
+    margin-top: 10
+
+  Panel
+    id: middlePanel
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 20
+    image-source: /images/ui/windows/player_death/panel_background
+
+    Panel
+      width: 1
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      border: 1 #3A3D43
+      margin: 15
+
+    DeathPenaltyTextPanel
+      id: leftPanel
+      anchors.left: parent.left
+      @onSetup: |
+        self.desc:setText('Death Penalty')
+        self.total.baseText = tr('Current Penalty =        ')
+        self.total:setIconOffset(g_settings.get('locale') == 'pt-BR' and {x = 106, y = -5} or {x = 100, y = -5})
+        self.price:setIcon('/images/ui/windows/player_death/icon_skull')
+        self.total:setIcon('/images/ui/windows/player_death/icon_skull')
+
+    DeathPenaltyTextPanel
+      id: rightPanel
+      anchors.right: parent.right
+      @onSetup: |
+        self.desc:setText('Silver to restore your Soul')
+        self.total.baseText = tr('Current Silver =          ')
+        self.total:setIconOffset(g_settings.get('locale') == 'pt-BR' and {x = 75, y = -5} or {x = 92, y = -5})
+        self.price:setIcon('/images/ui/icons/silver_44')
+        self.total:setIcon('/images/ui/icons/silver_24')
+
+  Panel
+    height: 1
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: next.top
+    margin-bottom: 10
+    border: 1 #3A3D43
+
+  UIWidget
+    id: buttonsPanel
+    height: 49
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 10
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 10
+
+    SpawnOptionButton
+      id: death
+      text: Death Penalty
+      &color: '#FF5151'
+      @onClick: modules.game_playerdeath.PlayerDeath:sendOpcode({ action = 'death_penalty_reject' })
+    SpawnOptionButton
+      id: silver
+      text: Pay the Silver
+      &color: nil
+      @onClick: modules.game_playerdeath.PlayerDeath:sendOpcode({ action = 'death_penalty_accept' })
+    SpawnOptionButton
+      id: customButton
+      &color: nil
+
+  UIWidget
+    id: timerPanel
+    anchors.fill: prev
+    visible: true
+    image-source: /images/ui/windows/player_death/timer_background
+    image-border: 10
+    
+    UIWidget
+      id: timer
+      image-source: /images/ui/windows/player_death/timer_icon
+      anchors.centerIn: parent
+      image-size: 27 27
+      text: 00:00
+      font: poppins-18
+      text-color: #FFA851
+      text-offset: 27 6
+      text-auto-resize: true

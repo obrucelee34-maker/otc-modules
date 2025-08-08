@@ -1,0 +1,20 @@
+PerformanceGraphsWidget < UIWindow
+  id: performanceGraphs
+  size: 230 230
+  draggable: true
+  visible: false
+  margin: 10
+
+  ResizeBorder
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    &minimum: 100
+    &maximum: 400
+  
+  ResizeBorder
+    anchors.right: parent.right
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    &minimum: 200
+    &maximum: 400

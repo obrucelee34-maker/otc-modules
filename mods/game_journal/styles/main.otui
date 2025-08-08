@@ -1,0 +1,16 @@
+GameJournalWindow < MainWindow
+  id: gameJournalWindow
+  size: 1350 811
+  anchors.centerIn: parent
+  &title: 'Journal'
+  &hotkeyId: HOTKEYS_IDS.JOURNAL
+  &iconName: 'icon_journal'
+  &isGeneralUIWindow: true
+
+  MainWindowContent
+    id: content
+    padding: 0
+    
+    GameJournalTopPanel
+    
+    GameJournalArtifactsPanel

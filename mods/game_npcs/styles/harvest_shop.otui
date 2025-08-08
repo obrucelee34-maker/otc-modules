@@ -1,0 +1,306 @@
+HarvestShopSelectionPanel < SideSelect
+  id: harvest_shop_selection_panel
+  size: 200 40
+  &left_text: 'Buy'
+  &right_text: 'Sell'
+  @onClick: |
+    HarvestShop:onChangeTypeSelection()
+
+HarvestShopItem < UIWidget
+  id: item
+  height: 65
+  image-border: 5
+  phantom: false
+  disabled: false
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  @onEnableChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setEnabled(self:isEnabled())
+    end
+
+  Item
+    id: item
+    size: 46 46
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: false
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+  GameItemShopPoppins14px
+    id: name
+    text-color: white
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    height: 20
+    margin-top: 2
+    margin-left: 10
+    margin-right: 10
+    phantom: false
+    text-wrap: false
+    text-auto-resize: true
+    @onTextChange: |
+      self:setTooltip(self:getText())
+    @onClick: |
+      local parent = self:getParent()
+      parent:onClick()
+
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+  UIItem
+    id: currency_icon
+    size: 12 12
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 2
+    margin-left: 0
+    phantom: true
+
+  GameItemShopPoppins12px
+    id: currency_price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    phantom: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+HarvestShopItemInfoLabel < Panel
+  size: 250 18
+
+  GameItemShopPoppinsBold14px
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-offset: 0 -1
+
+  UIItem
+    id: currency_icon
+    size: 18 18
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 25
+    phantom: true
+
+  GameItemShopPoppinsBold12px
+    id: currency_price
+    text: 0
+    text-auto-resize: true
+    //text-align: center
+    text-offset: 0 2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 8
+    phantom: true
+
+HarvestShopItemInfo < HarvestShopItem
+  width: 270
+
+  UIWidget
+    id: plus
+    image-source: /images/ui/windows/npcs/main/btnPlus
+    anchors.left: next.right
+    anchors.verticalCenter: currency_price.verticalCenter
+    margin-left: 8
+    @onClick: |
+      local label = self:getParent().count
+      local n = tonumber(label:getText()) or 0
+      label:setText(math.min(n+1, (self:getParent().realCount or 100)))
+
+  UITextEdit
+    id: count
+    size: 50 20
+    text-align: center
+    text-offset: 0 2
+    padding-left: 7
+    padding-right: 7
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.right: parent.right
+    anchors.verticalCenter: currency_price.verticalCenter
+    margin-right: 35
+    text-auto-resize: false
+    focusable: true
+    font: poppins-semibold-14
+    @onTextChange: |
+      HarvestShop.onItemCountChange(self:getParent(), self:getText())
+
+  UIWidget
+    id: minus
+    image-source: /images/ui/windows/npcs/main/btnMinus
+    anchors.right: prev.left
+    anchors.verticalCenter: currency_price.verticalCenter
+    margin-right: 8
+    @onClick: |
+      local label = self:getParent().count
+      local n = tonumber(label:getText()) or 0
+      label:setText(math.max(n-1, 1))
+
+GameHarvestShopPanel < Panel
+  id: gameHarvestShopPanel
+  anchors.fill: parent
+
+  HarvestShopSelectionPanel
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    visible: false
+
+  Panel
+    id: filterPanel
+    height: 40
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: prev.bottom
+    margin-left: 10
+    margin-right: 10
+    margin-top: 10
+
+    UITextEdit
+      id: textEdit
+      height: 40
+      image-source: /images/ui/windows/npcs/main/search_background
+      image-border: 4
+      font: poppins-12
+      padding: 10
+      text-align: left
+      text-offset: 0 5
+      selection-color: #272727
+      selection-background-color: #cccccc
+      color: #5B5B5B
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 8
+
+      @onTextChange: |
+        HarvestShop:onSearchFilter(self)
+
+      UIWidget
+        id: placeholder
+        font: poppins-12
+        !text: tr('Search item...')
+        text-align: left
+        text-offset: 0 5
+        color: #5B5B5B
+        opacity: 0.6
+        anchors.fill: parent
+        phantom: true
+
+  ScrollablePanel
+    id: itemsPanel
+    vertical-scrollbar: itemsPanelScrollbar
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    anchors.bottom: bottomPanel.top
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: grid
+      cell-size: 246 61
+      cell-spacing: 6 6
+      flow: true
+
+  GameNpcDialogueScrollBar
+    id: itemsPanelScrollbar
+    anchors.right: prev.right
+    margin-right: 0
+    step: 75
+    margin-top: 10
+    margin-bottom: 10
+
+  Panel
+    id: bottomPanel
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+
+    $on checked:
+      height: 310
+    $on !checked:
+      height: 260
+    $!on:
+      height: 0
+
+    HarvestShopItemInfo
+      id: shopItemInfo
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 15
+
+    UIWidget
+      id: itemQuality
+      height: 50
+      anchors.top: prev.bottom
+      anchors.left: prev.left
+      anchors.right: prev.right
+      margin-top: 15
+
+      $on:
+        height: 50
+      $!on:
+        height: 0
+
+      GameItemShopPoppinsBold14px
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        text-offset: 0 -1
+        text: Quality
+
+      ComboBox
+        id: comboBox
+        font: poppins-14
+        width: 165
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+
+    GameNpcHorizontalSeparator
+      margin-top: 15
+
+    HarvestShopItemInfoLabel
+      id: silver
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: prev.horizontalCenter
+      margin-top: 15
+
+      @onSetup: |
+        self:getChildById('text'):setText('Your Coins')
+
+    Button
+      id: buyButton
+      width: 110
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Buy
+
+    Button
+      id: sellButton
+      width: 110
+      anchors.top: cost.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Sell
+      visible: false

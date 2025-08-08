@@ -1,0 +1,502 @@
+GameTradepostSellItem < Panel
+  height: 100
+  image-border: 5
+  phantom: false
+  padding: 10
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  Item
+    id: item
+    size: 64 64
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: true
+
+  GameItemShopPoppins14px
+    id: name
+    font: poppins-18
+    text-color: white
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-top: 4
+    margin-left: 20
+    phantom: true
+    text-wrap: true
+    text-auto-resize: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+
+  Panel
+    id: icon
+    size: 12 12
+    image-source: /images/ui/icons/silver_24
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 4
+    margin-left: 0
+
+  GameItemShopPoppins12px
+    id: price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    phantom: true
+    $!disabled:
+      text-color: white
+    $disabled:
+      text-color: #7F7F7F
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GameTradepostWindowListItem < UIWidget
+  height: 150
+  image-source: /images/ui/windows/tradepacks/panel_background
+  $on:
+    image-source: /images/ui/windows/tradepacks/panel_background_active
+  margin: 5 20 5 20
+  image-border: 10
+  UIItem
+    id: item
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    size: 70 70
+    phantom: true
+    item-id: 36000
+
+  UIWidget
+    id: name
+    anchors.left: parent.left
+    anchors.top: item.bottom
+    anchors.right: parent.right
+    font: poppins-semibold-16
+    margin-left: 20
+    margin-top: 10
+    text-align: center
+    text: test
+    text-color: #a6aab2
+    text-auto-resize: true
+    text-wrap: true
+
+  UIWidget
+    id: demand
+    anchors.horizontalCenter: name.horizontalCenter
+    anchors.top: name.bottom
+    text-auto-resize: true
+    font: poppins-semibold-12
+    text-offset: 0 0
+    text-align: center
+    text-color: #7e828b
+    margin-top: 5
+    @onTextChange: |
+      addEvent(function()
+        local colors = {
+          [3] = '#6ec35c',
+          [2] = '#f7b500',
+          [1] = '#f75c5c'
+        }
+        -- get number from text string
+        local number = tonumber(self:getText():match('%d+'))
+        if not number then
+          local parent = self:getParent()
+          parent:getChildById('lock_icon'):setVisible(true)
+          parent:getChildById('lock_icon'):setTooltip(self.tooltip)
+          self:setTextOffset({x = -10, y = 0})
+          return
+        else
+          local parent = self:getParent()
+          parent:getChildById('lock_icon'):setVisible(false)
+          self:setTextOffset({x = 0, y = 0})
+        end
+        local color = colors[math.min(#colors, math.ceil(number / 33.3))]
+        self:setColoredText(GetHighlightedText(string.format('%s {%s%%, %s}', tr('Global demand:'), number, color), '#7e828b'), true)
+      end)
+
+  UIWidget
+    id: lock_icon
+    anchors.left: demand.right
+    anchors.verticalCenter: demand.verticalCenter
+    image-source: /images/ui/icons/icon_lock
+    visible: false
+    margin-left: 7
+    size: 13 16
+    margin-bottom: 2
+
+GameTradepostDemandPanel < AttachedWindow
+  id: demand_panel
+  title: Tradepost Location and Demand
+  height: 305
+  anchors.bottom: parent.bottom
+  anchors.right: gameNpcWindow.left
+  side: left
+  visible: false
+  phantom: true
+  @onVisibilityChange: |
+    self:setWidth(self:isVisible() and 350 or 0)
+
+  GameTradepacksWindowRightWindowCategory
+    id: Tradepost Location and Demand
+    anchors.fill: parent
+    margin-top: 50
+    vertical-scrollbar: location_scrollbar
+    @onSetup: |
+      for index, tradepost in ipairs(Tradeposts) do
+        local item = g_ui.createWidget('GameTradepacksWindowRightWindowDemand', self)
+        item.name:setText(tradepost.name:gsub(' Tradepost', ''))
+        item.tradepost = tradepost
+        item:setId(tradepost.name)
+        item.distance:setVisible(true)
+        item.locate_button.onClick = function() GameTradepacks:locateTradepost(index) end
+        GameTradepacks.rightAttachedWindow['Tradepost Location and Demand']:getChildByIndex(index).extended = item
+      end
+  GameProfessionsPanelRightPanelScrollBar
+    id: location_scrollbar
+    anchors.top: Tradepost Location and Demand.top
+    anchors.bottom: Tradepost Location and Demand.bottom
+    margin: 3
+
+GameNpcTradepostEffortPanel < UIWidget
+  id: effortPanel
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: prev.verticalCenter
+  size: 200 30
+  image-source: /images/ui/windows/house/list_item_price_background
+  image-border: 10
+  $on:
+    image-source: /images/ui/windows/house/list_item_price_background_active
+  
+  UIWidget
+    id: icon
+    size: 14 15
+    image-source: /images/ui/windows/house/effort_icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+
+  UIWidget
+    id: value
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: icon.right
+    text-auto-resize: true
+    margin-left: 10
+    font: poppins-14
+    text: 15000 / 250
+    text-offset: 0 2
+    @onTextChange: self:getParent():centerWidgets()
+
+  &centerWidgets: |
+    function(self)
+      local icon = self.icon
+      local value = self.value
+
+      local iconWidth = icon:getWidth()
+      local valueWidth = value:getWidth()
+
+      local totalWidth = iconWidth + valueWidth + 10
+      local marginLeft = (self:getWidth() - totalWidth) / 2
+
+      icon:setMarginLeft(marginLeft)
+    end
+
+GameTradepostBottomPanel < Panel
+  id: bottom_panel
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  visible: false
+  @onVisibilityChange: |
+    self:setHeight(self:isVisible() and 305 or 0)
+
+  UIWidget
+    image-source: /images/ui/windows/tradepacks/edge
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    height: 3
+  PrimaryButton
+    id: button
+    anchors.left: parent.left
+    anchors.top: parent.top
+    size: 42 42
+    &iconPath: '/images/ui/windows/base_window/icon_location'
+    margin-left: 10
+    margin-top: 10
+    @onClick: |
+      Tradepost:toggleDemandPanel()
+
+  GameTradepacksWindowRightWindowItem
+  GameTradepacksWindowRightWindowCategory
+    id: materials
+    vertical-scrollbar: materials_scrollbar
+  GameProfessionsPanelRightPanelScrollBar
+    id: materials_scrollbar
+    anchors.top: materials.top
+    anchors.bottom: materials.bottom
+
+  GameNpcHorizontalSeparator
+    margin-left: 0
+    margin-right: 0
+    margin-top: 25
+
+  GameNpcTradepostEffortPanel
+
+  Button
+    id: craftButton
+    width: 110
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-right: 0
+    $checked:
+      margin-right: 60
+    margin-top: 30
+    &color: '#77d463'
+    text: Create
+    @onClick: |
+      Tradepost:requestCraftTradepack()
+  
+  Button
+    id: useCertificateButton
+    &resizeText: true
+    anchors.top: craftButton.top
+    anchors.left: parent.horizontalCenter
+    &color: '#77d463'
+    text: Use Certificate
+    visible: false
+    @onClick: |
+      Tradepost:requestCraftTradepack(true)
+
+  UIWidget
+    id: primeTradepackLabel
+    text: Prime Tradepack
+    anchors.top: craftButton.top
+    anchors.right: craftButton.left
+    margin-right: 20
+    margin-top: 5
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-color: #a6aab2
+    on: false
+    $on:
+      text-color: #36f991
+
+  TrueFalseSelect
+    id: primeTradepackToggle
+    anchors.bottom: craftButton.bottom
+    anchors.horizontalCenter: primeTradepackLabel.horizontalCenter
+    checked: false
+    margin-bottom: 5
+    @onStateChange: |
+      Tradepost:onTogglePrimeTradepack(self)
+      local parent = self:getParent()
+      parent.primeTradepackLabel:setOn(self:isOn())
+
+
+GameTradepacksWindowRightWindowItem < GameTradepostWindowListItem
+  id: panel_top
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.horizontalCenter
+  margin-top: 25
+  margin-right: 50
+  image-color: alpha
+  phantom: true
+  @onSetup: |
+    self.item:setMarginLeft(10)
+    self.name:setMarginTop(15)
+    --self.name:setFont('poppins-semibold-18')
+    --self.demand:setFont('poppins-semibold-12')
+
+GameProfessionsPanelRightPanelScrollBar < VerticalScrollBar
+  anchors.right: parent.right
+  margin-right: 7
+  margin-top: 15
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true
+
+GameTradepacksWindowRightWindowCategory < ScrollablePanel
+  height: 170
+  anchors.left: panel_top.right
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-left: 10
+  margin-top: 15
+  layout:
+    type: verticalBox
+    spacing: 0
+
+GameTradepacksWindowRightWindowListItem < GameProfessionsPanelMiddlePanelMaterialsListItem
+  @onSetup: |
+    local height = self.quality_panel:getHeight()
+    self.quality_panel:destroy()
+    self:setHeight(80)
+    self:setMarginBottom(-20)
+
+GameTradepostCraftPanel < Panel
+  id: gameTradepostCraftPanel
+  anchors.fill: parent
+  @onSetup: |
+    addEvent(function()
+        Tradepost:onSetupCraftWindow(self)
+    end)
+    self.top_panel.name:setWidth(90)
+    self.top_panel.demand:setWidth(108)
+    self.top_panel.filter_panel:setWidth(150)
+    self.top_panel.search_panel:setWidth(132)
+    self.top_panel.filter_panel.onClick = function()
+      local state = self:isOn()
+      self:setOn(not state)
+      Tradepost:onFilterPanelClick(self.top_panel.filter_panel, not state)
+    end
+
+  GameTradepacksWindowTopPanel
+    margin-left: 20
+    margin-right: 20
+  GameTradepacksWindowListPanel
+    margin-bottom: 0
+    anchors.bottom: bottom_panel.top
+  GameTradepacksWindowListPanelScrollbar
+  GameTradepostBottomPanel
+    visible: false
+
+GameTradepostSellPanel < Panel
+  id: gameTradepostSellPanel
+  anchors.fill: parent
+
+  ScrollablePanel
+    id: list_panel
+    vertical-scrollbar: list_scroll
+    anchors.fill: parent
+    anchors.top: parent.top
+    anchors.bottom: bottom_panel.top
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: verticalBox
+      spacing: 2
+
+  GameNpcDialogueScrollBar
+    id: list_scroll
+    anchors.right: prev.right
+    margin-right: 0
+    step: 75
+    margin-top: 10
+    margin-bottom: 10
+
+  Panel
+    id: bottom_panel
+    height: 200
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    padding-top: 20
+
+    GameTradepostSellItem
+      id: tradepack
+      width: 250
+      anchors.horizontalCenter: parent.horizontalCenter
+      height: 62
+      padding: 0
+      @onSetup: |
+        addEvent(function()
+          self.item:setSize({height = 46, width = 46})
+          self.name:setFont('poppins-14')
+        end)
+
+    GameNpcHorizontalSeparator
+      margin-left: 0
+      margin-right: 0
+      margin-top: 25
+
+    GameNpcTradepostEffortPanel
+
+    Button
+      id: sellButton
+      width: 110
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 20
+      &color: '#77d463'
+      text: Sell
+      @onClick: GameNpc:sendOpcode({ action = 'dialogue', dialogueId = GameNpc.dialogueId, npcName = GameNpc.npcName, option = 'tradepost_turnin_pack', pack = Tradepost:getCurrentPack() })
+
+TradepostFilterPopupMenuButtonExpanded < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  text-offset: 40 1
+  $checked:
+// title
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onClick: |
+    self.checkbox:setChecked(not self.checkbox:isChecked())
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 10
+    @onCheckChange: |
+      function(self, state)
+        modules.game_npcs.Tradepost:onFilterPanelCheckboxChange(self, state)
+      end
+
+TradepostFilterPopupMenuClearAll < UIWidget
+  id: clear_button
+  text: Clear all
+  font: poppins-semibold-14
+  text-color: #CED2D9
+  $disabled:
+    text-color: #7E828B
+  enabled: false
+  margin-top: 5
+  opacity: 1
+  $hover:
+    opacity: 0.75
+  $pressed:
+    opacity: 0.5
+  text-auto-resize: true
+  text-align: center
+  @onClick: |
+    modules.game_npcs.Tradepost:clearAllFilters()
+  @onEnableChange: |
+    if not self.underscore then
+      return
+    end
+    self.underscore:setOn(self:isEnabled())
+
+  UIWidget
+    id: underscore
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    height: 1
+    background-color: #595c64
+
+    @onSetup: |
+      self:setWidth(self:getParent():getTextSize().width + 2)

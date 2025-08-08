@@ -1,0 +1,158 @@
+GameWarehouseItem < Item
+  //size: 58 58
+  font: poppins-14
+  virtual: true
+  image-source: /images/ui/windows/npcs/warehouse/bgItem
+  background-color: #ffffff00
+  border-color: #e7b131
+  border-width: 0
+  //item-tooltip: false
+  phantom: false
+  &canDragItem: true
+
+  $disabled:
+    image-color: #aaaaaa
+
+  @onSetup: |
+    connect(self, {
+      onHoverChange = function()
+        local path = '/images/ui/windows/npcs/warehouse/bgItem'
+        self:setImageSource((self:isHovered() and self:getItem()) and path .. 'Hover' or path)
+      end,
+      onItemChange = function()
+        local itemInfo = self:getItem() and self:getItem().tooltipInfo
+        if itemInfo then
+          self.weightLabel:setText(itemInfo.weight and (string.format("%.2f", itemInfo.weight) .. ' kg') or '')
+        end
+      end
+    })
+
+  Label
+    id: weightLabel
+    font: poppins-12
+    text-auto-resize: true
+    text-align: right
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 2
+    phantom: true
+
+GameWarehouseItems < Panel
+  width: 135
+  layout:
+    type: grid
+    cell-size: 56 56
+    cell-spacing: 6 6
+    flow: true
+
+GameWarehouseDarkPanel < Panel
+  image-source: /images/ui/windows/npcs/main/BgSelectQuest
+  anchors.left: parent.left
+  anchors.right: parent.right
+
+GameWarehouseSeparator < Panel
+  height: 1
+  background-color: #3a3d43
+  anchors.right: parent.right
+  anchors.left: parent.left
+  opacity: 0.5
+
+GameWarehouseButton < Button
+  width: 130
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.horizontalCenter: parent.horizontalCenter
+  margin-top: 5
+
+GameWarehouseNpcPanel < Panel
+  height: 140
+
+  UICreature
+    id: outfit
+    anchors.verticalCenter:parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    auto-resize: true
+    scale: 1.5
+
+  Label
+    id: name
+    font: vollkorn-16
+    text-auto-resize: true
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-bottom: 15
+    text: STORAGE
+
+
+GameWarehouseSplitPanel < Panel
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+
+  GameWarehouseDarkPanel
+    height: 90
+    anchors.bottom: parent.bottom
+
+    GameWarehouseButton
+      id: button
+
+  GameWarehouseNpcPanel
+    id: topPanel
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+
+  GameWarehouseSeparator
+    anchors.top: prev.bottom
+    margin-top: 5
+
+  GameWarehouseItems
+    id: items
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-top: 25
+    padding: 8
+
+GameWarehousePanel < Panel
+  id: gameWarehousePanel
+  anchors.fill: parent
+
+  GameWarehouseSplitPanel
+    id: playerPanel
+    anchors.left: parent.left
+    anchors.right: parent.horizontalCenter
+
+    @onSetup: |
+      local button = self:recursiveGetChildById('button')
+      button.color = '#77d463'
+      button:setText(tr('Deposit All'))
+      button:setColor(button.color)
+      button.onClick = function() GameNpc:sendOpcode({ action = 'dialogue', dialogueId = GameNpc.dialogueId, npcName = GameNpc.npcName, option = 'warehouse_depotsitall' }) end
+      button.clickSound = true
+      button:setWidth(150)
+
+  GameWarehouseSplitPanel
+    id: warehousePanel
+    anchors.right: parent.right
+    anchors.left: parent.horizontalCenter
+
+    @onSetup: |
+      local button = self:recursiveGetChildById('button')
+      button.color = '#fbfb79'
+      button:setText(tr('Withdraw All'))
+      button:setColor(button.color)
+      button.onClick = function() GameNpc:sendOpcode({ action = 'dialogue', dialogueId = GameNpc.dialogueId, npcName = GameNpc.npcName, option = 'warehouse_withdrawall' }) end
+      button.clickSound = true
+
+  Panel
+    image-source: /images/ui/windows/npcs/warehouse/iconTrade
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 25
+
+  Panel
+    width: 1
+    background-color: #3a3d43
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: prev.bottom
+    anchors.bottom: warehousePanel.bottom
+    opacity: 0.5

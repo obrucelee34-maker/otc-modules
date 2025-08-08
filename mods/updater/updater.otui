@@ -1,0 +1,70 @@
+UpdaterProgressBar < UIProgressBar3
+  image-source: /images/ui/windows/updater/progressbar_background
+  image-border: 3
+  image-auto-resize: true
+
+  Panel
+    id: progress
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    background-color: #36F991
+    height: 23
+    margin-left: 3
+
+  Label
+    id: label
+    font: myriad-pro-16
+    color: white
+    text-auto-resize: true
+    text-align: center
+    anchors.centerIn: parent
+    text-offset: 0 2
+
+UIWidget
+  &static: true
+  id: updaterWindow
+  anchors.centerIn: parent
+  size: 400 310
+  image-border: 20
+  image-source: /images/ui/windows/updater/background
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  UIWidget
+    id: title
+    margin-top: 20
+    text: Updating Ravendawn
+    font: poppins-16
+    text-auto-resize: true
+
+  UIWidget
+    id: status
+    !text: tr('Checking for updates')
+    text-align: center
+    height: 50
+    margin-top: 10
+    background-color: #181A1D
+    color: #CED2D9
+    font: poppins-14
+
+  UpdaterProgressBar
+    id: mainProgress
+    margin: 24 24 24 24
+    percent: 0
+
+  UIWidget
+    id: downloadStatus
+    visible: false
+    text: Downloading file: 73/233
+    text-align: center
+    height: 50
+    background-color: #181A1D
+    color: #CED2D9
+    font: poppins-14
+
+  UpdaterProgressBar
+    id: downloadProgress
+    visible: false
+    margin: 24 24 24 24
+    percent: 0

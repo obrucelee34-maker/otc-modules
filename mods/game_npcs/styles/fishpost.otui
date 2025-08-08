@@ -1,0 +1,325 @@
+GameFishpostButton < Button
+  size: 100 45
+  anchors.horizontalCenter: parent.horizontalCenter
+
+GameFishpostItemLabel < Panel
+  size: 140 18
+
+  GameItemShopPoppinsBold14px
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    text-offset: 0 -1
+
+  Panel
+    id: icon
+    size: 18 18
+    image-source: /images/ui/icons/silver_24
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 25
+
+  GameItemShopPoppinsBold12px
+    id: value
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 2
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 8
+    phantom: true
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+GameFishpostSplitPanel < Panel
+  anchors.bottom: parent.bottom
+
+GameFishpostWeightLabel < Label
+  size: 40 15
+  font: poppins-10
+  image-source: /images/ui/windows/npcs/warehouse/bgItem
+  image-border: 3
+  text-offset: 0 3
+  text-auto-resize: false
+  text-align: center
+  margin: 2
+  margin-bottom: 1
+  phantom: true
+
+GameFishpostItem < Panel
+  height: 62
+  image-border: 5
+  phantom: false
+
+  $on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIconActive
+  $!on:
+    image-source: /images/ui/windows/npcs/main/BgGeneralIcon
+
+  Item
+    id: item
+    size: 46 46
+    image-source: /images/ui/windows/npcs/main/BgIcon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    virtual: true
+    phantom: false
+    @onClick: self:getParent():onClick()
+
+    @onSetup: |
+      connect(self, {
+        onItemChange = function() local weight = self:getParent().weight self.weightLabel:setText(weight and (string.format("%.2f", weight) .. 'kg') or '') end
+      })
+
+    GameFishpostWeightLabel
+      id: weightLabel
+      size: 40 15
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.bottom: parent.bottom
+
+  GameItemShopPoppins14px
+    id: name
+    color: white
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.top: item.top
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-top: 2
+    margin-left: 10
+    text-wrap: true
+    text-auto-resize: true
+
+  Panel
+    id: iconPrice
+    size: 12 12
+    image-source: /images/ui/icons/silver_24
+    anchors.bottom: item.bottom
+    anchors.left: prev.left
+    margin-bottom: 2
+
+  GameItemShopPoppins12px
+    id: price
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+    @onTextChange: |
+      local number = tonumber(self:getText())
+      if number then
+        self._internal_value = number
+        self:setText(FormatCommaNumber(number), true)
+      end
+
+  UIItem
+    id: iconChopped
+    size: 12 12
+    anchors.bottom: iconPrice.bottom
+    anchors.left: prev.right
+    margin-left: 15
+    margin-bottom: 2
+    virtual: true
+    phantom: false
+    item-id: 40832
+    @onClick: self:getParent():onClick()
+
+  GameItemShopPoppins12px
+    id: chopped
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.verticalCenter: prev.verticalCenter
+    anchors.left: prev.right
+    margin-left: 5
+
+  GameItemShopPoppins12px
+    id: quality
+    text: 0
+    text-auto-resize: true
+    text-offset: 0 3
+    anchors.bottom: iconPrice.bottom
+    anchors.left: iconPrice.left
+    visible: false
+
+  GameFishpostWeightLabel
+    id: weightLabel
+    font: poppins-12
+    size: 60 18
+    text-offset: 0 4
+    anchors.bottom: prev.bottom
+    anchors.right: parent.right
+    margin-right: 15
+    visible: false
+
+GameFishpostPanel < Panel
+  id: gameFishpostPanel
+  anchors.fill: parent
+
+  Panel
+    id: filterPanel
+    height: 40
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-left: 10
+    margin-right: 10
+
+    UITextEdit
+      id: textEdit
+      height: 40
+      image-source: /images/ui/windows/npcs/main/search_background
+      image-border: 4
+      font: poppins-14
+      padding: 10
+      text-align: left
+      text-offset: 0 5
+      selection-color: #272727
+      selection-background-color: #cccccc
+      color: #5B5B5B
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin: 8
+      !preview: tr('Search...')
+
+      @onTextChange: |
+        Fishpost:onSearchFilter(self:getText())
+
+  ScrollablePanel
+    id: itemsPanel
+    vertical-scrollbar: itemsPanelScrollbar
+    anchors.fill: parent
+    anchors.top: prev.bottom
+    anchors.bottom: bottomPanel.top
+    margin: 10
+    margin-top: 15
+    padding: 8
+    layout:
+      type: grid
+      cell-size: 196 61
+      cell-spacing: 6 6
+      flow: true
+
+  GameNpcDialogueScrollBar
+    id: itemsPanelScrollbar
+    anchors.right: prev.right
+    margin-right: 3
+    step: 75
+
+  Panel
+    id: bottomPanel
+    height: 250
+    image-source: /images/ui/windows/npcs/main/BgSelectQuest
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    padding: 15
+
+    GameFishpostItem
+      id: fishpostItemInfo
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 15
+      @onSetup: |
+        self.iconPrice:setVisible(false)
+        self.price:setVisible(false)
+        self.iconChopped:setVisible(false)
+        self.chopped:setVisible(false)
+        self.quality:setVisible(true)
+        self.item.weightLabel:setVisible(false)
+        self.weightLabel:setVisible(true)
+
+    GameNpcHorizontalSeparator
+      margin-top: 15
+
+    GameFishpostSplitPanel
+      id: slicePanel
+      anchors.top: prev.bottom
+      anchors.right: parent.horizontalCenter
+      anchors.left: parent.left
+      margin-top: 15
+
+      GameItemShopPoppinsBold14px
+        id: text
+        anchors.left: button.left
+        anchors.bottom: button.top
+        margin-bottom: 15
+        text: Total
+        text-color: #fbfb79
+
+      UIItem
+        id: icon
+        size: 14 14
+        anchors.verticalCenter: text.verticalCenter
+        anchors.left: text.right
+        margin-left: 25
+        item-id: 40832
+
+      GameItemShopPoppinsBold12px
+        id: value
+        anchors.verticalCenter: icon.verticalCenter
+        anchors.left: icon.right
+        margin-left: 5
+        text-auto-resize: true
+        text-offset: 0 3
+
+      GameFishpostButton
+        id: button
+        anchors.bottom: parent.bottom
+        margin-bottom: 10
+        text: Slice
+        &color: '#fbfb79'
+        &clickSound: true
+        @onClick: GameNpc:sendOpcode({ action = 'dialogue', dialogueId = GameNpc.dialogueId, npcName = GameNpc.npcName, option = 'fishpost_chopped', pack = Fishpost:getCurrentPack() })
+
+    GameFishpostSplitPanel
+      id: sellPanel
+      anchors.top: prev.top
+      anchors.right: parent.right
+      anchors.left: prev.right
+
+      GameItemShopPoppinsBold14px
+        id: text
+        anchors.left: button.left
+        anchors.bottom: button.top
+        margin-bottom: 15
+        text: Total
+        text-color: #77d463
+
+      UIWidget
+        id: icon
+        size: 14 14
+        image-source: /images/ui/icons/silver_24
+        anchors.verticalCenter: text.verticalCenter
+        anchors.left: text.right
+        margin-left: 25
+
+      GameItemShopPoppinsBold12px
+        id: value
+        anchors.verticalCenter: icon.verticalCenter
+        anchors.left: icon.right
+        margin-left: 5
+        text-auto-resize: true
+        text-offset: 0 2
+        @onTextChange: |
+          local number = tonumber(self:getText())
+          if number then
+            self._internal_value = number
+            self:setText(FormatCommaNumber(number), true)
+          end
+
+      GameFishpostButton
+        id: button
+        anchors.bottom: parent.bottom
+        margin-bottom: 10
+        text: Sell
+        &color: '#77d463'
+        &clickSound: true
+        @onClick: GameNpc:sendOpcode({ action = 'dialogue', dialogueId = GameNpc.dialogueId, npcName = GameNpc.npcName, option = 'fishpost_turnin', pack = Fishpost:getCurrentPack() })

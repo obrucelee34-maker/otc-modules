@@ -1,0 +1,67 @@
+GameJournalTopPanel < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 40
+  background-color: #00000075
+  layout:
+    type: horizontalBox
+    spacing: 30
+  GameJournalTopPanelItem
+    id: artifacts
+
+GameJournalTopPanelItem < UIWidget
+  id: top_panel_item
+  size: 110 40
+  $first:
+    margin-left: 50
+  @onHoverChange: |
+    for _, child in ipairs(self:getChildren()) do
+      child:setChecked(self:isHovered())
+    end
+  @onClick: |
+    GameJournal:selectTab(self:getId())
+  @onStateChange: |
+    local highlight = self:getChildById('highlight')
+    highlight:setOn(self:isOn())
+
+  UIWidget
+    id: holder
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    height: 40
+    phantom: true
+    layout:
+      type: horizontalBox
+      spacing: 10
+      fit-children: true
+
+    UIWidget
+      id: text
+      font: poppins-15
+      text-auto-resize: true
+      text-offset: 0 5
+      phantom: true
+      $on:
+        text-color: white
+      $checked:
+        text-color: white
+      @onSetup: |
+        local parent = self:getParent()
+        local topParent = parent:getParent()
+        local id = parent:getId()
+        self:setText(topParent:getId():titleCase())
+
+  UIWidget
+    id: highlight
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    phantom: true
+    anchors.right: parent.right
+    height: 2
+    background-color: alpha
+    $on:
+      background-color: #36F991
+    $checked:
+      background-color: #36F991
