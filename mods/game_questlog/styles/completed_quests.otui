@@ -1,0 +1,41 @@
+GameCharacterCompletedQuestsPanelWidget < UIWidget
+  &level: 1
+  image-source: /images/ui/windows/questlog/quest_background
+  image-auto-resize: true
+  $on:
+    image-source: /images/ui/windows/questlog/quest_background_active
+  $hover:
+    image-source: /images/ui/windows/questlog/quest_background_active
+  @onClick: modules.game_questlog.GameQuestLog:requestQuestInfo(self.questId, self.questType)
+
+  UILabel
+    id: questNameLabel
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-offset: 12 0
+    text-color: white
+    phantom: true
+
+  MainWindowCloseButton
+    image-source: /images/ui/windows/base_window/close_button_right
+    $hover:
+      image-source: /images/ui/windows/base_window/close_button_right_active
+    $pressed:
+      image-source: /images/ui/windows/base_window/close_button_right
+    @onClick: modules.game_questlog.GameQuestLog:requestQuestInfo(self:getParent().questId, self:getParent().questType)
+
+GameCharacterCompletedQuestsPanel < UIWidget
+  id: completedquests_panel
+  anchors.fill: parent
+  visible: false
+  margin-top: -6
+
+  ScrollablePanel
+    id: panel
+    layout:
+      type: verticalBox
+      spacing: 4
+      fit-children: false
+    anchors.fill: parent

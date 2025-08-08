@@ -1,0 +1,55 @@
+GamePromptsArrowUp < UIWidget
+  id: arrow_up
+  size: 33 27
+  image-source: /images/ui/windows/interactions/arrow_up
+  visible: false
+
+GamePromptsArrowDown < UIWidget
+  id: arrow_down
+  size: 33 27
+  image-source: /images/ui/windows/interactions/arrow_down
+  visible: false
+
+GamePromptsArrowLeft < UIWidget
+  id: arrow_left
+  size: 27 33
+  image-source: /images/ui/windows/interactions/arrow_left
+  visible: false
+
+GamePromptsArrowRight < UIWidget
+  id: arrow_right
+  size: 27 33
+  image-source: /images/ui/windows/interactions/arrow_right
+  visible: false
+
+GamePromptsCloseButton < UIWidget
+  id: close_button
+  anchors.top: parent.top
+  anchors.right: parent.right
+  margin: 3
+  size: 25 25
+  image-source: /images/ui/windows/base_window/close_button
+  $checked:
+    image-source: /images/ui/windows/base_window/minimized_button
+  $hover !checked:
+    image-source: /images/ui/windows/base_window/close_button_active
+  $hover checked:
+    image-source: /images/ui/windows/base_window/minimized_button_active
+  $pressed !checked:
+    image-source: /images/ui/windows/base_window/close_button
+  $pressed checked:
+    image-source: /images/ui/windows/base_window/minimized_button
+  @onClick: |
+    local env = self:getParent().env
+    if not env then
+      return
+    end
+    GamePrompts:cancelPrompt(env)
+
+GamePromptsMiddleCloseButton < GamePromptsCloseButton
+  size: 45 25
+  image-source: /images/ui/windows/prompts/close_button
+  $hover !checked:
+    image-source: /images/ui/windows/prompts/close_button_active
+  $pressed !checked:
+    image-source: /images/ui/windows/prompts/close_button

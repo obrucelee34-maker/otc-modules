@@ -1,0 +1,6 @@
+Module
+  name: game_questmanager
+  sandboxed: true
+  scripts: [ questmanager ]
+  @onLoad: init()
+  @onUnload: terminate()

@@ -1,0 +1,6 @@
+Module
+  name: game_professions
+  sandboxed: true
+  scripts: [ professions ]
+  @onLoad: GameProfessions:init()
+  @onUnload: GameProfessions:terminate()

@@ -1,0 +1,59 @@
+GameCharacterCurrentQuestsPanelWidget < UIWidget
+  &level: 0
+  image-source: /images/ui/windows/questlog/quest_background
+  image-auto-resize: true
+  $on:
+    image-source: /images/ui/windows/questlog/quest_background_active
+  $hover:
+    image-source: /images/ui/windows/questlog/quest_background_active
+  @onClick: modules.game_questlog.GameQuestLog:requestQuestInfo(self.questId, self.questType)
+
+  CheckBoxSmall
+    id: trackerCheckBox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 8
+    @onCheckChange: modules.game_questlog.setQuestWidgetVisibility(self:getParent().questName, self:isChecked(), self, self:containsPoint(g_window.getMousePosition()))
+
+  UILabel
+    id: questLevelLabel
+    anchors.left: prev.right
+    anchors.verticalCenter: prev.verticalCenter
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-offset: 11 2
+    text-color: white
+    phantom: true
+
+  UILabel
+    id: questNameLabel
+    anchors.left: questLevelLabel.right
+    anchors.verticalCenter: prev.verticalCenter
+    padding-right: 5
+    font: poppins-semibold-14
+    text-auto-resize: true
+    text-offset: 6 2
+    text-color: white
+    phantom: true
+
+  MainWindowCloseButton
+    image-source: /images/ui/windows/base_window/close_button_right
+    $hover:
+      image-source: /images/ui/windows/base_window/close_button_right_active
+    $pressed:
+      image-source: /images/ui/windows/base_window/close_button_right
+    @onClick: modules.game_questlog.GameQuestLog:requestQuestInfo(self:getParent().questId, self:getParent().questType)
+
+GameCharacterCurrentQuestsPanel < UIWidget
+  id: currentquests_panel
+  anchors.fill: parent
+  visible: false
+  margin-top: -6
+
+  ScrollablePanel
+    id: panel
+    layout:
+      type: verticalBox
+      spacing: 4
+      fit-children: false
+    anchors.fill: parent

@@ -1,0 +1,97 @@
+GameRedeemRewardsWindow < MainWindow
+  size: 400 521
+  anchors.centerIn: parent
+  &title: 'Redeem Rewards'
+  &iconPath: '/images/ui/windows/redeem_rewards/redeem_rewards_icon'
+
+  GameRedeemRewardsWindowDisclaimerPanel
+  GameRedeemRewardsWindowNoItemsPanel
+    visible: false
+
+  MainWindowScrollableContent
+    margin-top: 18
+    margin-bottom: 12
+    size: 357 350
+    padding: 0 0 0 0
+    anchors.top: disclaimer_panel.bottom
+    anchors.bottom: parent.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    layout:
+      type: verticalBox
+      spacing: 10
+    
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+    GameRedeemRewardsWindowListItem
+
+  MainWindowScrollableContentScrollBar
+    margin-right: 7
+    step: 75
+
+GameRedeemRewardsWindowDisclaimerPanel < Panel
+  size: 400 70
+  id: disclaimer_panel
+  background-color: #00000050
+  !text: tr('You can only redeem these rewards once.')
+  text-color: #FFA851
+  font: poppins-semibold-14
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 47
+
+GameRedeemRewardsWindowNoItemsPanel < Panel
+  id: no_items_panel
+  size: 357 65
+  anchors.centerIn: parent
+  image-source: /images/ui/windows/redeem_rewards/item_panel_background
+  image-border: 10
+  !text: tr('You have no rewards to redeem.')
+  text-color: #CED2D9
+  font: poppins-semibold-14
+
+GameRedeemRewardsWindowListItem < UIWidget
+  size: 355 65
+  margin-left: 22
+  margin-right: 22
+  image-source: /images/ui/windows/redeem_rewards/item_panel_background
+  image-border: 10
+
+  UIItem
+    id: item
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 45 45
+    margin-left: 10
+
+  UIWidget
+    id: name
+    text: Item Name
+    font: poppins-semibold-14
+    text-color: #CED2D9
+    margin-left: 10
+    anchors.left: item.right
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+
+  UIWidget
+    id: redeem_button
+    text: Redeem
+    font: poppins-semibold-14
+    text-color: #36F991
+    border-width-bottom: 1
+    border-color-bottom: #36F991
+    text-auto-resize: true
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 20
+    opacity: 1
+    $hover:
+      opacity: 0.75
+    $pressed:
+      opacity: 0.5

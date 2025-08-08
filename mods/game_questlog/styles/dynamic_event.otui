@@ -1,0 +1,262 @@
+DynamicEventRewardItem < UIWidget
+  size: 148 55
+  image-source: /images/ui/items/background
+  image-border: 4
+  padding: 6
+
+  Item
+    id: item
+    size: 42 42
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    virtual: true
+    phantom: true
+
+  UIWidget
+    id: count
+    image-auto-resize: true 
+    image-source: /images/ui/windows/questlog/amount_background
+    anchors.bottom: item.bottom
+    anchors.right: item.right
+    font: poppins-semibold-11
+    !text: 1
+
+  UILabel
+    id: name
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: item.verticalCenter
+    font: poppins-semibold-12
+    !text: 'Item name'
+    text-offset: 8 0
+    phantom: false
+    text-auto-resize: true
+    text-wrap: true
+    @onTextChange: self:setTooltip(self:getText())
+
+DynamicEventHeader < UIWidget
+  id: header
+  height: 25
+  phantom: true
+
+  UIWidget
+    size: 16 16
+    image-source: /images/ui/windows/dynamicevents/event_icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+  
+  UIWidget
+    id: title
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+    font: poppins-14
+    phantom: true
+  
+  UIButton
+    id: syncButton
+    size: 25 25
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/dynamicevents/sync
+    phantom: false
+    $!on:
+      image-source: /images/ui/windows/dynamicevents/sync_active
+    $on:
+      image-source: /images/ui/windows/dynamicevents/sync
+    $hover:
+      opacity: 1.0
+    $pressed:
+      opacity: 0.8
+    @onSetup: |
+      self:setTooltip('Adjust your effective level to match this event\'s level\nin order to receive participation and earn rewards.')
+
+
+DynamicEventTimer < UIWidget
+  id: timer
+  height: 21
+  phantom: true
+
+  UIWidget
+    id: text
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: parent.verticalCenter
+    text: 00:00:00
+    text-auto-resize: true
+    font: poppins-semibold-14
+    icon: /images/ui/windows/dynamicevents/timer_icon
+    icon-offset: -20 -1
+    icon-align: left
+    phantom: true
+
+DynamicEventDescription < UIWidget
+  id: description
+  text-auto-resize: true
+  text-wrap: true
+  font: poppins-14
+  phantom: true
+
+DynamicEventProgressInfo < UIWidget
+  id: progressInfo
+  phantom: true
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 10
+
+  UIWidget
+    id: current
+    phantom: true
+    text: Kill 20 Troll Fledgling
+    text-auto-resize: true
+    text-wrap: true
+    font: poppins-14
+
+  UIWidget
+    id: total
+    phantom: true
+    text-auto-resize: true
+    font: poppins-14
+    text-align: right
+
+DynamicEventProgress < UIWidget
+  id: progress
+  height: 10
+  phantom: true
+  image-source: /images/ui/windows/dynamicevents/bg_bar
+  image-border: 3
+  image-border-bottom: 4
+  padding: 3
+  padding-top: 4
+  padding-bottom: 4
+  UIProgressBar
+    id: overall
+    anchors.fill: parent
+    background-color: #A556FF
+    @onSetup: self:setPercent(0)
+  UIProgressBar
+    id: individual
+    anchors.fill: parent
+    background-color: #77D463
+    @onSetup: self:setPercent(0)
+
+DynamicEventRewards < UIWidget
+  id: rewards
+  phantom: true
+  layout:
+    type: verticalBox
+    fit-children: true
+
+  UIWidget
+    height: 30
+    phantom: true
+    image-source: /images/ui/windows/dynamicevents/rewards_header
+    text: Rewards
+    font: poppins-semibold-14
+    text-align: center
+
+  UIWidget
+    id: list
+    margin-top: 10
+    margin-left: 20
+    margin-right: 20
+    layout:
+      type: grid
+      cell-size: 148 55
+      cell-spacing: 10 10
+      flow: true
+      fit-children: true
+
+  UIWidget
+    id: scarcity
+    phantom: true
+    height: 110
+    visible: false
+    image-source: /images/ui/windows/dynamicevents/scarcity_background
+    image-border: 3
+    margin-top: 10
+    margin-left: 20
+    margin-right: 20
+
+    UIWidget
+      id: title
+      phantom: true
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 10
+      icon: /images/ui/windows/dynamicevents/scarcity_icon
+      icon-offset: -30 0
+      icon-color: #FF5151
+      text: Scarcity
+      text-offset: 30 7
+      text-auto-resize: true
+      font: poppins-16
+
+    UIWidget
+      phantom: true
+      anchors.top: title.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      text-auto-resize: true
+      text-wrap: true
+      text: You've already completed this event recently, hence you are temporarily ineligible to receive any rewards from it.
+      font: poppins-14
+
+DynamicEventWindow < UIWindow
+  id: dynamicEventWindow
+  size: 350 500
+  draggable: true
+  visible: false
+
+  EditModePanel
+    &title: 'Dynamic Events'
+
+  UIWidget
+    id: content
+    visible: false
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin: 2
+    image-source: /images/ui/windows/dynamicevents/background
+    image-border: 5
+    padding-bottom: 14
+    layout:
+      type: verticalBox
+      fit-children: true
+      spacing: 10
+
+    DynamicEventHeader
+      margin-left: 20
+      margin-right: 20
+      margin-top: 20
+    DynamicEventTimer
+      margin-left: 20
+      margin-right: 20
+    DynamicEventDescription
+      margin-left: 20
+      margin-right: 20
+    DynamicEventProgressInfo
+      margin-left: 20
+      margin-right: 20
+    DynamicEventProgress
+      margin-top: -5
+      margin-left: 20
+      margin-right: 20
+      margin-bottom: 4
+    DynamicEventRewards
+    @onGeometryChange: |
+      self:getParent():setHeight(self:getHeight() + 12)
+
+  UIButton
+    id: toggleButton
+    anchors.top: content.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: -12
+    @onClick: modules.game_questlog.DynamicEvent:toggle()
+    $on:
+      image-source: /images/ui/windows/dynamicevents/button_maximize
+    $!on:
+      image-source: /images/ui/windows/dynamicevents/button_minimize

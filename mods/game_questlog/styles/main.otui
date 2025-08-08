@@ -1,0 +1,207 @@
+GameQuestScrollBar < VerticalScrollBar
+  anchors.right: parent.right
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  step: 48
+  pixels-scroll: true
+
+GameQuestLogSortWidget < UIWidget
+  height: 40
+  font: poppins-14
+  text-offset: -10 0
+  image-source: /images/ui/windows/questlog/filter_background
+  image-border: 4
+  @onStateChange: |
+    local isOn = self:isOn()
+    self.icon:setRotation(isOn and 180 or 0)
+    GameQuestLog.sortFunction = self.sortFunction
+    GameQuestLog.ascSorting = isOn
+    GameQuestLog:sortQuests()
+  @onClick: |
+    self:setOn(not self:isOn())
+
+  UIWidget
+    id: icon
+    image-auto-resize: true
+    margin-right: 10
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/questlog/arrow
+    image-color: white
+    phantom: true
+
+GameQuestTopPanelSelectionButton < UIWidget
+  size: 130 47
+  font: poppins-semibold-14
+  text-offset: 0 0
+  text-color: #5b5b5b
+  image-source: /images/ui/windows/character/selection_button_background_on
+  image-color: alpha
+  $on:
+    text-color: white
+    image-color: white
+
+  UIWidget
+    id: content
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: poppins-semibold-14
+    text-offset: 0 0
+    text-color: #5b5b5b
+    image-color: #5b5b5b
+    image-size: 18 18
+    image-offset: -23 -2
+    opacity: 1
+    $on:
+      text-color: white
+      image-color: white
+    $hover:
+      text-color: white
+      image-color: white
+    $pressed:
+      opacity: 0.7
+    @onClick: GameQuestLog:selectTab(self:getParent():getId())
+
+  @onSetup: | 
+    self.content:setText(self.selectionText)
+    self.content:setImageSource('/images/ui/windows/questlog/' .. self.selectionIconName)
+  @onStateChange: self.content:setOn(self:isOn())
+
+GameQuestLogTopPanelSelection < UIWidget
+  id: selectionPanel
+  anchors.top: prev.bottom
+  margin-top: 9
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 47
+  image-source: /images/ui/windows/character/selection_panel_background
+  layout:
+    type: horizontalBox
+    spacing: 0
+  @onSetup: |
+    addEvent(function()
+        GameQuestLog:selectTab(self:getChildByIndex(1):getId())
+    end)
+
+  GameQuestTopPanelSelectionButton
+    id: currentquests
+    &selectionText: 'Current quests'
+    &selectionIconName: 'current_quest_icon'
+    margin-left: 43
+  GameQuestTopPanelSelectionButton
+    id: completedquests
+    &selectionText: 'Completed quests'
+    &selectionIconName: 'completed_quest_icon'
+    margin-left: 70
+
+GameQuestLogWindow < MainWindow
+  id: gameQuestlogWindow
+  size: 447 704
+  anchors.centerIn: parent
+  &title: 'Quest log'
+  &hotkeyId: HOTKEYS_IDS.QUEST
+  &iconName: 'icon_quest'
+  &isGeneralUIWindow: true
+
+  UIWidget
+    id: gameQuestlogTopWidget
+    margin-top: 16
+    padding-left: 15
+    padding-right: 22
+    anchors.top: top_panel.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    height: 96
+
+    UIWidget
+      id: filterWidget
+      height: 40
+      width: 199
+      anchors.top: parent.top
+      anchors.left: parent.left
+      image-source: /images/ui/windows/questlog/search_background
+
+      UIWidget
+        image-auto-resize: true
+        image-source: /images/ui/windows/questlog/icon_search
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        margin: 10
+
+      UITextEdit
+        height: 30
+        id: textEdit
+        font: poppins-14
+        padding-top: 5
+        padding-left: 10
+        padding-right: 10
+        text-align: left
+        selection-color: #272727
+        selection-background-color: #cccccc
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: prev.right
+        anchors.right: parent.right
+        margin: 10
+        margin-right: 0
+        @onSetup: |
+          connect(self, { onTextChange = function()
+            self.placeholder:setVisible(#self:getText() == 0)
+          end })
+        @onTextChange: GameQuestLog:onSearchFilterChange(self:getText())
+
+        UIWidget
+          id: placeholder
+          font: poppins-14
+          !text: 'Search quests...'
+          text-align: left
+          text-color: #FAFAFA
+          opacity: 0.6
+          anchors.fill: parent
+          phantom: true
+
+    GameQuestLogSortWidget
+      id: nameSort
+      width: 106
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 7
+      !text: 'Name'
+      &sortFunction: function(a, b) local function padnum(d) local dec, n = string.match(d, "(%.?)0*(.+)") return #dec > 0 and ("%.4f"):format(d) or ("%s%03d%s"):format(dec, #n, n) end a = a.questNameLabel:getText() b = b.questNameLabel:getText() return {nil, tostring(a):gsub("%.?%d+", padnum)..("%3d"):format(#b) < tostring(b):gsub("%.?%d+", padnum)..("%3d"):format(#a)} end
+    GameQuestLogSortWidget
+      id: levelSort
+      width: 92
+      anchors.top: prev.top
+      anchors.left: prev.right
+      margin-left: 5
+      !text: tr('Level')
+      &sortFunction: | 
+        function(a, b)
+          local levelA = a.level
+          local levelB = b.level
+          if type(levelA) == "table" then
+            levelA = levelA.min
+          end
+          if type(levelB) == "table" then
+            levelB = levelB.min
+          end
+          return {levelA == levelB, levelA < levelB}
+        end
+
+    GameQuestLogTopPanelSelection
+
+  MainWindowContent
+    anchors.top: prev.bottom
+    padding-left: 15
+    padding-right: 10
+    GameCharacterCurrentQuestsPanel
+      margin-right: 12
+    GameCharacterCompletedQuestsPanel
+      margin-right: 12
+
+    GameQuestScrollBar
+      id: currentquests_scrollbar
+    GameQuestScrollBar
+      id: completedquests_scrollbar
+    @onSetup: |
+      self.currentquests_panel.panel:setVerticalScrollBar(self.currentquests_scrollbar)
+      self.completedquests_panel.panel:setVerticalScrollBar(self.completedquests_scrollbar)

@@ -1,0 +1,177 @@
+WorldMapRegionInfoEdgeTop < UIWidget
+  id: edge_top
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 2
+  image-source: /images/ui/windows/worldmap/region_info/horizontal_edge
+
+WorldMapRegionInfoEdgeBottom < UIWidget
+  id: edge_bottom
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 2
+  image-source: /images/ui/windows/worldmap/region_info/horizontal_edge
+
+WorldMapRegionInfoTopPanel < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 2
+  height: 47
+  phantom: true
+
+  UIWidget
+    id: close_button
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 20
+    size: 25 25
+    image-source: /images/ui/windows/base_window/close_button
+    $hover:
+      image-source: /images/ui/windows/base_window/close_button_active
+    $pressed:
+      image-source: /images/ui/windows/base_window/close_button
+    @onClick: |
+      g_worldMap:hideRegionInfoPanel()
+
+  UIWidget
+    id: title
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    layout:
+      type: horizontalBox
+      fit-children: true
+    UIWidget
+      id: title_icon
+    UIWidget
+      id: title_text
+      text-auto-resize: true
+      text-offset: 0 5
+      font: poppins-semibold-18
+
+WorldMapRegionInfoStatusTimer < UIWidget
+  id: status_timer
+  height: 55
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  text-align: center
+  font: poppins-20
+  UIWidget
+    id: timer
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: 00:00:00
+    text-auto-resize: true
+    font: poppins-semibold-14
+    icon: /images/ui/windows/worldmap/region_info/timer_icon
+    icon-offset: -20 -1
+    icon-align: left
+    phantom: true
+  UIWidget
+    id: progress
+    size: 200 10
+    margin-top: 6
+    phantom: true
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/worldmap/region_info/timer_bar1
+    padding-top: 3
+    padding-bottom: 4
+    UIProgressBar
+      id: bar
+      anchors.fill: parent
+      background-color: #A556FF
+      @onSetup: self:setPercent(20)
+  UIWidget
+    id: status_icon_left
+    size: 40 40
+    anchors.verticalCenter: progress.verticalCenter
+    anchors.right: progress.left
+    margin-right: -1
+  UIWidget
+    id: status_icon_right
+    size: 40 40
+    anchors.verticalCenter: progress.verticalCenter
+    anchors.left: progress.right
+    margin-left: -1
+
+WorldMapRegionInfoStatusNormal < UIWidget
+  id: status_normal
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  height: 40
+  layout:
+    type: horizontalBox
+    fit-children: true
+    spacing: 5
+  UIWidget
+    id: status_icon
+  UIWidget
+    id: status_text
+    text-auto-resize: true
+    font: poppins-semibold-14
+
+WorldMapRegionInfoStatus < UIWidget
+  id: status
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 10
+  height: 55
+
+  WorldMapRegionInfoStatusTimer
+  WorldMapRegionInfoStatusNormal
+
+WorldMapRegionInfoDescription < UIWidget
+  id: description
+  margin-top: 10
+  anchors.top: status.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-left: 18
+  margin-right: 18
+  text-auto-resize: true
+  text-align: center
+  text-wrap: true
+  font: poppins-14
+  margin-bottom: 10
+
+WorldMapRegionInfoBottomPanel < UIWidget
+  id: bottom_panel
+  image-source: /images/ui/windows/worldmap/region_info/bottom_background
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin-bottom: 2
+  UIWidget
+    id: bottom_text
+    anchors.fill: parent
+    text-auto-resize: true
+    text-align: center
+    text-wrap: true
+    margin-left: 15
+    margin-right: 15
+    text-color: #77D463
+    font: poppins-14
+    @onTextChange: |
+      function(self)
+        local textSize = self:getTextSize()
+        self:getParent():setHeight(textSize.height+20)
+      end
+
+WorldMapRegionInfo < UIWindow
+  id: regionInfoPanel
+  size: 350 250
+  image-source: /images/ui/windows/worldmap/region_info/background
+
+  WorldMapRegionInfoEdgeTop
+  WorldMapRegionInfoEdgeBottom
+  WorldMapRegionInfoTopPanel
+  WorldMapRegionInfoStatus
+  WorldMapRegionInfoDescription
+  WorldMapRegionInfoBottomPanel

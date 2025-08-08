@@ -1,0 +1,335 @@
+GameProfessionPanelSearchSeparator < Panel
+  height: 1
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-top: 10
+  border: 1 #25272C
+
+GameProfessionsCraftingWindowTopPanelCheckBox < UIWidget
+  size: 140 35
+  anchors.right: parent.right
+  anchors.verticalCenter: parent.verticalCenter
+  font: poppins-14
+  text: Only Unlocked
+  text-offset: 25 2
+  text-color: #CED2D9
+  CheckBoxSmall
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    phantom: true
+    checked: false
+
+GameProfessionsPanelSearch < UIWidget
+  id: panel_search
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 67
+  padding-left: 28
+  padding-right: 28
+  GameProfessionPanelSearchSeparator
+  GameProfessionsSearchInput
+  GameProfessionsCraftingWindowTopPanelCheckBox
+    id: unlocked
+    anchors.verticalCenter: search_panel.verticalCenter
+    @onClick: |
+      local checked = not self.checkbox:isChecked()
+      self.checkbox:setChecked(checked)
+      local filter = checked and { ["Recipe"] = {["Unlocked"] = true}} or nil
+      GameProfessions:fitFilters(GameProfessions.currentSelectedPanel.left_panel.content.list, filter)
+
+GameProfessionsSearchInput < TextEdit
+  id: search_panel
+  anchors.left: parent.left
+  anchors.verticalCenter: parent.verticalCenter
+  width: 275
+  !preview: tr('Search...')
+  font: poppins-15
+  text-offset: 25 0
+  image-source: /images/ui/windows/tradepacks/panel_background
+  image-border: 10
+  height: 40
+  padding-left: 35
+  margin-top: 10
+  @onTextChange: |
+    GameProfessions:onSearchEditChange(self:getText())
+  UIWidget
+    id: icon_search
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    image-source: /images/ui/windows/tradepacks/icon_search
+    margin-left: -25
+    margin-top: -3
+
+GameProfessionsPanelLeftPanel < UIWidget
+  id: left_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.bottom: parent.bottom
+  anchors.right: parent.horizontalCenter
+  background-color: #1a1b1d
+  //width: 250
+  UIWidget
+    id: content
+    anchors.fill: parent
+    GameProfessionsPanelLeftPanelTitle
+    GameProfessionsPanelLeftPanelLevelProgress
+    GameProfessionsPanelLeftPanelLevelRect
+    GameProfessionsPanelLeftPanelExperience
+    GameProfessionsPanelSearch
+    GameProfessionsPanelLeftPanelList
+    GameProfessionsPanelLeftPanelListScrollBar
+
+GameProfessionsPanelLeftPanelTitle < UIWidget
+  id: title
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  margin-top: 10
+  height: 40
+  font: poppins-semibold-14
+  margin-left: 28
+  margin-right: 28
+  text-color: #ced2d9
+
+GameProfessionsPanelLeftPanelLevelProgress < UIWidget
+  id: level
+  size: 447 9
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 16
+  margin-left: 28
+  margin-right: 28
+  image-border: 3
+  image-source: /images/ui/windows/character/level_progress_background
+
+  UIProgressBar
+    id: level_progress
+    anchors.fill: parent
+    size: 447 3
+    margin-top: 3
+    margin-bottom: 4
+    margin-left: 3
+    margin-right: 3
+    background-color: #A556FF
+
+GameProfessionsPanelLeftPanelLevelRect < UIWidget
+  id: level_rect
+  size: 30 30
+  anchors.verticalCenter: level.verticalCenter
+  anchors.horizontalCenter: level.horizontalCenter
+  image-border: 5
+  image-source: /images/ui/windows/character/level_rect_background
+  text: 15
+  font: poppins-15
+  text-offset: 0 5
+
+GameProfessionsPanelLeftPanelExperience < UIWidget
+  id: experience
+  anchors.horizontalCenter: level_rect.horizontalCenter
+  anchors.top: level_rect.bottom
+  margin-top: 10
+  font: poppins-14
+  text-color: #ced2d9
+  text: 15,000/20,000
+  text-auto-resize: true
+
+GameProfessionsPanelLeftPanelList < ScrollablePanel
+  id: list
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  margin-top: 15
+  vertical-scrollbar: list_scrollbar
+  layout:
+    type: verticalBox
+
+GameProfessionsPanelLeftPanelListCategory < UIWidget
+  height: 40
+  UIWidget
+    id: category
+    anchors.top: parent.top
+    anchors.left: parent.left
+    text-align: top-left
+    font: poppins-semibold-14
+    text-color: #b3b7bd
+    image-source: /images/ui/windows/professions/category_background
+    text-offset: 28 10
+    padding-top: 10
+    &shrinkedHeight: 40
+    text: Category
+    &expanded: true
+    layout:
+      type: verticalBox
+      spacing: 1
+    &update: |
+      function(self)
+        local parent = self:getParent()
+        local height = 0
+        for _, child in ipairs(self:getChildren()) do
+          if not child.original_height then
+            child.original_height = child:getHeight()
+          end
+
+          child:setHeight((not child.hidden and not child.locked) and child.original_height or 0)
+          if child:isVisible() then
+            if height == 0 then
+              child:setMarginTop(40)
+            else
+              child:setMarginTop(0)
+            end
+            height = height + child:getHeight() + self:getLayout():getSpacing()
+          end
+        end
+        self.expanded = height > 0
+        if parent.button then
+          parent.button:setOn(not self.expanded)
+          parent.button:setVisible(height > 0)
+        end
+
+        self:setHeight(height + 60)
+        self.expandedHeight = height + 60
+        parent:setHeight(height + 60)
+        parent:setWidth(parent:getParent():getWidth())
+        self:setWidth(parent:getWidth())
+        self:setImageSize({width = self:getParent():getWidth(), height = 40})
+      end
+    @onSetup: |
+      self:update()
+    @onClick: |
+      local parent = self:getParent()
+      if parent.button and not parent.button:isVisible() then
+        return
+      end
+      parent:setHeight(self.expanded and self.shrinkedHeight or self.expandedHeight)
+      self.expanded = not self.expanded
+      if parent.button then
+        parent.button:setOn(not self.expanded)
+      end
+  UIWidget
+    id: button
+    anchors.right: parent.right
+    anchors.top: parent.top
+    margin-top: 8
+    margin-right: 15
+    size: 24 24
+    image-source: /images/ui/windows/base_window/close_button_up
+    $on:
+      image-source: /images/ui/windows/base_window/close_button_down
+    $hover on:
+      image-source: /images/ui/windows/base_window/close_button_down_active
+    $hover !on:
+      image-source: /images/ui/windows/base_window/close_button_up_active
+    @onClick: |
+      self:getParent().category:onClick()
+
+GameProfessionsPanelLeftPanelListEntry < UIWidget
+  text: Entry
+  margin-left: 30
+  margin-right: 30
+  UIItem
+    id: icon
+    size: 24 24
+    image-source: /images/ui/windows/professions/level_background
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 25
+    padding: 2
+    virtual: true
+    $on:
+      image-source: /images/ui/windows/professions/level_active
+  UICreature
+    id: outfit
+    size: 24 24
+    image-source: /images/ui/windows/professions/level_background
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 25
+    padding: 2
+    outfit-walk: false
+    phantom: true
+    visible: false
+
+  height: 50
+  text-align: left
+  font: poppins-semibold-14
+  text-color: #a6aab2
+  text-offset: 64 0
+  background-color: #161618
+  $hover:
+    background-color: #0e0f10
+    text-color: #77d463
+  $on:
+    background-color: #0e0f10
+    text-color: #77d463
+  @onHoverChange: |
+    function(self, hovered)
+      if hovered and not self.locked then
+        g_gameTooltip.displayItemFromOtherWidget(self.icon:getItem(), self)
+      else
+        g_gameTooltip.hide()
+      end
+    end
+  @onMouseMove: |
+    if g_tooltip.parentWidget ~= self.emblem then
+      g_tooltip.hide()
+      self.emblem.tooltipData = nil
+
+      if self.emblem:isExplicitlyVisible() and self.emblem:containsPoint(g_window.getMousePosition()) then
+        g_gameTooltip.hide()
+        self.emblem.tooltipData = g_tooltip.display(self.emblem)
+      end
+    elseif self.emblem.tooltipData then
+      self.emblem.tooltipData.moveToolTip()
+    end
+  @onStateChange: self.icon:setOn(self:isOn())
+  UIWidget
+    id: level
+    width: 55
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    text-align: right
+    font: poppins-semibold-14
+    text-color: #ff5151
+    icon-source: /images/ui/windows/professions/icon_lock
+    icon-align: left
+    icon-offset: -30 -1
+    phantom: true
+    $on:
+      icon-source:
+      text-color: white
+    @onStateChange: |
+      local emblem = self:getParent().emblem
+      if emblem then
+        emblem:setVisible(not emblem.completed and self:isOn())
+      end
+  UIWidget
+    id: emblem
+    size: 20 20
+    margin-right: 14
+    anchors.top: parent.top
+    anchors.right: prev.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/professions/emblem
+    image-size: 20 20
+    &tooltip: tr('Complete this task to obtain an emblem.')
+    pantom: true
+    visible: true
+
+GameProfessionsPanelLeftPanelListScrollBar < VerticalScrollBar
+  id: list_scrollbar
+  anchors.right: parent.right
+  anchors.top: list.top
+  anchors.bottom: list.bottom
+  margin-right: 5
+  margin-top: 5
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true

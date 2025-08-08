@@ -1,0 +1,238 @@
+CraftingProgressBar < UIProgressBar3
+  size: 124 37
+  image-source: /images/ui/windows/crafting/progress_background
+  image-border-left: 30
+  image-border-right: 30
+
+  UIWidget
+    id: progress
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 18
+    margin-right: 18
+    height: 22
+    phantom: true
+    image-border-left: 2
+    image-border-right: 2
+    image-source: /images/ui/windows/crafting/green_fill
+    margin-top: -1
+    @onSetup: |
+      self:setImageSource(string.format('/images/ui/windows/crafting/%s_fill', self:getParent().color))
+    UIWidget
+      id: edge
+      phantom: true
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      image-source: /images/ui/windows/crafting/edge_green
+      @onSetup: |
+        local color = self:getParent():getParent().color
+        if not color or color == 'orange' then
+          return
+        end
+        self:setImageSource(string.format('/images/ui/windows/crafting/edge_%s', color))
+
+  UIWidget
+    id: description
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: left
+    font: poppins-semibold-bordered-14
+    margin-left: 30
+    text-offset: 0 -2
+    phantom: true
+    text-auto-resize: true
+
+  UIWidget
+    id: label
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text: 70/100
+    text-align: right
+    font: poppins-semibold-bordered-14
+    margin-right: 30
+    phantom: true
+    text-auto-resize: true
+
+  UIWidget
+    id: edge_left
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/crafting/progress_edge_left
+    size: 24 39
+  
+  UIWidget
+    id: edge_right
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/crafting/progress_edge_right
+    size: 24 39
+
+CraftingMinigame < UIWindow
+  size: 300 200
+  anchors.centerIn: parent
+  margin-top: 70
+  draggable: false
+  focusable: false
+
+  UIButton
+    id: exitButton
+    anchors.top: parent.top
+    anchors.right: parent.right
+    image-source: /images/ui/windows/crafting/exit_button
+    size: 24 24
+    opacity: 0.9
+    $hover:
+      opacity: 1.0
+    $pressed:
+      opacity: 0.8
+    @onClick: cancelCrafting()
+
+  CraftingProgressBar
+    id: progress
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    &minWidth: 1
+    @onSetup: |
+      self:setPercentage(0, 100)
+      self.description:setText('Progress')
+    margin-top: 5
+    &color: 'green'
+
+  CraftingProgressBar
+    id: quality
+    anchors.top: prev.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 12
+    &minWidth: 1
+    @onSetup: |
+      self:setPercentage(0, 100)
+      self.description:setText('Quality')
+    &color: 'purple'
+
+  UIWidget
+    id: item
+    image-source: /images/ui/windows/crafting/item_background
+    anchors.top: quality.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 7
+    size: 60 60
+    image-border: 4
+    image-size: 58 58
+    image-offset: 1 1
+    UIItem
+      id: preview
+      anchors.fill: parent
+      margin: 2
+    UIWidget
+      id: outline
+      anchors.fill: parent
+      image-source: /images/ui/windows/crafting/item_border
+      phantom: true
+
+  UIWidget
+    id: durabilityPanel
+    anchors.top: quality.bottom
+    anchors.left: parent.left
+    anchors.right: item.left
+    size: 150 60
+    margin-top: 10
+    margin-right: 10
+
+    UIWidget
+      id: durability
+      font: poppins-semibold-bordered-14
+      text-auto-resize: true
+      text-align: center
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text: 4/4
+      text-offset: 0 2
+      phantom: false
+
+    CraftingProgressBar
+      id: durabilityProgress
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      &minWidth: 1
+      &color: 'orange'
+      @onSetup: |
+        self:setPercentage(100, 100)
+        self.label:destroy()
+        self.progress.edge:destroy()
+
+  UIWidget
+    id: laborPanel
+    anchors.top: prev.top
+    anchors.right: parent.right
+    anchors.left: item.right
+    size: 150 60
+    margin-left: 10
+    phantom: false
+
+    UIWidget
+      id: labor
+      font: poppins-semibold-bordered-14
+      text-auto-resize: true
+      text-align: center
+      anchors.top: parent.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      text: Labor: 85/85
+      text-offset: 0 2
+      phantom: false
+
+    CraftingProgressBar
+      id: laborProgress
+      anchors.top: prev.bottom
+      anchors.horizontalCenter: parent.horizontalCenter
+      anchors.left: parent.left
+      anchors.right: parent.right
+      &minWidth: 1
+      &color: 'blue'
+      @onSetup: |
+        self:setPercentage(100, 100)
+        self.label:destroy()
+
+  Label
+    id: qualityName
+    anchors.top: item.bottom
+    anchors.left: durabilityPanel.right
+    anchors.right: laborPanel.left
+    text: Superior Quality
+    text-wrap: true
+    font: poppins-semibold-bordered-14
+    text-auto-resize: true
+    text-align: center
+    margin-top: 5
+    phantom: false
+
+  Label
+    id: durabilityName
+    anchors.top: durabilityPanel.bottom
+    anchors.horizontalCenter: durabilityPanel.horizontalCenter
+    text: Durability
+    font: poppins-semibold-bordered-14
+    text-auto-resize: true
+    text-align: center
+    phantom: true
+
+  Label
+    id: laborName
+    anchors.top: laborPanel.bottom
+    anchors.horizontalCenter: laborPanel.horizontalCenter
+    text: Labor
+    text-wrap: true
+    font: poppins-semibold-bordered-14
+    text-auto-resize: true
+    text-align: center
+    phantom: true

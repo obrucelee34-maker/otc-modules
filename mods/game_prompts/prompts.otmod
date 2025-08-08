@@ -1,0 +1,7 @@
+Module
+  name: game_prompts
+  description: Game prompts module
+  sandboxed: true
+  scripts: [ prompts ]
+  @onLoad: GamePrompts:init()
+  @onUnload: GamePrompts:terminate()

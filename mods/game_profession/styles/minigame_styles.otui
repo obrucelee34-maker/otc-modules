@@ -1,0 +1,60 @@
+MinigameAbilityRow < Panel
+  size: 380 55
+  layout:
+    type: horizontalBox
+    spacing: 10
+
+  MinigameAbilityPanel
+  MinigameAbilityPanel
+  MinigameAbilityPanel
+  MinigameAbilityPanel
+  MinigameAbilityPanel
+
+MinigameAbilityRowSmall < Panel
+  size: 380 45
+  layout:
+    type: horizontalBox
+    spacing: 10
+
+  MinigameAbilityPanelSmall
+  MinigameAbilityPanelSmall
+  MinigameAbilityPanelSmall
+  MinigameAbilityPanelSmall
+
+MinigameAbilityIcon < UIButton
+  size: 55 55
+  anchors.verticalCenter: parent.verticalCenter
+
+  $first:
+    anchors.left: parent.left
+
+  $!first:
+    anchors.left: prev.right
+    margin-left: 20
+
+MinigameAbilityPanel < UIButton
+  size: 55 55
+  background-color: #00000099
+  border: 2 #e7b131
+  image-color: white
+
+  $disabled:
+    image-color: #666666
+
+  $hover !disabled:
+    image-color: #cccccc
+
+  $pressed !disabled:
+    image-color: #aaaaaa
+
+  @onClick: modules.game_professions.onAbilityClicked(self)
+
+  SpellProgressRect
+    id: cooldown
+    anchors.fill: parent
+    show-text: true
+    visible: false
+    phantom: true
+
+MinigameAbilityPanelSmall < MinigameAbilityPanel
+  size: 45 45

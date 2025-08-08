@@ -1,0 +1,8 @@
+Module
+  name: game_worldmap
+  description: Minimap
+  author: otclient@otclient.ovh
+  sandboxed: false
+  scripts: [ worldmap ]
+  @onLoad: g_worldMap.init()
+  @onUnload: g_worldMap.terminate()

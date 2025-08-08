@@ -1,0 +1,127 @@
+GameProfessionsPassiveWindow < AttachedWindow
+  id: gameProfessionsPassiveWindow
+  size: 350 650
+  anchors.verticalCenter: gameProfessionsWindow.verticalCenter
+  anchors.left: gameProfessionsWindow.right
+  side: right
+  GameProfessionTree
+    id: mining
+    visible: true
+    &professionName: 'mining'
+    &professionId: ProfessionIds['mining']
+  GameProfessionTree
+    id: herbalism
+    &professionName: 'herbalism'
+    &professionId: ProfessionIds['herbalism']
+  GameProfessionTree
+    id: woodcutting
+    &professionName: 'woodcutting'
+    &professionId: ProfessionIds['woodcutting']
+  GameProfessionTree
+    id: farming
+    &professionName: 'farming'
+    &professionId: ProfessionIds['farming']
+  GameProfessionTree
+    id: husbandry
+    &professionName: 'husbandry'
+    &professionId: ProfessionIds['husbandry']
+  GameProfessionTree
+    id: fishing
+    &professionName: 'fishing'
+    &professionId: ProfessionIds['fishing']
+  GameProfessionTree
+    id: blacksmithing
+    &professionName: 'blacksmithing'
+    &professionId: ProfessionIds['blacksmithing']
+  GameProfessionTree
+    id: carpentry
+    &professionName: 'carpentry'
+    &professionId: ProfessionIds['carpentry']
+  GameProfessionTree
+    id: weaving
+    &professionName: 'weaving'
+    &professionId: ProfessionIds['weaving']
+  GameProfessionTree
+    id: cooking
+    &professionName: 'cooking'
+    &professionId: ProfessionIds['cooking']
+  GameProfessionTree
+    id: breeding
+    &professionName: 'breeding'
+    &professionId: ProfessionIds['breeding']
+    @onSetup: |
+      if g_game.isRavenQuest() then
+        self:setEnabled(false)
+      end
+  GameProfessionTree
+    id: alchemy
+    &professionName: 'alchemy'
+    &professionId: ProfessionIds['alchemy']
+
+GameProfessionsWindow < MainWindow
+  id: gameProfessionsWindow
+  size: 950 753
+  anchors.centerIn: parent
+  &title: 'Professions'
+  &hotkeyId: HOTKEYS_IDS.PROFESSIONS
+  &iconName: 'icon_professions'
+  &isGeneralUIWindow: true
+
+  MainWindowContent
+    padding: 0 0 0 0
+    GameProfessionTopPanel
+    GameProfessionsTopPanelSeparator
+
+    GameProfessionsPanel
+      id: mining
+      visible: true
+      &professionName: 'mining'
+      &professionId: ProfessionIds['mining']
+    GameProfessionsPanel
+      id: herbalism
+      &professionName: 'herbalism'
+      &professionId: ProfessionIds['herbalism']
+    GameProfessionsPanel
+      id: woodcutting
+      &professionName: 'woodcutting'
+      &professionId: ProfessionIds['woodcutting']
+    GameProfessionsPanel
+      id: farming
+      &professionName: 'farming'
+      &professionId: ProfessionIds['farming']
+    GameProfessionsPanel
+      id: husbandry
+      &professionName: 'husbandry'
+      &professionId: ProfessionIds['husbandry']
+    GameProfessionsPanel
+      id: fishing
+      &professionName: 'fishing'
+      &professionId: ProfessionIds['fishing']
+    GameProfessionsPanel
+      id: blacksmithing
+      &professionName: 'blacksmithing'
+      &professionId: ProfessionIds['blacksmithing']
+    GameProfessionsPanel
+      id: carpentry
+      &professionName: 'carpentry'
+      &professionId: ProfessionIds['carpentry']
+    GameProfessionsPanel
+      id: weaving
+      &professionName: 'weaving'
+      &professionId: ProfessionIds['weaving']
+    GameProfessionsPanel
+      id: cooking
+      &professionName: 'cooking'
+      &professionId: ProfessionIds['cooking']
+    GameProfessionsPanel
+      id: breeding
+      &professionName: 'breeding'
+      &professionId: ProfessionIds['breeding']
+      @onSetup: |
+        if g_game.isRavenQuest() then
+          self:setEnabled(false)
+        end
+    GameProfessionsPanel
+      id: alchemy
+      &professionName: 'alchemy'
+      &professionId: ProfessionIds['alchemy']

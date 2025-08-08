@@ -1,0 +1,538 @@
+GameWarforgeInventoryItem < Item
+  &hasHover: true
+
+GameWarforgePreviewPanel < UIWidget
+  id: preview_panel
+  anchors.top: parent.top
+  anchors.horizontalCenter: parent.horizontalCenter
+  height: 180
+  layout:
+    type: horizontalBox
+    fit-children: true
+    spacing: 26
+  GameWarforgePreviewPanelWeapon
+    id: item
+  GameWarforgePreviewPanelInfo
+    id: info
+  GameWarforgePreviewPanelWeapon
+    id: preview
+
+GameWarforgePreviewPanelWeapon < UIWidget
+  size: 80 160
+  @onSetup: |
+    local id = self:getId()
+    local placeholder = self.item.placeholder
+    placeholder:setImageSource(string.format('/images/ui/windows/infusion/icon_%s', id))
+    
+    local textureSize = {width = placeholder:getImageTextureWidth(), height = placeholder:getImageTextureHeight()}
+    placeholder:setSize(textureSize)
+
+    if id == 'preview' then
+      self.skill.overlay:setOn(true)
+    end
+
+  UIWidget
+    id: text
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    text-auto-resize: true
+    font: poppins-semibold-13
+    text-color: #a6aab2
+    @onSetup: |
+      self:setText(self:getParent():getId():titleCase())
+  UIWidget
+    id: skill
+    size: 80 80
+    anchors.top: item.bottom
+    image-source: /images/ui/windows/warforge/skill_background
+    margin-top: -3
+    UIWidget
+      id: icon
+      size: 50 50
+      anchors.centerIn: parent
+      margin-top: 5
+    UIWidget
+      id: overlay
+      margin-top: 2
+      image-source: /images/ui/windows/warforge/normal_skill_overlay
+      $on:
+        image-source: /images/ui/windows/warforge/preview_skill_overlay
+      image-auto-resize: true
+      phantom: true
+      anchors.centerIn: parent
+  Item
+    size: 80 80
+    id: item
+    anchors.top: text.bottom
+    margin-top: 6
+    draggable: false
+    virtual: true
+    image-source: /images/ui/windows/infusion/preview_background
+    &isWarforge: true
+    $on:
+      image-source: /images/ui/windows/infusion/preview_background_active
+    UIWidget
+      id: placeholder
+      anchors.centerIn: parent
+
+GameWarforgeStatsBackground < Panel
+  size: 455 65
+  image-source: /images/ui/windows/infusion/attributes_background
+  text-align: center
+  text-color: #CED2D9
+  text-offset: 0 2
+  font: poppins-16
+  text: Add an item to see its attributes
+  @onStateChange: |
+    if not self:isOn() then
+      self.separator:setVisible(false)
+      self:setText('Add an item to see its attributes')
+      self:setHeight(65)
+    else
+      self.separator:setVisible(true)
+      self:setText('')
+    end
+  
+  UIWidget
+    id: separator
+    width: 1
+    background-color: #3A3D43
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.top: parent.top
+    anchors.bottom: parent.bottom
+    margin-top: 30
+    margin-bottom: 30
+    visible: false
+
+GameWarforgeInfoBackground < Panel
+  size: 330 38
+  image-source: /images/ui/windows/infusion/info_background
+  text-align: center
+  text-color: #CED2D9
+  font: poppins-14
+  text: Drag and drop an item or double click it
+
+GameWarforgeInventoryPanelScrollBar < VerticalScrollBar
+  anchors.top: parent.top
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  step: 48
+  pixels-scroll: true
+  margin-top: 85
+  margin-bottom: 7
+  margin-right: 13
+
+GameWarforgeInventoryPanelFilterPanel < UIWidget
+  id: filter_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 46
+  font: poppins-16
+  text-color: #a6aab2
+  text-align: right
+  margin-right: 28
+  text-offset: 0 5
+  layout:
+    type: horizontalBox
+    spacing: 10
+  GameWarforgeInventoryPanelFilterButton
+    id: all
+  GameWarforgeInventoryPanelFilterButton
+    id: infusion
+  GameWarforgeInventoryPanelFilterButton
+    id: weapon
+  GameWarforgeInventoryPanelFilterButton
+    id: helmet
+  GameWarforgeInventoryPanelFilterButton
+    id: armor
+  GameWarforgeInventoryPanelFilterButton
+    id: legs
+  GameWarforgeInventoryPanelFilterButton
+    id: boots
+
+GameWarforgeInventoryPanelFilterButton < UIWidget
+  size: 25 46
+  @onSetup: |
+    self:setTooltip(self:getId():titleCase())
+  @onStateChange: |
+    self.icon:setOn(self:isOn())
+
+  UIWidget
+    id: icon
+    anchors.centerIn: parent
+    phantom: true
+    text-auto-resize: true
+    font: poppins-semibold-13
+    image-color: #8a8a8b
+    text-color: #8a8a8b
+    $on:
+      image-color: white
+      text-color: white
+    @onSetup: |
+      local parentId = self:getParent():getId()
+      if parentId == 'all' then
+        self:setText(parentId:upper())
+        return
+      end
+      self:setImageSource(string.format('/images/ui/windows/inventory/icon_%s', parentId))
+      local textureWidth = self:getImageTextureWidth()
+      local textureHeight = self:getImageTextureHeight()
+      self:setImageSize({width = textureWidth, height = textureHeight})
+      self:setSize({width = textureWidth, height = textureHeight})
+      self:getParent():setSize({width = textureWidth, height = textureHeight})
+
+  @onClick: GameWarforge:applyInfusionFilter(self:getId())
+
+GameWarforgeEquipmentPanelSlot < Item
+  size: 60 60
+  @onSetup: |
+    connect(self, {
+      onItemChange = function(self)
+        self.placeholder:setVisible(not self:getItem())
+      end
+    })
+
+  UIWidget
+    id: placeholder
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/character/helmet
+    phantom: true
+
+GameWarforgeItemHolder < ScrollablePanel
+  id: item_holder
+  anchors.left: parent.left
+  anchors.right: parent.right
+  background-color: #00000040
+  padding: 25
+  padding-top: 40
+  padding-bottom: 10
+  layout:
+    type: grid
+    cell-size: 60 60
+    cell-spacing: 6 6
+    flow: true
+
+GameWarforgeInventoryPanel < Panel
+  Panel
+    id: header
+    height: 40
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    text-color: #CED2D9
+    font: poppins-14
+    background-color: #00000080
+
+GameWarforgePreviewPanelInfo < UIWidget
+  width: 78
+  UIWidget
+    id: arrow
+    image-source: /images/ui/windows/infusion/preview_arrow
+    anchors.centerIn: parent
+    size: 78 78
+    $on:
+      image-source: /images/ui/windows/infusion/preview_arrow_active
+
+GameWarforgeStatsPanelItem < UIWidget
+  font: poppins-semibold-12
+  text-color: #ffffff
+  text-align: left
+  text-offset: 15 0
+  image-source: /images/ui/windows/infusion/circle
+  image-color: #ffffff
+  image-size: 7 7
+  image-offset: 0 8
+  height: 23
+  $disabled:
+    text-color: #6a6d72
+    image-color: #6a6d72
+
+GameWarforgeStatsPanel < UIWidget
+  anchors.top: preview_panel.bottom
+  size: 195 133
+  margin-top: 25
+  visible: false
+  layout:
+    type: verticalBox
+    cell-size: 195 23
+
+GameWarforgeSlotPanel < UIWidget
+  id: slot_panel
+  anchors.top: item_stats_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  layout:
+    type: verticalBox
+    spacing: 10
+  GameWarforgeSlotPanelItem
+    id: slot_1
+  GameWarforgeSlotPanelItem
+    id: slot_2
+  GameWarforgeSlotPanelItem
+    id: slot_3
+  GameWarforgeSlotPanelItem
+    id: slot_4
+  
+GameWarforgeSlotPanelItem < UIWidget
+  height: 53
+  image-source: /images/ui/windows/infusion/infusion_background
+  image-border: 15
+  padding: 7
+  @onStateChange: |
+    local state = self:isOn()
+    self.name:setOn(state)
+    self.description:setOn(state)
+    if not state then
+      self.exp:setText('0')
+      self.cost:setText('0')
+    end
+
+  Item
+    id: item
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    draggable: false
+    size: 42 42
+
+  UIWidget
+    id: name
+    anchors.left: item.right
+    anchors.top: item.top
+    text-auto-resize: true
+    margin-left: 15
+    font: poppins-semibold-16
+    text-color: #a6aab2
+    margin-top: 3
+    anchors.verticalCenter: none
+    $on:
+      margin-top: 0
+      text-color: #e3e3e3
+      anchors.verticalCenter: parent.verticalCenter
+    @onSetup: |
+      self:setText(self:getParent():getId():gsub('slot_', 'Slot '):titleCase())
+    @onStateChange: |
+      if not self:isOn() then
+        self:setText(self:getParent():getId():gsub('slot_', 'Slot '):titleCase())
+      else
+        self:setText(self:getParent().item:getItem():getName():titleCase())
+      end
+
+  UIWidget
+    id: description
+    anchors.left: item.right
+    anchors.bottom: item.bottom
+    text-auto-resize: true
+    text: Item or infusion artifacts
+    margin-left: 15
+    font: poppins-semibold-12
+    text-color: #696d75
+    margin-bottom: 3
+    visible: true
+    $on:
+      visible: false
+
+  UIWidget
+    id: exp
+    anchors.top: parent.top
+    anchors.right: parent.right
+    size: 80 20
+    text-auto-resize: true
+    font: poppins-semibold-13
+    text-color: #a6aab2
+    visible: false
+    $on:
+      text-color: #67b15a
+      visible: true
+    text: 0
+    margin-top: 4
+    margin-right: 25
+    @onTextChange: |
+      self:setText(string.format('%s%s', tonumber(self:getText()) > 0 and '+' or '', self:getText()), true)
+      self:setOn(self:getText() ~= '0')
+  
+  UIWidget
+    anchors.left: prev.right
+    anchors.verticalCenter: prev.verticalCenter
+    text-auto-resize: true
+    font: poppins-semibold-13
+    text: XP
+    visible: false
+    margin-left: 4
+    @onSetup: |
+      connect(self:getParent().exp, {
+        onVisibilityChange = function(widget, visible)
+          self:setVisible(visible)
+        end
+      })
+
+  UIWidget
+    id: cost
+    anchors.verticalCenter: exp.bottom
+    anchors.right: parent.right
+    size: 80 20
+    text-auto-resize: true
+    font: poppins-semibold-13
+    text-color: #a6aab2
+    text-offset: 0 0
+    text: 0
+    margin-top: 6
+    margin-right: 25
+    visible: false
+    $on:
+      text-color: #CED2D9
+      visible: true
+    @onTextChange: |
+      self:setText(string.format('%s%s', tonumber(self:getText()) > 0 and '-' or '', self:getText()), true)
+      self:setOn(self:getText() ~= '0')
+  
+  UIWidget
+    anchors.left: prev.right
+    anchors.verticalCenter: prev.verticalCenter
+    size: 17 17
+    margin-left: 4
+    image-source: /images/ui/icons/silver_24
+    visible: false
+    @onSetup: |
+      connect(self:getParent().cost, {
+        onVisibilityChange = function(widget, visible)
+          self:setVisible(visible)
+        end
+      })
+
+GameWarforgeOptionsPanel < UIWidget
+  id: options_panel
+  layout:
+    type: verticalBox
+    fit-children: true
+  GameWarforgeOption
+    id: normal_option
+  GameWarforgeOptionSeparator
+    id: charge_separator
+  GameWarforgeOption
+    id: charge_option
+
+GameWarforgeOptionSeparator < UIWidget
+  height: 15
+  margin-top: 15
+  margin-bottom: 10
+  UIWidget
+    id: text
+    anchors.centerIn: parent
+    font: poppins-12
+    text-auto-resize: true
+    text-offset: 0 2
+    text: Guild Charge
+  UIWidget
+    anchors.verticalCenter: text.verticalCenter
+    anchors.left: parent.left
+    anchors.right: text.left
+    margin-right: 15
+    image-source: /images/ui/windows/warforge/horizontal_separator
+  UIWidget
+    anchors.verticalCenter: text.verticalCenter
+    anchors.right: parent.right
+    anchors.left: text.right
+    margin-left: 15
+    image-source: /images/ui/windows/warforge/horizontal_separator
+
+GameWarforgeOption < UIWidget
+  height: 60
+  $on:
+    image-source: /images/ui/windows/infusion/infusion_background_on
+  $!on:
+    image-source: /images/ui/windows/infusion/infusion_background
+  image-border: 15
+  padding: 7
+
+  opacity: 1.0
+  $disabled:
+    opacity: 0.5
+
+  UIWidget
+    id: radio_button
+    size: 20 20
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 15
+    phantom: true
+    $on:
+      image-source: /images/ui/windows/infusion/radio_button_on
+    $!on:
+      image-source: /images/ui/windows/infusion/radio_button_off
+
+  UIWidget
+    id: amounts
+    width: 75
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    phantom: true
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text: 1/1
+
+  UIWidget
+    id: item_image
+    size: 48 48
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/warforge/warforge_shard
+    phantom: true
+
+  UIWidget
+    id: description
+    anchors.left: prev.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    phantom: true
+    font: poppins-14
+    text-auto-resize: true
+    text-color: #77D463
+    text: Warforging Shards
+
+  UIWidget
+    id: cost
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 25
+    phantom: true
+    font: poppins-12
+    text-auto-resize: true
+    text-color: #CED2D9
+    text-align: right
+    text-offset: 0 2
+
+  UIWidget
+    id: free
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 25
+    phantom: true
+    font: poppins-semibold-12
+    text-auto-resize: true
+    text-color: #77D463
+    text-align: right
+    text-offset: 0 2
+    text: FREE
+    visible: false
+  
+  UIWidget
+    size: 17 17
+    anchors.left: prev.right
+    anchors.verticalCenter: prev.verticalCenter
+    margin-left: 4
+    image-source: /images/ui/icons/silver_24
+    phantom: true
+  
+  @onStateChange: |
+    self.radio_button:setOn(self:isOn())
+  
+  @onEnableChange: |
+    if not self:isEnabled() then
+      self:setOn(false)
+    end
+  
+  @onClick: |
+    GameWarforge:selectWarforgeOption(self)

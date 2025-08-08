@@ -1,0 +1,478 @@
+GameProfessionsPanelMiddlePanel < UIWidget
+  id: right_panel
+  anchors.top: parent.top
+  anchors.left: left_panel.right
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  GameProfessionsPanelMiddlePanelContent
+    GameProfessionsPanelMiddlePanelTopPanel
+    GameProfessionsPanelMiddlePanelMaterialsListHeader
+    GameProfessionsPanelMiddlePanelMaterialsList
+    GameProfessionsPanelMiddlePanelSecondaryListHeader
+    GameProfessionsPanelMiddlePanelSecondaryList
+    GameProfessionsPanelMiddlePanelTertiaryListHeader
+    GameProfessionsPanelMiddlePanelTertiaryList
+  GameProfessionsPanelBottomPanelButtons
+  GameProfessionsPanelMiddlePanelContentListScrollBar
+
+GameProfessionsPanelMiddlePanelContent < ScrollablePanel
+  id: content
+  vertical-scrollbar: content_list_scrollbar
+  anchors.fill: parent
+  anchors.bottom: next.top
+  background-color: #1a1b1d
+
+GameProfessionsPanelMiddlePanelTopPanel < UIWidget
+  id: top_panel
+  padding: 0 20 15 20
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 130
+  //background-color: #16171a
+  background-color: #1a1b1d
+  &centerTextChildren: |
+    function(self)
+      -- set margin to center all children vertically
+      local height = 0
+      for _, child in ipairs(self:getChildren()) do
+        if child:isVisible() and child:getText() ~= '' and not child.ignore then
+          height = height + child:getHeight()
+        end
+      end
+      if height > 0 then
+        self.name:setMarginTop((self:getHeight() - height) / 2)
+      end
+    end
+
+  Item
+    id: item
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    size: 80 80
+    margin-top: 10
+    padding: 8
+  UICreature
+    id: outfit
+    image-source: /images/ui/items/background
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    size: 80 80
+    margin-top: 10
+    padding: 8
+    outfit-walk: false
+    phantom: true
+    visible: false
+  UIWidget
+    id: name
+    anchors.top: parent.top
+    anchors.left: item.right
+    anchors.right: parent.right
+    margin-left: 20
+    text-align: left
+    text: Pepega
+    font: poppins-semibold-14
+    text-color: #f1f1f1
+    @onTextChange: |
+      local parent = self:getParent()
+      parent.centerTextChildren(parent)
+  UIWidget
+    id: level
+    anchors.top: prev.bottom
+    anchors.left: item.right
+    anchors.right: parent.right
+    margin-left: 20
+    margin-top: 10
+    text-align: left
+    font: poppins-semibold-12
+    text-color: #a6aab2
+  UIWidget
+    id: mass_level
+    anchors.top: prev.bottom
+    anchors.left: item.right
+    anchors.right: parent.right
+    margin-left: 20
+    margin-top: 2
+    text-align: left
+    font: poppins-semibold-12
+    text-color: #a6aab2
+    visible: false
+  UIWidget
+    id: description
+    anchors.top: level.top
+    anchors.left: parent.horizontalCenter
+    anchors.right: parent.right
+    margin-left: 40
+    text-align: left
+    font: poppins-semibold-12
+    text-color: #a6aab2
+    visible: false
+    &ignore: true
+  UIWidget
+    id: tax
+    anchors.top: prev.bottom
+    anchors.left: prev.left
+    font: poppins-semibold-12
+    text-align: left
+    text: Tax:
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    margin-top: 2
+    visible: false
+    &ignore: true
+  UIWidget
+    id: silver_icon
+    anchors.top: tax.top
+    anchors.left: tax.right
+    margin-left: 6
+    size: 18 18
+    image-source: /images/ui/icons/silver_24
+    visible: false
+    &ignore: true
+  UIWidget
+    id: tax_value
+    anchors.top: tax.top
+    anchors.left: silver_icon.right
+    font: poppins-semibold-12
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    margin-left: 6
+    text-align: left
+    visible: false
+    &ignore: true
+    @onTextChange: |
+      -- format text to cotain commas
+      local length = 0
+      local text = self:getText()
+      local formatted = ''
+      for i = #text, 1, -1 do
+        formatted = text:sub(i, i) .. formatted
+        length = length + 1
+        if length == 3 and i ~= 1 then
+          formatted = ',' .. formatted
+          length = 0
+        end
+      end
+      self:setText(formatted, true)
+  UIWidget
+    id: specialization
+    anchors.top: prev.bottom
+    anchors.left: mass_level.left
+    font: poppins-semibold-12
+    text-align: left
+    text: Requires:
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    margin-top: 2
+    visible: false
+
+GameProfessionsPanelMiddlePanelMaterialsList < Panel
+  id: materials_list
+  anchors.top: prev.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  margin-top: 10
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 10
+
+GameProfessionsPanelMiddlePanelMaterialsListHeader < UIWidget
+  id: materials_list_header
+  image-source: /images/ui/windows/professions/category_background
+  height: 40
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: top_panel.bottom
+  @onStateChange: |
+    if self:isOn() then
+      self.text:setMarginRight(42)
+      self.time:setMarginLeft(72)
+      self.time:setVisible(true)
+    end
+
+  UIWidget
+    id: text
+    font: poppins-semibold-14
+    text-color: #b3b7bd
+    text: Gathering
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-auto-resize: true
+
+  UIWidget
+    id: time
+    width: 140
+    font: poppins-14
+    text-color: #A6AAB2
+    text: 1 Hour
+    icon-source: /images/ui/windows/professions/icon_time
+    icon-align: left
+    icon-offset: -1 -1
+    text-offset: 20 0
+    text-align: left
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.horizontalCenter: parent.horizontalCenter
+    visible: false
+
+GameProfessionsPanelMiddlePanelSecondaryList < GameProfessionsPanelMiddlePanelMaterialsList
+  id: secondary_list
+  visible: false
+  @onVisibilityChange: |
+    local parent = self:getParent()
+    parent:getChildById('secondary_list_header'):setVisible(self:isVisible())
+    --parent:getChildById('secondary_list_scrollbar'):setVisible(self:isVisible())
+
+GameProfessionsPanelMiddlePanelSecondaryListHeader < GameProfessionsPanelMiddlePanelMaterialsListHeader
+  id: secondary_list_header
+  anchors.top: materials_list.bottom
+  margin-top: -40
+  visible: false
+
+GameProfessionsPanelMiddlePanelTertiaryList < GameProfessionsPanelMiddlePanelMaterialsList
+  id: tertiary_list
+  height: 0
+  visible: false
+  layout:
+    type: verticalBox
+    fit-children: true
+    spacing: 1
+  @onVisibilityChange: |
+    local parent = self:getParent()
+    parent:getChildById('tertiary_list_header'):setVisible(self:isVisible())
+
+GameProfessionsPanelMiddlePanelTertiaryListHeader < GameProfessionsPanelMiddlePanelMaterialsListHeader
+  id: tertiary_list_header
+  anchors.top: secondary_list.bottom
+  margin-top: 10
+  visible: false
+  @onSetup: self.text:setText('Color Rarities')
+
+GameProfessionsPanelMiddlePanelMaterialsListItemCheckBox < UIWidget
+  height: 30
+  width: 90
+  CheckBoxSmall
+    id: checkbox
+    size: 16 16
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    text-offset: 0 2
+    margin-left: 2
+    text-color: #a6aab2
+    font: poppins-semibold-10
+    text-auto-resize: true
+    text: 0
+    @onTextChange: |
+      self:setText(string.format('%s[%s]', self:getParent():getId(), self:getText()), true)
+
+GameProfessionsPanelMiddlePanelMaterialsListItem < UIWidget
+  height: 80
+  padding: 0 20 0 20
+
+  UIWidget
+    id: quality_panel
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 290 30
+    image-source: /images/ui/windows/professions/amount_background
+    image-border: 5
+    margin-bottom: 2
+    padding: 0 5 0 5
+    layout:
+      type: horizontalBox
+    GameProfessionsPanelMiddlePanelMaterialsListItemCheckBox
+      id: HQ
+      margin-left: 10
+    GameProfessionsPanelMiddlePanelMaterialsListItemCheckBox
+      id: SQ
+    GameProfessionsPanelMiddlePanelMaterialsListItemCheckBox
+      id: AQ
+    @onSetup: |
+      -- set spacing to evenly distribute buttons
+      addEvent(function()
+        local childCount = self:getChildCount()
+        if childCount > 0 then
+          local width = self:getFirstChild():getWidth()
+          self:getLayout():setSpacing((self:getWidth() - 10 - width * childCount) / (childCount - 1))
+        end
+      end)
+
+  UIWidget
+    id: background
+    anchors.fill: parent
+    margin-bottom: 30
+    image-source: /images/ui/windows/professions/item_background
+    image-border: 5
+
+  UIWidget
+    id: amount
+    padding: 10
+    image-source: /images/ui/windows/professions/points_background
+    $on:
+      image-source: /images/ui/windows/professions/points_background_active
+    image-border: 5
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: parent.left
+    text: 0/1
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text-color: #a6aab2
+    margin-left: 15
+    size: 70 30
+
+  UIItem
+    id: item
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: amount.right
+    margin-left: 15
+    phantom: true
+    size: 32 32
+
+  UIWidget
+    id: name
+    height: 50
+    anchors.verticalCenter: background.verticalCenter
+    anchors.left: item.right
+    anchors.right: parent.right
+    margin-left: 15
+    margin-right: 5
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text-align: left
+    //text-auto-resize: true
+    text-wrap: true
+    text-color: #a6aab2
+  
+  @onSetup: |
+    addEvent(function()
+      if self:isLast() then
+        self:setMarginBottom(30)
+      end
+    end)
+
+GameProfessionsPanelRightHorizontalSeparator < UIWidget
+  height: 3
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.top: parent.top
+  image-source: /images/ui/windows/professions/horizontal_separator
+
+GameProfessionsPanelRightLocateStationButton < NeutralButton
+  id: locate_station
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  &resizeText: true
+  text: Locate Station
+  @onClick: |
+    GameProfessions:locateStation()
+
+GameProfessionsPanelRightPassiveButton < SecondaryButton
+  id: passive_button
+  anchors.horizontalCenter: parent.horizontalCenter
+  anchors.verticalCenter: parent.verticalCenter
+  &resizeText: true
+  text: Passive Skills
+  @onClick: |
+    GameProfessions:passiveSkills()
+
+GameProfessionsPanelBottomPanelButtons < UIWidget
+  id: bottom_panel
+  height: 100
+  background-color: #0b0c0d
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  GameProfessionsPanelRightHorizontalSeparator
+  GameProfessionsPanelRightLocateStationButton
+  GameProfessionsPanelRightPassiveButton
+
+GameProfessionsPanelRightPanelBreedingListEntry < UIWidget
+  text: Entry
+  margin-left: 30
+  margin-right: 30
+  height: 50
+  text-align: left
+  font: poppins-16
+  text-color: white
+  text-offset: 64 5
+  background-color: #161618
+  $hover:
+    background-color: #0e0f10
+    text-color: #77d463
+  $on:
+    background-color: #0e0f10
+    text-color: #77d463
+
+  UIItem
+    id: icon
+    size: 20 20
+    image-source: /images/ui/windows/professions/level_background
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 25
+  UIWidget
+    id: value
+    width: 55
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    text-align: right
+    font: poppins-16
+    text-color: white
+    text-offset: 0 5
+    text-auto-resize: true
+
+GameProfessionsPanelRightPanelBreedingOutfitListEntry < UIWidget
+  text: Entry
+  margin-left: 30
+  margin-right: 30
+  height: 50
+  text-align: left
+  font: poppins-16
+  text-color: white
+  text-offset: 64 5
+  background-color: #161618
+  $hover:
+    background-color: #0e0f10
+    text-color: #77d463
+  $on:
+    background-color: #0e0f10
+    text-color: #77d463
+
+  UICreature
+    id: outfit
+    size: 24 24
+    image-source: /images/ui/windows/professions/level_background
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 25
+    padding: 2
+    outfit-walk: false
+    phantom: true
+    text-offset: 0 5
+  UIWidget
+    id: value
+    width: 150
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 15
+    text-align: right
+    font: poppins-16
+    text-color: white
+    text-offset: 0 5
+    text-auto-resize: true
+
+GameProfessionsPanelMiddlePanelContentListScrollBar < VerticalScrollBar
+  id: content_list_scrollbar
+  anchors.right: content.right
+  anchors.top: parent.top
+  anchors.bottom: content.bottom
+  margin-right: 10
+  margin-top: 5
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true

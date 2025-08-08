@@ -1,0 +1,6 @@
+Module
+  name: game_redeem_rewards
+  sandboxed: true
+  scripts: [ redeem_rewards ]
+  @onLoad: GameRedeemRewards:init()
+  @onUnload: GameRedeemRewards:terminate()

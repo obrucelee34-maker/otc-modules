@@ -1,0 +1,681 @@
+GameProfessionsCraftingWindow < UIWindow
+  id: crafting_window
+  draggable: false
+  width: 554
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.right: parent.right
+  image-source: /images/ui/windows/professions/crafting_window_background
+  @onEscape: |
+    GameProfessions:hideCraftingWindow()
+
+  MainWindowCloseButton
+    anchors.top: parent.top
+    anchors.right: parent.right
+    anchors.verticalCenter: none
+    margin: 20
+    checked: true
+  GameProfessionsCraftingWindowTopPanel
+  GameProfessionsCraftingWindowSearchPanel
+    id: search_panel
+    anchors.top: prev.bottom
+
+  GameProfessionsCraftingWindowInfoPanel
+  GameProfessionsCraftingWindowMassCraftPanel
+  GameProfessionsCraftingWindowButtonPanel
+
+GameProfessionsCraftingWindowTopPanel < UIWidget
+  id: top_panel
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 170
+  margin-top: 50
+
+  UIWidget
+    id: icon
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 64 64
+  
+  UIWidget
+    id: title
+    anchors.top: icon.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-align: center
+    font: poppins-semibold-23
+    text-color: #ffffffff
+    text: Blacksmithing Station
+    text-auto-resize: true
+    margin-top: 20
+
+  GameProfessionsPanelLeftPanelLevelProgress
+    anchors.top: title.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    margin-top: 20
+    margin-left: 150
+    margin-right: 150
+
+  GameProfessionsPanelLeftPanelLevelRect
+    anchors.centerIn: prev
+
+  HorizontalSeparator
+    background-color: #3a3d43
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    height: 1
+    margin-left: 15
+    margin-right: 15
+
+GameProfessionsCraftingFilterPanel < UIWidget
+  id: filter_panel
+  anchors.left: search_panel.right
+  anchors.top: search_panel.top
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  size: 140 40
+  margin-left: 10
+  @onStateChange: |
+    function(self, state)
+      for _, child in ipairs(self:getChildren()) do
+        child:setOn(state)
+      end
+    end
+  @onClick: |
+    local state = self:isOn()
+    self:setOn(not state)
+    GameProfessions:onCraftWindowFilterPanelClick(self, not state)
+
+  UIWidget
+    id: icon
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-left: 10
+    image-source: /images/ui/windows/market/filter_panel_icon
+    size: 20 20
+    image-color: white
+    phantom: true
+    $on:
+      image-color: #36F991
+  
+  UIWidget
+    id: text
+    anchors.left: icon.right
+    anchors.verticalCenter: parent.verticalCenter
+    text: Filter
+    font: poppins-14
+    text-color: #CED2D9
+    margin-left: 10
+    phantom: true
+    text-auto-resize: true
+    text-offset: 0 1
+    $on:
+      text-color: #36F991
+
+  UIWidget
+    id: arrow
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/market/filter_panel_arrow_down
+    size: 20 20
+    phantom: true
+    margin-right: 10
+    $on:
+      image-source: /images/ui/windows/market/filter_panel_icon_active
+
+GameProfessionsCraftingWindowSearchPanel < UIWidget
+  id: panel_search
+  anchors.top: panel_progress.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  height: 67
+  padding-left: 28
+  padding-right: 28
+  GameProfessionsCraftingWindowSearchInput
+  GameProfessionsCraftingFilterPanel
+  GameProfessionsCraftingWindowTopPanelButton
+    id: level
+    width: 90
+    anchors.left: prev.right
+    margin-left: 10
+  GameProfessionsCraftingWindowTopPanelButton
+    id: name
+    width: 93
+    anchors.left: prev.right
+    margin-left: 10
+
+GameProfessionsCraftingWindowSearchInput < TextEdit
+  id: search_panel
+  anchors.left: parent.left
+  anchors.verticalCenter: parent.verticalCenter
+  width: 132
+  !preview: tr('Search...')
+  font: poppins-15
+  text-offset: 25 0
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  height: 40
+  padding-left: 35
+  @onTextChange: |
+    GameProfessions:onCraftingWindowSearchEditChange(self:getText())
+  UIWidget
+    id: icon_search
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    image-source: /images/ui/windows/tradepacks/icon_search
+    margin-left: -25
+    margin-top: -3
+
+GameProfessionsCraftingWindowTopPanelButton < UIWidget
+  anchors.top: search_panel.top
+  image-source: /images/ui/windows/market/search_panel_background
+  image-border: 5
+  opacity: 1.0
+  padding: 0 10 0 10
+  height: 40
+  &sortDirection: 'asc'
+  $hover:
+    opacity: 0.9
+  UIWidget
+    id: text
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+    font: poppins-semibold-14
+    text-offset: 0 2
+    text: Demand
+    phantom: true
+    text-color: #595c64
+    $checked:
+      text-color: #a6aab2
+    @onSetup: |
+      self:setText(self:getParent():getId():titleCase())
+  UIWidget
+    id: icon
+    anchors.right: parent.right
+    anchors.verticalCenter: parent.verticalCenter
+    size: 11 7
+    margin-top: 1
+    phantom: true
+    image-source: /images/ui/windows/tradepacks/arrow_down
+    image-color: #595c64
+    $checked:
+      image-color: #a6aab2
+    $on:
+      image-source: /images/ui/windows/tradepacks/arrow_up
+  @onStateChange: |
+    self.icon:setOn(self:isOn())
+    self.text:setOn(self:isOn())
+  @onCheckChange: |
+    self.text:setChecked(self:isChecked())
+    self.icon:setChecked(self:isChecked())
+  @onClick: |
+    GameProfessions:sortCraftingWindow(self, self:getId(), self.sortDirection)
+
+GameProfessionsCraftingWindowRecipeList < GameProfessionsPanelLeftPanelList
+  margin-left: 28
+  margin-right: 28
+  anchors.top: search_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: none
+  size: 554 335
+  visible: false
+
+GameProfessionsCraftingWindowInfoPanel < UIWidget
+  id: info_panel
+  height: 440
+  &maxHeight: 440
+  &minHeight: 380
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  background-color: #131416
+  GameProfessionsCraftingWindowInfoPanelItemInfo
+  GameProfessionsCraftingWindowInfoPanelMaterialList
+  GameProfessionsCraftingWindowInfoPanelMaterialListScrollBar
+  GameProfessionsCraftingWindowOversupplyPanel
+
+GameProfessionsCraftingWindowInfoPanelItemInfo < UIWidget
+  id: item_info
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  width: 225
+
+  Item
+    id: item
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    size: 70 70
+    margin-top: 30
+    margin-left: 10
+    UIWidget
+      id: amount
+      anchors.bottom: parent.bottom
+      anchors.right: parent.right
+      text-auto-resize: true
+      font: poppins-semibold-bordered-16
+      margin-bottom: -3
+      margin-right: 3
+  
+  UIWidget
+    id: name
+    anchors.top: item.bottom
+    anchors.horizontalCenter: item.horizontalCenter
+    font: poppins-semibold-20
+    text-color: #ffffffff
+    text-auto-resize: true
+    text: Noble Dagger
+    margin-top: 10
+    @onTextChange: |
+      -- extract the name from the text
+      self:setFont("poppins-semibold-20")
+      addEvent(function()
+        if self:getWidth() > 180 then
+          self:setFont("poppins-semibold-14")
+        end
+      end)
+
+  UIWidget
+    id: level_single
+    anchors.top: name.bottom
+    anchors.horizontalCenter: item.horizontalCenter
+    font: poppins-semibold-14
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    text: 1
+    margin-top: 5
+    @onTextChange: |
+      -- extract the level from the text
+      local level = self:getText():match('%d+')
+      self:setText(tr(string.format('Level required: |%s|', level)), true)
+
+  UIWidget
+    id: level_mass
+    anchors.top: level_single.bottom
+    anchors.horizontalCenter: item.horizontalCenter
+    font: poppins-semibold-14
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    text: 15
+    margin-top: 5
+    @onTextChange: |
+      -- extract the level from the text
+      local level = self:getText():match('%d+')
+      self:setText(tr(string.format('Mass level required: |%s|', level)), true)
+
+  UIWidget
+    id: experience
+    anchors.top: level_mass.bottom
+    anchors.horizontalCenter: item.horizontalCenter
+    font: poppins-semibold-14
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    text: 200
+    margin-top: 5
+    @onTextChange: |
+      -- extract the exp from the text
+      local exp = self:getText():match('%d+')
+      self:setText(tr(string.format('Experience: |%s|', exp)), true)
+
+  UIWidget
+    id: tax
+    anchors.top: experience.bottom
+    anchors.left: parent.left
+    font: poppins-semibold-14
+    text: Tax:
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    margin-top: 5
+  UIWidget
+    id: silver_icon
+    anchors.top: tax.top
+    anchors.left: tax.right
+    margin-left: 6
+    size: 20 20
+    image-source: /images/ui/icons/silver_24
+  UIWidget
+    id: tax_value
+    anchors.top: tax.top
+    anchors.left: silver_icon.right
+    font: poppins-semibold-14
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    text: 1337
+    margin-left: 6
+    @onTextChange: |
+      -- format text to cotain commas
+      local length = 0
+      local text = self:getText()
+      local formatted = ''
+      for i = #text, 1, -1 do
+        formatted = text:sub(i, i) .. formatted
+        length = length + 1
+        if length == 3 and i ~= 1 then
+          formatted = ',' .. formatted
+          length = 0
+        end
+      end
+      self:setText(formatted, true)
+
+      -- center tax, silver icon and tax value
+      local tax_width = self:getParent().tax:getWidth()
+      local silver_icon_width = self:getParent().silver_icon:getWidth()
+      local tax_value_width = self:getWidth()
+      local total_width = tax_width + silver_icon_width + tax_value_width
+      local left = (self:getParent():getWidth() - total_width) / 2
+      self:getParent().tax:setMarginLeft(left)
+
+  UIWidget
+    id: specialization
+    anchors.top: tax.bottom
+    anchors.horizontalCenter: item.horizontalCenter
+    font: poppins-semibold-14
+    text-align: left
+    text: Requires:
+    text-color: #a6aab2ff
+    text-auto-resize: true
+    margin-top: 2
+    visible: false
+
+GameProfessionsCraftingWindowInfoPanelMaterialList < ScrollablePanel
+  id: material_list
+  anchors.top: parent.top
+  height: 240
+  anchors.left: item_info.right
+  anchors.right: parent.right
+  margin-top: 10
+  vertical-scrollbar: material_list_scrollbar
+  layout:
+    type: verticalBox
+    spacing: 10
+
+GameProfessionsCraftingWindowInfoPanelMaterialListScrollBar < VerticalScrollBar
+  id: material_list_scrollbar
+  anchors.right: parent.right
+  anchors.top: material_list.top
+  anchors.bottom: material_list.bottom
+  margin-right: 10
+  margin-top: 5
+  margin-bottom: 5
+  step: 48
+  pixels-scroll: true
+
+GameProfessionsCraftingWindowOversupplyPanel < UIWidget
+  id: oversupply_panel
+  height: 67
+  anchors.top: material_list.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  background-color: #1F2124
+  visible: true
+  @onVisibilityChange: |
+    function(self, visible)
+      local parent = self:getParent()
+      if visible then
+        parent:setHeight(parent.maxHeight)
+      else
+        parent:setHeight(parent.minHeight)
+      end
+    end
+
+  UIWidget
+    id: info_icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 40
+    size: 20 20
+    image-source: /images/ui/windows/professions/icon_info
+    &tooltipFormat: 'Your current oversupply threshold begins after {%s, #36F991} experience points been earned via crafting.\n\nYour current oversupply level is burdening you with an additional tax of {%.1f%%, #FFA851}.\n\nYour oversupply level will recede by {%s%%, #FFA851} of your {%s, #36F991} threshold every 1 hour.\n\nYour current crafting tax is at {%.1f%%, #FFA851} ({%s%% base tax, #FFA851} and {%.1f%% oversupply tax, #FFA851}).'
+  
+  UIWidget
+    id: oversupply_text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: info_icon.right
+    margin-left: 7
+    font: poppins-14
+    text-color: #a6aab2
+    text: Oversupply
+
+  UIWidget
+    id: progress_background
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: oversupply_text.right
+    anchors.right: parent.right
+    margin-right: 25
+    margin-left: 80
+    image-border: 5
+    image-source: /images/ui/windows/professions/oversupply_progress_background
+
+  UIWidget
+    id: progress_fill
+    anchors.left: progress_background.left
+    margin-left: -10
+    anchors.verticalCenter: parent.verticalCenter
+    image-source: /images/ui/windows/professions/oversupply_progress_fill
+    image-clip: 0 0 0 0
+    image-size: 0 0
+
+  UIWidget
+    id: oversupply_percent
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: oversupply_text.right
+    margin-left: 16
+    image-source: /images/ui/windows/professions/oversupply_background
+    image-border: 5
+    padding: 10
+    size: 80 29
+    text-horizontal-auto-resize: true
+    text-offset: 20 3
+    text: +152%
+    font: poppins-semibold-14
+    text-color: #a6aab2
+
+  UIWidget
+    id: silver_icon
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: oversupply_percent.left
+    margin-left: 6
+    size: 20 20
+    image-source: /images/ui/icons/silver_24
+
+  @onSetup: |
+    local colors = {
+      '#36F991',
+      '#CACA61',
+      '#D88A3B',
+      '#BD4936',
+      '#181A1D',
+      '#181A1D',
+    }
+    for i = 1, 6 do
+      local marker = g_ui.createWidget('GameProfessionsCraftingWindowOversupplyProgressMarker', self)
+      marker:setMarginLeft(48 * i)
+      marker:setImageColor(colors[i])
+    end
+
+GameProfessionsCraftingWindowMassCraftPanel < UIWidget
+  id: mass_craft_panel
+  height: 60
+  anchors.bottom: button_panel.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  background-color: #00000050
+  margin-bottom: -3
+
+  UIWidget
+    id: locked
+    visible: false
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    margin: 10 15 10 15
+    image-source: /images/ui/windows/professions/oversupply_background
+    image-border: 5
+    UIWidget
+      id: text
+      anchors.centerIn: parent
+      text-auto-resize: true
+      text-align: center
+      font: poppins-semibold-14
+      text: Mass Craft unlocks at level 15
+      text-offset: 25 1
+    UIWidget
+      id: lock
+      image-source: /images/ui/windows/professions/lock_icon
+      size: 15 16
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: text.left
+
+  UIWidget
+    id: slider_panel
+    anchors.fill: parent
+
+    UIWidget
+      id: info_button
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-left: 30
+      image-source: /images/ui/windows/professions/icon_info
+      &tooltip: tr("Mass Crafting is available once your current profession is 5 levels above the recipe's required level, allowing you to craft 5 items at once. Each additional level beyond the Mass Crafting requirement increases the base amount by 3, up to a maximum of 50 items crafted at once.")
+
+
+    UIWidget
+      id: text
+      anchors.left: info_button.right
+      anchors.verticalCenter: parent.verticalCenter
+      font: poppins-semibold-14
+      text: Mass Craft
+      text-color: #CED2D9
+      margin-left: 10
+      text-offset: 0 1
+
+    SettingsSlider
+      id: count_slider
+      step: 1
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: text.right
+      margin-left: 20
+      size: 250 10
+      focusable: false
+      show-value: false
+      @onValueChange: |
+        function(self, value)
+          local parent = self:getParent()
+          local amount_text = parent.amount_text
+          amount_text:setText(value)
+          GameProfessions:updateCraftingWindowAmountToCraft(value)
+        end
+
+    UIWidget
+      id: amount_text
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: count_slider.right
+      margin-left: -1
+      image-source: /images/ui/windows/professions/oversupply_background
+      image-border: 5
+      padding: 10
+      size: 33 33
+      font: poppins-semibold-14
+      text-offset: -1 1
+      text: 1
+      text-color: #36F991
+
+    UIWidget
+      id: max_text
+      anchors.top: text.top
+      anchors.left: amount_text.right
+      margin-left: 15
+      font: poppins-semibold-14
+      text: Max. [12]
+      text-color: #CED2D9
+      text-auto-resize: true
+
+GameProfessionsCraftingWindowButtonPanel < UIWidget
+  id: button_panel
+  height: 70
+  anchors.bottom: parent.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+
+  SuccessButton
+    id: craft_button
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    text: Craft Item
+    width: 150
+    margin-bottom: 10
+
+GameProfessionsCraftingWindowOversupplyProgressMarker < UIWidget
+  id: progress_marker
+  anchors.verticalCenter: parent.verticalCenter
+  anchors.left: progress_background.left
+  image-source: /images/ui/windows/professions/progress_marker
+
+CraftinFilterPopupMenuButtonExpanded < UIWidget
+  height: 30
+  text-align: left
+  font: poppins-14
+  text-horizontal-auto-resize: true
+  text-color: #CED2D9
+  text-offset: 40 1
+  $checked:
+// title
+    font: poppins-12
+  $on:
+    text-color: #36F991
+  $hover:
+    text-color: #36F991
+  @onClick: |
+    self.checkbox:setChecked(not self.checkbox:isChecked())
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    size: 20 20
+    margin-left: 10
+    @onCheckChange: |
+      function(self, state)
+        modules.game_professions.GameProfessions:onFilterPanelCheckboxChange(self, state)
+      end
+
+CraftingFilterPopupMenuClearAll < UIWidget
+  id: clear_button
+  text: Clear all
+  font: poppins-semibold-14
+  text-color: #CED2D9
+  $disabled:
+    text-color: #7E828B
+  enabled: false
+  margin-top: 5
+  opacity: 1
+  $hover:
+    opacity: 0.75
+  $pressed:
+    opacity: 0.5
+  text-auto-resize: true
+  text-align: center
+  @onClick: |
+    modules.game_professions.GameProfessions:clearAllFilters()
+  @onEnableChange: |
+    if not self.underscore then
+      return
+    end
+    self.underscore:setOn(self:isEnabled())
+
+  UIWidget
+    id: underscore
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    height: 1
+    background-color: #595c64
+
+    @onSetup: |
+      self:setWidth(self:getParent():getTextSize().width + 2)

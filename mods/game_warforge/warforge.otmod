@@ -1,0 +1,7 @@
+Module
+  name: game_warforge
+  description: Warforge
+  sandboxed: true
+  scripts: [ warforge ]
+  @onLoad: GameWarforge:init()
+  @onUnload: GameWarforge:terminate()

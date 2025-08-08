@@ -1,0 +1,131 @@
+GameProfessionTopPanel < UIWidget
+  id: top_panel
+  height: 94
+  margin-left: 28
+  margin-right: 28
+  margin-top: 20
+  anchors.top: parent.top
+  anchors.left: parent.left
+  anchors.right: parent.right
+  layout:
+    type: horizontalBox
+  GameProfessionTopPanelButton
+    id: mining
+  GameProfessionTopPanelButton
+    id: herbalism
+  GameProfessionTopPanelButton
+    id: woodcutting
+  GameProfessionTopPanelButton
+    id: farming
+  GameProfessionTopPanelButton
+    id: husbandry
+  GameProfessionTopPanelButton
+    id: fishing
+  GameProfessionTopPanelButton
+    id: blacksmithing
+  GameProfessionTopPanelButton
+    id: carpentry
+  GameProfessionTopPanelButton
+    id: weaving
+  GameProfessionTopPanelButton
+    id: cooking
+  GameProfessionTopPanelButton
+    id: breeding
+  GameProfessionTopPanelButton
+    id: alchemy
+  @onSetup: |
+    -- set spacing to evenly distribute buttons
+    local width = self:getFirstChild():getWidth()
+    local childCount = self:getChildCount()
+    self:getLayout():setSpacing((self:getWidth() - width * childCount) / (childCount - 1))
+
+GameProfessionTopPanelButton < UIWidget
+  id: top_panel_button
+  size: 64 94
+  @onStateChange: |
+    local parent = self:getParent()
+    for _, child in ipairs(parent:getChildren()) do
+      if self:isOn() and child ~= self then
+        child:setOn(false)
+      end
+    end
+    local isOn = self:isOn()
+    self.background:setOn(isOn)
+    self.level:setOn(isOn)
+    self.icon:setOn(isOn)
+  UIWidget
+    id: background
+    margin-bottom: 30
+    image-source: /images/ui/windows/professions/item_background_circle
+    image-border: 5
+    anchors.fill: parent
+    phantom: true
+    $on:
+      image-source: /images/ui/windows/professions/item_background_circle_active
+  UIWidget
+    id: icon
+    anchors.centerIn: background
+    phantom: true
+    @onSetup: |
+      self:setImageSource(string.format('/images/ui/windows/professions/icons/%s_dark', self:getParent():getId()))
+      local textureWidth = self:getImageTextureWidth()
+      local textureHeight = self:getImageTextureHeight()
+      self:setSize({width = textureWidth, height = textureHeight})
+    @onStateChange: |
+      self:setImageSource(string.format('/images/ui/windows/professions/icons/%s%s', self:getParent():getId(), (self:isOn() and '' or '_dark')))
+  UIWidget
+    id: level
+    phantom: true
+    image-source: /images/ui/windows/professions/level_background
+    image-border: 5
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.verticalCenter: background.bottom
+    size: 20 20
+    font: poppins-semibold-12
+    text-offset: 0 2
+    text-color: #94989f
+    text: 10
+    $on:
+      image-source: /images/ui/windows/professions/level_active
+  UIWidget
+    id: level_background
+    height: 5
+    margin-top: 5
+    anchors.left: background.left
+    anchors.right: background.right
+    anchors.top: prev.bottom
+    image-border: 5
+    image-source: /images/ui/windows/professions/menu_progress_background
+    UIProgressBar
+      id: level_progress
+      anchors.fill: parent
+      size: 447 3
+      margin: 1
+      background-color: #A556FF
+
+GameProfessionsPanel < UIWidget
+  id: profession_panel
+  anchors.top: top_panel.bottom
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: parent.bottom
+  visible: false
+  GameProfessionsPanelLeftPanel
+  GameProfessionsPanelMiddlePanel
+  GameProfessionsPanelSeparator
+    anchors.left: left_panel.right
+
+GameProfessionsTopPanelSeparator < UIWidget
+  id: separator
+  height: 3
+  anchors.left: parent.left
+  anchors.right: parent.right
+  anchors.bottom: top_panel.bottom
+  image-source: /images/ui/windows/professions/horizontal_separator
+
+GameProfessionsPanelSeparator < UIWidget
+  id: separator
+  width: 3
+  anchors.top: parent.top
+  anchors.bottom: parent.bottom
+  image-source: /images/ui/windows/professions/vertical_separator

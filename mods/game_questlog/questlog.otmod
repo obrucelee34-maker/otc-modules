@@ -1,0 +1,6 @@
+Module
+  name: game_questlog
+  sandboxed: true
+  scripts: [ questlog, dynamic_event ]
+  @onLoad: GameQuestLog:init()
+  @onUnload: GameQuestLog:terminate()

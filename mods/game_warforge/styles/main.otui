@@ -1,0 +1,99 @@
+GameWarforgePanel < Panel
+
+GameWarforgeWindow < MainWindow
+  id: gameWarforgeWindow
+  size: 505 738
+  anchors.centerIn: parent
+  &title: 'Warforge'
+  &iconName: 'icon_warforge'
+  @onEscape: GameWarforge.hide()
+
+  MainWindowContent
+    GameWarforgePreviewPanel
+
+    GameWarforgeStatsBackground
+      id: item_stats_background
+      anchors.top: prev.bottom
+      anchors.bottom: options_panel.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      margin-top: 15
+      margin-bottom: 15
+    GameWarforgeStatsPanel
+      id: item_stats_panel
+      anchors.left: item_stats_background.left
+      margin-left: 40
+    GameWarforgeStatsPanel
+      id: preview_stats_panel
+      anchors.left: item_stats_background.horizontalCenter
+      margin-left: 40
+
+    GameWarforgeOptionsPanel
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: bottom_panel.top
+      margin-bottom: 15
+
+    GameWarforgePanel
+      id: bottom_panel
+      height: 80
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: parent.bottom
+      background-color: #00000040
+      margin-left: -28
+      margin-bottom: -20
+      margin-right: -28
+
+      UIWidget
+        id: silver_text
+        height: 16
+        anchors.left: parent.left
+        anchors.top: parent.top
+        margin-left: 30
+        margin-top: 20
+        font: poppins-12
+        text-color: #A6AAB2
+        text: Total Silver
+      
+      UIWidget
+        id: silver
+        height: 24
+        anchors.left: silver_text.left
+        anchors.top: silver_text.bottom
+        margin-top: 4
+        font: poppins-16
+        text-color: #CED2D9
+        text-horizontal-auto-resize: true
+        text-offset: 28 6
+        text: -
+
+        UIWidget
+          id: icon
+          size: 24 24
+          anchors.left: parent.left
+          anchors.verticalCenter: parent.verticalCenter
+          image-source: /images/ui/icons/silver_24
+      
+      UIWidget
+        id: free
+        height: 24
+        anchors.left: silver_text.left
+        anchors.top: silver_text.bottom
+        margin-top: 4
+        font: poppins-semibold-16
+        text-color: #77D463
+        text-horizontal-auto-resize: true
+        text-offset: 0 3
+        text: FREE
+        visible: false
+
+      SuccessButton
+        id: warforge_button
+        size: 95 50
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        margin-right: 30
+        text: Forge
+        enabled: false
+        @onClick: |
+          GameWarforge:requestUpgrade()

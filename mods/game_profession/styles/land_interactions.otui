@@ -1,0 +1,539 @@
+
+AbilityGatheringWidget < Panel
+  size: 64 64
+
+  UIItem
+    id: item
+    font: roboto-18-bordered
+    size: 40 40
+    image-size: 58 58
+    image-offset: -10 -10
+    anchors.centerIn: parent
+    opacity: 0.9
+    draggable: false
+    @onItemChange: self:setTooltip(false)
+    $on:
+      image-color: white
+      color: white
+    $!on:
+      image-color: gray
+      color: gray
+    $hover:
+      opacity: 1.0
+    $pressed:
+      opacity: 0.8
+    UIWidget
+      id: icon
+      anchors.centerIn: parent
+      anchors.fill: parent
+      phantom: true
+
+  UIWidget
+    id: lock
+    size: 42 39
+    anchors.centerIn: parent
+    image-source: /images/ui/windows/house/land_interaction/icon_lock
+    visible: false
+    phantom: true
+
+  SpellProgressRect
+    id: progress
+    size: 64 64
+    anchors.centerIn: prev
+    show-text: true
+    margin-top: 1
+    margin-left: 1
+    padding: 1
+    visible: false
+    phantom: true
+
+  Panel
+    size: 64 64
+    image-source: /images/ui/windows/house/land_interaction/slot_overlay
+    anchors.centerIn: item
+
+  Label
+    id: label
+    font: roboto-18-bordered
+    color: #e7b131
+    text-auto-resize: true
+    anchors.centerIn: prev
+
+  UIWidget
+    id: hotkey
+    image-source: /images/ui/windows/house/land_interaction/background_text
+    font: poppins-14
+    padding: 1 5 1 5
+    text-align: center
+    text-auto-resize: true
+    text-min-size: 23 23
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: -7
+    phantom: true
+
+GameBreedingWindowPagination < Panel
+  id: pagination_panel
+  height: 50
+  image-source: /images/ui/windows/transport/pagination_background
+  image-border: 5
+
+  UIWidget
+    id: count
+    font: poppins-14
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: parent.left
+    margin-left: 20
+    text-auto-resize: true
+    text-offset: 0 3
+    color: #CED2D9
+    text: 1-6 of 10
+
+  UIWidget
+    id: current
+    font: poppins-14
+    image-source: /images/ui/windows/transport/square_background
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 10
+    text-offset: 0 3
+    color: #CED2D9
+
+  UIWidget
+    id: total
+    font: poppins-14
+    anchors.right: next.left
+    anchors.verticalCenter: parent.verticalCenter
+    margin-right: 10
+    text-auto-resize: true
+    text-offset: 0 3
+    color: #CED2D9
+
+  UIWidget
+    id: back
+    image-source: /images/ui/windows/transport/left_arrow
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: next.left
+    margin-right: 10
+    opacity: 0.7
+    $hover:
+      opacity: 1.0
+    $disabled:
+      opacity: 0.4
+    @onClick: |
+      function(self)
+        local panel = modules.game_professions.getBreedingSelectionPanel()
+        if panel.currentPagination > 1 then
+          modules.game_professions.requestPaginationMountList(panel.currentPagination - 1)
+        end
+      end
+  
+  UIWidget
+    id: next
+    image-source: /images/ui/windows/transport/right_arrow
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.right: parent.right
+    margin-right: 20
+    opacity: 0.8
+    $hover:
+      opacity: 1.0
+    $disabled:
+      opacity: 0.4
+    @onClick: |
+      function(self)
+        local panel = modules.game_professions.getBreedingSelectionPanel()
+        if panel.currentPagination < tonumber(self:getParent().total:getText()) then
+          modules.game_professions.requestPaginationMountList(panel.currentPagination + 1)
+        end
+      end
+
+BreedingSelectionWindow < MainWindow
+  anchors.centerIn: parent
+  size: 350 590
+  &title: 'Female Moa Selection'
+  &iconPath: '/images/ui/windows/transport/icon_female'
+  &shortcut: 
+  @onEscape: self:destroy()
+  @onVisibilityChange: |
+    if not self:isVisible() then
+        self:destroy()
+    end
+
+  MainWindowContent
+    id: contents
+    padding: 0
+    padding-top: 20
+
+    GameTransportAttachedWindowFilterPanel
+      margin-right: 30
+      margin-left: 15
+      &filterCategory: 'mount'
+
+    ScrollablePanel
+      id: list
+      size: 245 300
+      anchors.top: prev.bottom
+      anchors.bottom: pagination_panel.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      vertical-scrollbar: scrollbar
+      margin-top: 15
+      margin-right: 15
+      margin-left: 15
+      //border: 1 green
+      layout:
+        type: grid
+        num-columns: 2
+        cell-size: 145 175
+        cell-spacing: 15 10
+
+    VerticalScrollBar
+      id: scrollbar
+      anchors.top: list.top
+      anchors.bottom: next.top
+      anchors.left: list.right
+      pixels-scroll: true
+      margin-bottom: 10
+      step: 32
+
+    GameBreedingWindowPagination
+      anchors.left: parent.left
+      anchors.right: parent.right
+      anchors.bottom: next.top
+
+    UIWidget
+      id: spacer
+      anchors.bottom: next.top
+      anchors.left: parent.left
+      anchors.right: parent.right
+      background-color: #2d3132
+      height: 1
+
+    UIWidget
+      id: button_panel
+      height: 80
+      background-color: #3A3D4325
+      anchors.bottom: parent.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      PrimaryButton
+        id: confirm_button
+        text: Confirm
+        &resizeText: true
+        anchors.centerIn: parent
+
+BreedingSelectionWidget < UIWidget
+  size: 245 64
+  focusable: false
+  border: 0 black
+  $on:
+    border: 1 yellow
+
+  UICreature
+    size: 64 64
+    id: outfit
+    anchors.top: parent.top
+    anchors.left: parent.left
+    visible: false
+    @onClick: self:getParent():onClick()
+
+  UIItem
+    size: 64 64
+    id: item
+    anchors.top: parent.top
+    anchors.left: parent.left
+    visible: false
+    @onClick: self:getParent():onClick()
+
+  UIWidget
+    id: text
+    anchors.verticalCenter: parent.verticalCenter
+    anchors.left: prev.right
+    anchors.right: parent.right
+    text: whatever
+    text-align: center
+    text-auto-resize: true
+    text-wrap: true
+    phantom: true
+
+GameHouseInteractionExitButton < UIWidget
+  id: exitButton
+  image-source: /images/ui/windows/house/land_interaction/button_exit
+  $hover:
+    image-source: /images/ui/windows/house/land_interaction/button_exit_on
+
+GameHouseInteractionSeparatorVerticalTop < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_vertical
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginBottom(exit:getHeight() / 2)
+      end
+    end)
+
+GameHouseInteractionSeparatorVerticalBottom < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_vertical
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginTop(exit:getHeight() / 2)
+      end
+    end)
+
+GameHouseInteractionSeparatorLeftTop < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_diagonal_left
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginBottom(exit:getHeight() / 2)
+        self:setMarginRight(exit:getWidth() / 2)
+      end
+    end)
+
+GameHouseInteractionSeparatorLeftBottom < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_diagonal_right
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginTop(exit:getHeight() / 2)
+        self:setMarginRight(exit:getWidth() / 2)
+      end
+    end)
+
+GameHouseInteractionSeparatorRightTop < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_diagonal_right
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginBottom(exit:getHeight() / 2)
+        self:setMarginLeft(exit:getWidth() / 2)
+      end
+    end)
+
+GameHouseInteractionSeparatorRightBottom < UIWidget
+  anchors.centerIn: exitButton
+  image-source: /images/ui/windows/house/land_interaction/border_diagonal_left
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local exit = parent.exitButton
+        self:setMarginTop(exit:getHeight() / 2)
+        self:setMarginLeft(exit:getWidth() / 2)
+      end
+    end)
+
+GameHouseInteractionWidgetVerticalTop < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginBottom(prev:getHeight())
+      end
+    end)
+
+
+GameHouseInteractionWidgetVerticalBottom < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginTop(prev:getHeight())
+      end
+    end)
+
+GameHouseInteractionWidgetRightTop < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginBottom(prev:getHeight() - 3)
+        self:setMarginLeft(prev:getWidth() - 3)
+      end
+    end)
+
+GameHouseInteractionWidgetRightBottom < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginTop(prev:getHeight() - 3)
+        self:setMarginLeft(prev:getWidth() - 3)
+      end
+    end)
+
+GameHouseInteractionWidgetLeftTop < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginBottom(prev:getHeight() - 3)
+        self:setMarginRight(prev:getWidth() - 3)
+      end
+    end)
+
+GameHouseInteractionWidgetLeftBottom < AbilityGatheringWidget
+  anchors.centerIn: prev
+  @onSetup: |
+    addEvent(function()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginTop(prev:getHeight() - 3)
+        self:setMarginRight(prev:getWidth() - 3)
+      end
+    end)
+
+GameHouseInteractionNestringWidget < AbilityGatheringWidget
+  id: interationNestringWidget
+  anchors.centerIn: prev
+  visible: false
+  @onSetup: |
+    addEvent(function()
+      self.item:setImageSource('/images/ui/windows/breeding/neststring')
+      self.item:setOn(true)
+      self.hotkey:hide()
+      self.progress:hide()
+      local parent = self:getParent()
+      if parent then
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginTop(55)
+      end
+      for i = 1, 5, 1 do
+        local widget = g_ui.createWidget("GameHouseInteractionAddNestringWidget", parent)
+        if widget then
+          widget:hide()
+          widget:setId("AddNestringWidget"..i)
+          widget.neststringId = i
+        end
+      end
+    end)
+  UIWidget
+    id: toggle
+    image-source: /images/ui/windows/breeding/toggle_off
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    size: 30 30
+    image-size: 30 30
+    margin-bottom: -10
+    on: true
+    $on:
+      image-source: /images/ui/windows/breeding/toggle_on
+    @onClick: |
+      self:setOn(not self:isOn())
+      local parent = self:getParent():getParent()
+      for i = 1, 5, 1 do
+        local widget = parent:getChildById("AddNestringWidget"..i)
+        if widget then
+          widget:setVisible(self:isOn())
+        end
+      end
+
+GameHouseInteractionAddNestringWidget < AbilityGatheringWidget
+  anchors.centerIn: interationNestringWidget
+  &neststringId: 1
+  @onSetup: |
+    addEvent(function()
+      self.item:setImageSource('/images/ui/windows/breeding/neststring_bkg')
+      self.item:setOn(true)
+      self.hotkey:hide()
+      self.progress:hide()
+      local parent = self:getParent()
+      if parent then
+        local positions = {
+          [1] = { top = -45, left = -55 },
+          [2] = { top = 25, left = -70 },
+          [3] = { top = 75, left = 0 },
+          [4] = { top = 25, left = 70 },
+          [5] = { top = -45, left = 55 },
+        }
+        local prev = parent:getChildByIndex(parent:getChildIndex(self) - 1)
+        self:setMarginTop(positions[self.neststringId].top)
+        self:setMarginLeft(positions[self.neststringId].left)
+      end
+    end)
+
+GameHouseInteractionWindow < UIWidget
+  id: landInteractionPanel
+  size: 220 410
+  draggable: false
+
+GameHouseInteractionWindow1 < GameHouseInteractionWindow
+  GameHouseInteractionSeparatorVerticalTop
+  GameHouseInteractionWidgetVerticalTop
+    id: widget1
+  GameHouseInteractionSeparatorVerticalBottom
+    id: neststringSeparator
+    visible: false
+  GameHouseInteractionNestringWidget
+    visible: false
+  GameHouseInteractionExitButton
+    anchors.centerIn: parent
+    margin-top: 10
+
+GameHouseInteractionWindow2 < GameHouseInteractionWindow
+  GameHouseInteractionSeparatorLeftTop
+  GameHouseInteractionWidgetLeftTop
+    id: widget1
+  GameHouseInteractionSeparatorRightTop
+  GameHouseInteractionWidgetRightTop
+    id: widget2
+  GameHouseInteractionExitButton
+    anchors.centerIn: parent
+    margin-top: 10
+
+GameHouseInteractionWindow3 < GameHouseInteractionWindow
+  GameHouseInteractionSeparatorVerticalBottom
+  GameHouseInteractionWidgetVerticalBottom
+    id: widget3
+  GameHouseInteractionSeparatorLeftTop
+  GameHouseInteractionWidgetLeftTop
+    id: widget1
+  GameHouseInteractionSeparatorRightTop
+  GameHouseInteractionWidgetRightTop
+    id: widget2
+  GameHouseInteractionExitButton
+    anchors.centerIn: parent
+    margin-top: 10
+
+GameHouseInteractionWindow4 < GameHouseInteractionWindow
+  GameHouseInteractionSeparatorLeftTop
+  GameHouseInteractionWidgetLeftTop
+    id: widget1
+  GameHouseInteractionSeparatorRightTop
+  GameHouseInteractionWidgetRightTop
+    id: widget2
+  GameHouseInteractionSeparatorLeftBottom
+  GameHouseInteractionWidgetLeftBottom
+    id: widget3
+  GameHouseInteractionSeparatorRightBottom
+  GameHouseInteractionWidgetRightBottom
+    id: widget4
+  GameHouseInteractionExitButton
+    anchors.centerIn: parent
+    margin-top: 10

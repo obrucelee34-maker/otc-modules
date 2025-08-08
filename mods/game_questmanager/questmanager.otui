@@ -1,0 +1,228 @@
+ManagerQuestName < UIButton
+  height: 32
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+
+  Label
+    id: name
+    width: 300
+    phantom: false
+    font: myriad-pro-18
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 15
+    text: Task Description
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+    text-wrap: true
+    linethrough: false
+    text-offset: 0 10
+    @onClick: modules.game_questmanager.selectQuest(self)
+    color: white
+    $hover:
+      color: #e7b131
+    $on:
+      color: #e7b131
+
+ManagerQuestActionPosition < UIButton
+  font: myriad-pro-18
+  height: 32
+  text-align: left
+  @onClick: modules.game_questmanager.goToActionPosition(self)
+  color: white
+  $hover:
+    color: #e7b131
+  $on:
+    color: #e7b131
+
+ManagerQuestActionCreature < UIButton
+  font: myriad-pro-18
+  height: 32
+  text-align: left
+  @onClick: modules.game_questmanager.summonCreature(self)
+  color: white
+  $hover:
+    color: #e7b131
+  $on:
+    color: #e7b131
+
+ManagerTaskListItem < Panel
+  height: 30
+
+  CheckBox
+    id: checkbox
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+
+  Label
+    id: description
+    width: 300
+    phantom: false
+    font: myriad-pro-18
+    anchors.left: prev.right
+    anchors.right: parent.right
+    margin-left: 15
+    text: Task Description
+    anchors.verticalCenter: parent.verticalCenter
+    text-auto-resize: true
+    text-wrap: true
+    linethrough: false
+    text-offset: 0 10
+    @onClick: modules.game_questmanager.goToTaskPosition(self:getParent())
+
+QuestManagerWindow < MainWindow
+  id: questManagerWindow
+  size: 775 545
+  &baseWidth: 775
+  &baseHeight: 545
+  visible: false
+  &title: 'Quest Manager'
+  &shortcut: 'Ctrl+Alt+2'
+  anchors.centerIn: parent
+  @onEscape: modules.game_questmanager.hide()
+
+  UIWidget
+    height: 45
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 10
+    margin-right: 5
+
+    Label
+      text: Search
+      font: myriad-pro-14
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+      margin-right: 10
+
+    TextEdit
+      id: textFilter
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: prev.right
+      anchors.right: parent.right
+      margin-right: 10
+      margin-left: 10
+      @onTextChange: modules.game_questmanager.onQuestSearch(self:getText())
+
+  Panel
+    id: questPanel
+    size: 265 350
+    padding-left: 10
+    padding-right: 10
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+
+    ScrollablePanel
+      id: allQuests
+      anchors.left: parent.left
+      anchors.top: parent.top
+      width: 255
+      height: 300
+      vertical-scrollbar: questListScrollbar
+      layout:
+        type: verticalBox
+
+    VerticalScrollBar
+      id: questListScrollbar
+      height: 300
+      anchors.top: parent.top
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 40
+
+    Label
+      id: totalQuestsLabel
+      text: Total Quests:
+      height: 40
+      anchors.top: allQuests.bottom
+      anchors.left: parent.left
+      margin-top: 10
+
+  ScrollablePanel
+    id: tasksPanel
+    size: 300 300
+    padding-left: 10
+    padding-right: 10
+    anchors.top: prev.top
+    anchors.left: questPanel.right
+    vertical-scrollbar: taskListScrollBar
+    layout:
+      type: verticalBox
+      spacing: 5
+
+  VerticalScrollBar
+    id: taskListScrollBar
+    anchors.top: prev.top
+    anchors.bottom: tasksPanel.bottom
+    anchors.left: tasksPanel.right
+    margin-left: 5
+    pixels-scroll: true
+    step: 40
+
+  Panel
+    id: extraInfoPanel
+    height: 300
+    padding-left: 10
+    padding-right: 10
+    anchors.top: prev.top
+    anchors.right: parent.right
+    anchors.left: tasksPanel.right
+    margin-left: 10
+
+    ScrollablePanel
+      id: positionList
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.right: parent.right
+      height: 195
+      vertical-scrollbar: positionListScrollbar
+      layout:
+        type: verticalBox
+
+    VerticalScrollBar
+      id: positionListScrollbar
+      anchors.top: positionList.top
+      anchors.bottom: positionList.bottom
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 10
+
+    ScrollablePanel
+      id: creaturesList
+      height: 95
+      margin-top: 10
+      anchors.left: parent.left
+      anchors.top: prev.bottom
+      anchors.right: parent.right
+      vertical-scrollbar: creaturesListScrollbar
+      layout:
+        type: verticalBox
+
+    VerticalScrollBar
+      id: creaturesListScrollbar
+      anchors.top: creaturesList.top
+      anchors.bottom: creaturesList.bottom
+      anchors.right: parent.right
+      pixels-scroll: true
+      step: 10
+
+  UIWidget
+    id: buttonsPanel
+    height: 45
+    anchors.horizontalCenter: parent.horizontalCenter
+    anchors.bottom: parent.bottom
+    margin-bottom: 10
+    layout:
+      type: horizontalBox
+      fit-children: true
+      spacing: 20
+
+    Button
+      width: 200
+      id: trackButton
+      @onClick: modules.game_questmanager.resetAllQuests()
+      text: Reset All Quests

@@ -1,0 +1,816 @@
+WorldMapIcon < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  image-auto-resize: true
+  $on:
+    opacity: 0
+  $!on:
+    opacity: 1
+
+WorldMapIconAndBottomText < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  size: 31 31
+  UIWidget
+    id: frame
+    anchors.top: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/worldmap/region_text_background
+    margin-top: -5
+    phantom: true
+    UIWidget
+      id: text
+      anchors.fill: parent
+      font: poppins-semibold-16
+      phantom: true
+      @onTextChange: |
+        function(self)
+          addEvent(function()
+            local parent = self:getParent()
+            if not parent then
+              return
+            end
+            local textSize = self:getTextSize()
+            local doubleLine = string.find(self:getText(), "\n")
+            parent:setSize({width = textSize.width * 1.6, height = textSize.height + (textSize.height / (doubleLine and 2 or 1) * 0.25)})
+          end)
+        end
+      @onFontChange: |
+        function(self)
+          addEvent(function()
+            local parent = self:getParent()
+            if not parent then
+              return
+            end
+            local textSize = self:getTextSize()
+            local doubleLine = string.find(self:getText(), "\n")
+            parent:setSize({width = textSize.width * 1.6, height = textSize.height + (textSize.height / (doubleLine and 2 or 1) * 0.25)})
+          end)
+        end
+  UIWidget
+    id: iconImage
+    anchors.fill: parent
+    phantom: true
+    @onImageChange: |
+      local imageTextureSize = self:getImageTextureSize()
+      local parent = self:getParent()
+      parent:setSize(imageTextureSize)
+
+  UIWidget
+    id: iconActive
+    anchors.fill: parent
+    visible: false
+    phantom: true
+    image-source: /images/ui/windows/worldmap/status_icons/region_active_border_small
+
+WorldMapPlayerIcon < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  image-source: /images/ui/windows/minimap/arrows/worldmap/player_background
+  image-auto-resize: true
+
+  UIWidget
+    id: playerArrow
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/minimap/arrows/worldmap/player_arrow
+    image-auto-resize: true
+    margin-bottom: 2
+    phantom: true
+
+  UIWidget
+    id: playerOutfitBackground
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: /images/ui/windows/minimap/arrows/worldmap/player_outfit_background    
+    image-auto-resize: true
+    margin: 2
+    phantom: true
+
+  UICreature
+    id: playerOutfit
+    anchors.fill: playerOutfitBackground
+    margin: 2
+    image-auto-resize: true
+    clipping: true
+    outfit-scale: 1
+    outfit-offset: 5 3
+    outfit-direction: 2
+    phantom: true
+
+  UIWidget
+    id: playerOutfitFrame
+    anchors.fill: playerOutfitBackground
+    image-source: /images/ui/windows/minimap/arrows/worldmap/player_outfit_frame
+    image-auto-resize: true
+    phantom: true
+
+WorldMapPartyIcon < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  image-source: /images/ui/windows/minimap/arrows/worldmap/party_background
+  size: 25 44
+
+  UIWidget
+    id: partyArrow
+    anchors.bottom: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    image-source: /images/ui/windows/minimap/arrows/worldmap/party_arrow
+    image-auto-resize: true
+    margin-bottom: 2
+    phantom: true
+
+  UIWidget
+    id: partyOutfitBackground
+    anchors.top: parent.top
+    anchors.left: parent.left
+    image-source: /images/ui/windows/minimap/arrows/worldmap/party_outfit_background    
+    image-auto-resize: true
+    margin: 2
+    phantom: true
+
+  UICreature
+    id: partyOutfit
+    anchors.fill: partyOutfitBackground
+    margin: 2
+    image-auto-resize: true
+    clipping: true
+    outfit-scale: 1
+    outfit-offset: 5 3
+    outfit-direction: 2
+    phantom: true
+
+  UIWidget
+    id: partyOutfitFrame
+    anchors.fill: partyOutfitBackground
+    image-source: /images/ui/windows/minimap/arrows/worldmap/party_outfit_frame
+    image-auto-resize: true
+    margin-top: 1
+    phantom: true
+
+
+WorldMapSeparator < UIWidget
+  height: 1
+  background: #414141
+
+WorldMapCompassHighlight < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  on: false
+  $on:
+    opacity: 0
+  $!on:
+    opacity: 1
+
+WorldMapText < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  text-auto-resize: true
+  phantom: true
+  font: myriad-pro-semibold-30
+
+WorldMapZone < UIWidget
+  anchors.top: parent.top
+  anchors.left: parent.left
+  phantom: true
+  width: 10
+  UIWidget   
+    id: name
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: vollkorn-sc-bold-14
+    text-auto-resize: true
+    phantom: true
+    text-color: #ffe9c7
+  UIWidget
+    id: level
+    margin-top: -2
+    anchors.top: parent.bottom
+    anchors.horizontalCenter: parent.horizontalCenter
+    font: vollkorn-sc-bold-14
+    text-auto-resize: true
+    phantom: true
+
+InfoPanelLabel < Label
+  text-wrap: true
+  text-auto-resize: true
+
+WorldMapCheckBoxPanel < Panel
+  size: 26 26
+  margin-left: 22
+  CheckBoxSmall
+    anchors.left: parent.left
+    anchors.top: parent.top
+    id: checkbox
+  UIWidget
+    id: description
+    anchors.left: parent.left
+    anchors.top: parent.top
+    text-align: center
+    text-auto-resize: true
+    font: poppins-semibold-14
+    text-offset: 30 -1
+    text-color: white
+    opacity: 1.0
+    @onClick: local cb = self:getParent().checkbox cb.onClick(cb)
+
+WorldMapTradepostPanel < Panel
+  id: tradepostPanel
+  size: 300 433
+  image-source: /images/ui/windows/tradepack/button_bg_off
+  image-border: 5
+  font: myriad-pro-semibold-30
+  text-align: top
+  text-offset: 0 10
+  padding: 10
+  visible: false
+
+  Panel
+    id: searchPanel
+    size: 300 45
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 40
+    UITextEdit
+      id: searchEdit
+      anchors.fill: parent
+      image-source: /images/ui/windows/tradepack/search_bg
+      image-border: 5
+      font: myriad-pro-semibold-16
+      padding-top: 15
+      padding-left: 15
+      UILabel
+        id: placeholder
+        text: tr('Search...')
+        anchors.top: parent.top
+        anchors.left: parent.left
+        text-auto-resize: true
+        visible: true
+        font: myriad-pro-semibold-16
+        opacity: 0.8
+
+      @onTextChange: |
+        self:getChildById('placeholder'):setVisible(self:getText() == '')
+        modules.game_worldmap.onSort(modules.game_worldmap.lastSortButton, nil, true)
+
+  Panel
+    id: sortPanel
+    size: 300 50
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+
+    UIWidget
+      id: sortLabel
+      text: Sort by:
+      text-auto-resize: true
+      font: myriad-pro-semibold-16
+      text-offset: 0 6
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: parent.left
+
+    UIWidget
+      id: sortNameButton
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: prev.right
+      margin-left: 9
+      size: 95 40
+      text: Name
+      font: myriad-pro-semibold-16
+      text-align: left
+      text-offset: 30 6
+      icon: /images/ui/windows/tradepack/sort_ascending
+      icon-align: left
+      icon-offset: 10 0
+      image-border: 5
+      $on:
+        image-source: /images/ui/windows/tradepack/button_bg_on
+        color: #e7b131
+      $!on:
+        image-source: /images/ui/windows/tradepack/button_bg_off
+        color: white
+      @onClick: modules.game_worldmap.onSort(self)
+      $direction: descending
+
+    UIWidget
+      id: sortDemandButton
+      anchors.verticalCenter: parent.verticalCenter
+      anchors.left: prev.right
+      margin-left: 9
+      size: 115 40
+      text: Demand
+      font: myriad-pro-semibold-16
+      text-align: left
+      text-offset: 30 6
+      icon: /images/ui/windows/tradepack/sort_ascending
+      icon-align: left
+      icon-offset: 10 0
+      image-border: 5
+      $on:
+        image-source: /images/ui/windows/tradepack/button_bg_on
+        color: #e7b131
+      $!on:
+        image-source: /images/ui/windows/tradepack/button_bg_off
+        color: white
+      @onClick: modules.game_worldmap.onSort(self)
+      $direction: ascending
+
+  ScrollablePanel
+    id: tradepackPanel
+    size: 300 350
+    margin-right: 15
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    anchors.bottom: parent.bottom
+    vertical-scrollbar: tradepackPanelScrollBar
+    layout:
+      type: verticalBox
+
+  VerticalScrollBar
+    id: tradepackPanelScrollBar
+    anchors.right: parent.right
+    anchors.top: tradepackPanel.top
+    anchors.bottom: tradepackPanel.bottom
+    step: 70
+    pixels-scroll: true
+    margin-top: 2
+    margin-bottom: 2
+
+WorldMapEventInfoPanel < Panel
+  id: dynamicEventInfoPanel
+  size: 300 150
+  image-source: /images/ui/windows/tradepack/button_bg_off
+  image-border: 5
+  font: myriad-pro-semibold-30
+  text-align: top
+  text-offset: 0 10
+  padding: 10
+  visible: false
+
+  DynamicEventProgressBar
+    id: progressBox
+    height: 16
+    margin: 10
+    margin-top: 35
+
+  UIWidget
+    id: level
+    anchors.left: progressBox.left
+    anchors.top: prev.bottom
+    text-auto-resize: true
+    font: myriad-pro-14
+    margin-top: 3
+
+  UIWidget
+    id: timer
+    anchors.top: prev.top
+    anchors.right: progressBox.right
+    image-source: /images/ui/windows/dynamicevents/iconClock
+    image-size: 14 14
+    text-offset: 18 1
+    font: myriad-pro-14
+    text-auto-resize: true
+
+  UIWidget
+    id: description
+    text-wrap: true
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    text-auto-resize: true
+    text-align: topLeft
+    margin: 10
+    margin-top: 0
+    padding: 10
+    padding-bottom: -5
+    image-source: /images/ui/windows/tradepack/button_bg_off
+    image-border: 10
+    text-offset: 5 5
+    color: white
+    font: myriad-pro-14
+
+  UIWidget
+    id: scarcity
+    visible: false
+    height: 145
+    anchors.top: prev.bottom
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 10
+    image-source: /images/ui/windows/dynamicevents/scarcity_background
+    image-border: 3
+    padding: 10
+
+    UIWidget
+      id: title
+      anchors.top: parent.top
+      anchors.horizontalCenter: parent.horizontalCenter
+      icon: /images/ui/windows/dynamicevents/scarcity_icon
+      icon-offset: -30 0
+      icon-color: #FF5151
+      text: Scarcity
+      text-offset: 30 7
+      text-auto-resize: true
+      font: poppins-16
+
+    UIWidget
+      anchors.top: title.bottom
+      anchors.left: parent.left
+      anchors.right: parent.right
+      margin-top: 10
+      text-auto-resize: true
+      text-wrap: true
+      text: You've already completed this event recently, hence you are temporarily ineligible to receive any rewards from it.
+      font: poppins-14
+
+
+WorldMapFrameButton < UIButton
+  size: 150 40
+  image-border: 3
+  image-source: /images/ui/icons/actionbar-shortcut-background
+  color: white
+  opacity: 1.0
+  text-offset: 0 2
+  text-auto-resize: false
+  text-align: center
+  font: myriad-pro-15
+  $hover:
+    opacity: 0.9
+  $pressed:
+    opacity: 0.8
+  $on:
+    image-color: white
+    enabled: true
+  $!on:
+    image-color: #505050
+    enabled: false
+
+WorldMapHouseInfoPanel < Panel
+  id: houseInfoPanel
+  size: 300 150
+  image-source: /images/ui/windows/tradepack/button_bg_off
+  image-border: 5
+  font: myriad-pro-semibold-30
+  text-align: top
+  text-offset: 0 10
+  padding: 10
+  visible: false
+
+  UIWidget
+    id: timer
+    size: 70 30
+    anchors.top: parent.top
+    anchors.horizontalCenter: parent.horizontalCenter
+    text-align: center
+    margin-top: 40
+    font: myriad-pro-20
+
+  WorldMapFrameButton
+    id: description
+    margin-top: 10
+    anchors.top: timer.bottom
+    anchors.left: iconLeft.left
+    anchors.right: iconRight.right
+    @onClick: |
+      GameHouse:sendOpcode({ action = 'house_teleport_home', houseId = self:getParent().houseId })
+      self:getParent():hide()
+
+  UIWidget
+    id: iconLeft
+    size: 30 30
+    anchors.top: timer.top
+    anchors.right: timer.left
+    margin-right: 10
+    margin-top: -5
+  UIWidget
+    id: iconRight
+    size: 30 30
+    anchors.top: timer.top
+    anchors.left: timer.right
+    margin-left: 10
+    margin-top: -5
+
+WorldMapPanel < MainWindow
+  anchors.centerIn: parent
+  width: 1265
+  height: 570
+  &width: 1265
+  &height: 570
+
+  &title: 'Map'
+  &hotkeyId: HOTKEYS_IDS.MAP
+  &iconName: 'icon_map'
+  &isGeneralUIWindow: true
+
+  MainWindowContent
+    id: contentPanel
+    padding: 0 0 0 0
+    clipping: true
+
+    UIWidget
+      id: image
+      anchors.left: parent.left
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+      anchors.right: filterWindow.left
+      image-fixed-ratio: false
+      image-smooth: false
+      image-repeated: false
+      draggable: true
+      clipping: true
+
+      WorldMapPlayerIcon
+        id: cross
+        focusable: false
+        &margin: { left = 3, top = -24}
+
+    SmallButton
+      id: fullMapButton
+      anchors.top: prev.top
+      anchors.right: prev.right
+      margin-top: 8
+      margin-right: 10
+      icon-source: /images/ui/icons/icon_expansion
+      icon-color: #707070
+      $hover:
+        icon-color: white
+      @onClick: |
+        g_worldMap.toggleFullMap()
+
+    WorldMapTradepostPanel
+      id: tradepostPanel
+
+    WorldMapRegionInfo
+      id: regionInfoPanel
+
+    WorldMapHouseInfoPanel
+      id: houseInfoPanel
+
+    WorldMapEventInfoPanel
+      id: dynamicEventInfoPanel
+
+    UIWidget
+      id: filterWindow
+      width: 270
+      anchors.right: parent.right
+      anchors.top: parent.top
+      anchors.bottom: parent.bottom
+
+      UIWidget
+        id: topMenu
+        height: 0
+        phantom: true
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        MainWindowTopPanelIcon
+          &iconName: 'icon_map'
+        MainWindowTopPanelLabel
+          !text: 'Map'
+        MainWindowCloseButton
+
+      UIWidget
+        id: selectPanel
+        anchors.top: prev.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 50
+        background: #141717
+        margin: 1
+
+        UIWidget
+          id: leftText
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          text-auto-resize: true
+          font: poppins-semibold-13
+          text-align: center
+          margin-left: 20
+          text-color: #36F091
+          opacity: 1.0
+          !text: 'Icon Viewer'
+
+        TrueSelect
+          id: zoneViewToggle
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: leftText.right
+          margin-left: 15
+          @onStateChange: |
+            local value = self:isOn()
+            local parent = self:getParent()
+            if value then
+              parent.leftText:setTextColor('white')
+              parent.rightText:setTextColor('#36F091')
+              parent:getParent().iconFilterPanel:hide()
+              parent:getParent().landViewerPanel:show()
+            else
+              parent.rightText:setTextColor('white')
+              parent.leftText:setTextColor('#36F091')
+              parent:getParent().landViewerPanel:hide()
+              parent:getParent().iconFilterPanel:show()
+            end
+
+        UIWidget
+          id: rightText
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          text-auto-resize: true
+          font: poppins-semibold-13
+          margin-right: 20
+          text-align: center
+          text-color: white
+          opacity: 1.0
+          !text: 'Housing Viewer'
+
+      Panel
+        id: iconFilterPanel
+        anchors.top: selectPanel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 400
+        margin-top: 13
+        padding-left: 20
+
+        VerticalScrollBar
+          id: channelsScrollBar
+          anchors.top: parent.top
+          anchors.bottom: parent.bottom
+          anchors.right: parent.right
+          step: 28
+          pixels-scroll: true
+
+        ScrollablePanel
+          id: contentPanel
+          anchors.fill: parent
+          vertical-scrollbar: channelsScrollBar
+          margin-top: 5
+          margin-left: 0
+          margin-right: 20
+          layout:
+            type: verticalBox
+            spacing: 5
+          WorldMapCheckBoxPanel
+            id: showMissionComplete
+            &ignoreSortFilter: true
+          WorldMapCheckBoxPanel
+            id: showMissionAvailable
+            &ignoreSortFilter: true
+          WorldMapSeparator
+          WorldMapCheckBoxPanel
+            id: showZoneNames
+            margin-top: 5
+            &ignoreSortFilter: true
+          WorldMapCheckBoxPanel
+            id: showLevelBrackets
+            &ignoreSortFilter: true
+          WorldMapSeparator
+          WorldMapCheckBoxPanel
+            id: showCraftingStation
+            margin-top: 5
+          WorldMapCheckBoxPanel
+            id: showTradepost
+          WorldMapCheckBoxPanel
+            id: showHouse
+          WorldMapCheckBoxPanel
+            id: showSeaport
+          WorldMapCheckBoxPanel
+            id: showPvPArena
+          WorldMapCheckBoxPanel
+            id: showRangersCompanyOutpost
+          WorldMapCheckBoxPanel
+            id: showAutomaticHighlights
+          WorldMapCheckBoxPanel
+            id: showBank
+          WorldMapCheckBoxPanel
+            id: showFishpost
+          WorldMapCheckBoxPanel
+            id: showBuilders
+          WorldMapCheckBoxPanel
+            id: showWarehouse
+          WorldMapCheckBoxPanel
+            id: showRespawnShrine
+          WorldMapCheckBoxPanel
+            id: showMarket
+          WorldMapCheckBoxPanel
+            id: showMoaMerchant
+          WorldMapCheckBoxPanel
+            id: showVendors
+          WorldMapCheckBoxPanel
+            id: showCollectors
+
+      Panel
+        id: landViewerPanel
+        visible: false
+        anchors.top: selectPanel.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 250
+        Panel
+          id: contentPanel
+          anchors.top: parent.top
+          anchors.left: parent.left
+          anchors.right: parent.right
+          margin-left: 25
+          margin-right: 25
+          height: 300
+
+          ComboBox
+            id: regionComboBox
+            text: Select region
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            margin-top: 21
+            @onOptionChange: landViewerRegionChanged(self)
+            @onClick: |
+              self:clearOptions()
+              self:addPlaceholderOption('Select region')
+              for _, region in ipairs(RegionsAsc) do
+                if not self:getOption(region.name) then
+                  if region.name ~= 'The Blotch' then
+                    self:addOption(region.name, nil, true)
+                  end
+                end
+              end
+              self:onMousePress()
+
+          WorldMapCheckBoxPanel
+            id: showSmallEstate
+            anchors.top: prev.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            margin-top: 23
+            margin-left: 6
+            @onSetup: self.description:setText('Small Estate')
+          WorldMapCheckBoxPanel
+            id: showMediumEstate
+            anchors.top: prev.bottom
+            anchors.left: showSmallEstate.left
+            anchors.right: showSmallEstate.right
+            margin-left: 0
+            margin-top: 10
+            @onSetup: self.description:setText('Medium Estate')
+          WorldMapCheckBoxPanel
+            id: showLargeEstate
+            anchors.top: prev.bottom
+            anchors.left: showSmallEstate.left
+            anchors.right: showSmallEstate.right
+            margin-left: 0
+            margin-top: 10
+            @onSetup: self.description:setText('Large Estate')
+          WorldMapCheckBoxPanel
+            id: showStronghold
+            anchors.top: prev.bottom
+            anchors.left: showSmallEstate.left
+            anchors.right: showSmallEstate.right
+            margin-left: 0
+            margin-top: 10
+            @onSetup: self.description:setText('Stronghold')
+          WorldMapCheckBoxPanel
+            id: showFort
+            anchors.top: prev.bottom
+            anchors.left: showSmallEstate.left
+            anchors.right: showSmallEstate.right
+            margin-left: 0
+            margin-top: 10
+            @onSetup: self.description:setText('Fort')
+      UIWidget
+        id: footer
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 50
+        background: #131517
+        margin: 1
+
+        UIWidget
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.left: parent.left
+          text-auto-resize: true
+          font: poppins-semibold-12
+          icon: /images/ui/icons/icon_scroll_top
+          icon-offset: 22 0
+          icon-align: right
+          margin-left: 25
+          text-color: white
+          opacity: 1.0
+          !text: 'Zoom In'
+
+        UIWidget
+          anchors.centerIn: parent
+          image-source: /images/ui/icons/icon_click
+
+        UIWidget
+          anchors.verticalCenter: parent.verticalCenter
+          anchors.right: parent.right
+          text-auto-resize: true
+          font: poppins-semibold-12
+          icon: /images/ui/icons/icon_scroll_down
+          icon-offset: -20 0
+          icon-align: left
+          margin-right: 25
+          text-color: white
+          opacity: 1.0
+          !text: 'Zoom Out'

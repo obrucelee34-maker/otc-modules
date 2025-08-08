@@ -1,0 +1,173 @@
+
+TaskListItemHUD < UILabel
+  text: Task Description
+  text-auto-resize: true
+  text-wrap: true
+  text-color: white
+  linethrough: true
+  margin-left: 2
+  phantom: false
+  $first:
+    margin-top: 6
+  font: poppins-bold-bordered-14
+  text-align: left
+
+TaskListHudEventReward < UIWidget
+  size: 154 56
+  image-source: /images/ui/items/background
+  image-border: 4
+  padding: 6
+
+  Item
+    id: item
+    size: 42 42
+    anchors.left: parent.left
+    anchors.verticalCenter: parent.verticalCenter
+    virtual: true
+    phantom: true
+
+  UIWidget
+    id: itemCount
+    image-auto-resize: true 
+    image-source: /images/ui/windows/questlog/amount_background
+    anchors.bottom: item.bottom
+    anchors.right: item.right
+    font: poppins-semibold-11
+    !text: 1
+
+  UILabel
+    id: itemName
+    anchors.left: prev.right
+    anchors.right: parent.right
+    anchors.verticalCenter: item.verticalCenter
+    font: poppins-semibold-12
+    !text: 'Item name'
+    text-offset: 8 0
+    phantom: false
+    @onTextChange: self:setTooltip(self:getText())
+
+TaskListHUDQuest < Panel
+  &minimized: false
+  &minimizedHeight: 25
+  &lastHeight: 20
+  $!first:
+    margin-top: 10
+  
+  UIWidget
+    id: compass
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-source: /images/ui/windows/questlog/location_button
+    image-size: 25 25
+    size: 25 25
+    $pressed:
+      opacity: 1.0
+    $hover:
+      opacity: 0.9
+    opacity: 0.8
+    @onClick: modules.game_questlog.GameQuestLog:showQuestCompass(self.questName)
+
+  UIWidget
+    id: custom_icon
+    anchors.left: parent.left
+    anchors.top: parent.top
+    image-size: 25 25
+    size: 0 0
+    $pressed:
+      opacity: 1.0
+    $hover:
+      opacity: 0.9
+    opacity: 0.8
+    @onIdChange: |
+      function(self, id)
+        if id == 'north_star' then
+          self:setImageSource('/images/ui/windows/questlog/north_star_icon')
+        elseif id == 'rangers_company' then
+          self:setImageSource('/images/ui/windows/questlog/rangers_company_icon')
+        end
+        self:setSize({width = 32, height = 32})
+        local parent = self:getParent()
+        parent.name:addAnchor(AnchorLeft, id, AnchorRight)
+      end
+    @onClick: modules.game_questlog.GameQuestLog:onCustomIconClicked(self:getId())
+
+  UIWidget
+    id: name
+    anchors.left: compass.right
+    anchors.verticalCenter: compass.verticalCenter
+    anchors.right: parent.right
+    text-vertical-auto-resize: true
+    margin-bottom: 2
+    text-align: topleft
+    text-offset: 0 0
+    text-color: #F8F8FF
+    text-wrap: true
+    font: poppins-bold-bordered-16
+    opacity: 1.0
+    $hover:
+      opacity: 0.9
+    $pressed:
+      opacity: 1.0
+
+  Panel
+    id: taskListPanel
+    anchors.left: name.left
+    anchors.top: name.bottom
+    anchors.right: parent.right
+    margin-top: 0
+
+    layout:
+      type: verticalBox
+      fit-children: true
+
+TaskListHUDEvent < Panel
+  &minimized: false
+  &minimizedHeight: 20
+  &lastHeight: 20
+  $!first:
+    margin-top: 5
+
+  Panel
+    id: taskListPanel
+    anchors.left: parent.left
+    anchors.top: parent.top
+    anchors.right: parent.right
+    margin-top: 20
+    visible: false
+
+    layout:
+      type: verticalBox
+      fit-children: true
+
+  Panel
+    id: eventDescriptionPanel
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-top: 5
+    layout:
+      type: verticalBox
+      fit-children: true
+
+TaskListHUD < UIWindow
+  id: questHud
+  size: 332 500
+  &minimized: false
+  &minimizedHeight: 50
+  &lastHeight: 50
+  draggable: true
+
+  EditModePanel
+    &title: 'Quest Log'
+
+  Panel
+    id: quests
+    anchors.top: parent.top
+    anchors.left: parent.left
+    anchors.right: parent.right
+    margin-left: 10
+    phantom: true
+    layout:
+      type: verticalBox
+      fit-children: true
+      spacing: 5
